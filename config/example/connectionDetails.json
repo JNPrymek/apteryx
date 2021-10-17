@@ -1,0 +1,16 @@
+{
+	"default" : {
+		"hostname" : "localhost",
+		"useSSL" : true,
+		"port" : 8080,
+		"username" : "user",
+		"password" : "pass"
+	},
+	"development" : {
+		"hostname" : "localhost",
+		"useSSL" : true,
+		"port" : 8080,
+		"username" : "devUser",
+		"password" : "devPass"
+	}
+}
