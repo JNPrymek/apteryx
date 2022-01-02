@@ -4,6 +4,7 @@ node_modules
 # Compiled files
 dist/
 build/
+.eslintcache
 
 # Debug / temporary folders
 debug/
