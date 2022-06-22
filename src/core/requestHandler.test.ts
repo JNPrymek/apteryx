@@ -18,7 +18,7 @@ describe('HTTP Request Handler', () => {
 		statusText: 'OK',
 		config: {},
 		headers: {
-			'set-cookie' : `resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/ domain=.${serverDomain}`
+			'set-cookie' : `resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=${serverDomain}`
 		},
 		data: {
 			a: 'a',
@@ -99,8 +99,7 @@ describe('HTTP Request Handler', () => {
 		});
 		
 		// Save cookie to jar from POST response
-		// Not sure why this is returning [] for the cookiesInJar.  Will investigate when there is another RPC method defined besides login & logout.
-		it.skip('Can save cookies returned by a POST response', async () => {
+		it('Can save cookies returned by a POST response', async () => {
 			const reqHeaders = {
 				accept:  'application/json',
 				'X-Requested-With': 'Axios'
@@ -124,13 +123,20 @@ describe('HTTP Request Handler', () => {
 			expect(response.headers).toEqual(expect.objectContaining(mockSuccessPostResponse.headers));
 			
 			const cookiesInJar = await RequestHandler.cookieJar.getCookies(requestPath);
+			console.log(cookiesInJar[0]);
 			expect(cookiesInJar)
 				.toEqual(
 					expect.arrayContaining([
 						expect.objectContaining(
-							Cookie.parse(
-								mockSuccessPostResponse.headers['set-cookie']
-							)
+							{
+								domain: 'example.com',
+								path: '/',
+								key: 'resCustomCookie',
+								value: 'abcdefg',
+								hostOnly: false,
+								// Expiration time cannot be matched exactly from within object assertion
+								expires: expect.any(Date) 
+							}
 						)
 					])
 				);
