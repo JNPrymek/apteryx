@@ -1,10 +1,9 @@
 import axios from 'axios';
-import KiwiConnector from '../core/kiwiConnector';
-import { serverDomain } from '../../test/testServerDetails';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 
 import TestCase from './testCase';
 import Priority from '../management/priority';
+import Category from './category';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -127,6 +126,18 @@ describe('TestCase', () => {
 		
 		it('Can get TC Category Name', () => {
 			expect(tc1.getCategoryName()).toEqual('Regression');
+		});
+
+		it('Can get TC Category', async () => {
+			const regressionCategoryVals = {
+				id: 4,
+				name: 'Regression',
+				product: 1,
+				'product_name': 'Example.com Website'
+			};
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [regressionCategoryVals]}));
+			const regressionCategory = await tc1.getCategory();
+			expect(regressionCategory).toEqual(new Category(regressionCategoryVals));
 		});
 		
 		it('Can get TC Priority', async () => {
