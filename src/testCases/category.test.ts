@@ -60,7 +60,6 @@ describe('Category', () => {
 	describe('Basic Server Functions', () => {
 
 		const cat1 = new Category(cat1Vals);
-		const cat2 = new Category(cat2Vals);
 
 		it('Can get Category by a single ID (one match)', async () => {
 			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [cat1Vals]}));
