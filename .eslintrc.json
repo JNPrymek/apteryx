@@ -16,13 +16,7 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "indent": [
-            "error",
-            "tab",
-			{
-				"SwitchCase" : 1
-			}
-        ],
+        "indent": "off",
         "linebreak-style": [
             "error",
             "unix"
@@ -36,6 +30,13 @@
             "always"
         ],
 		"no-extra-semi": "off",
-		"@typescript-eslint/no-extra-semi": "off"
+		"@typescript-eslint/no-extra-semi": "off",
+        "@typescript-eslint/indent": [
+            "error", 
+            "tab", 
+            {
+                "SwitchCase": 1
+            }
+        ]
     }
 }
