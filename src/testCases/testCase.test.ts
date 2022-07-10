@@ -4,6 +4,7 @@ import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestCase from './testCase';
 import Priority from '../management/priority';
 import Category from './category';
+import TestCaseStatus from './testCaseStatus';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -110,6 +111,20 @@ describe('TestCase', () => {
 		
 		it('Can get TC Notes', () => {
 			expect(tc1.getNotes()).toEqual('Notes or empty string');
+		});
+
+		it('Can get TC Status', async () => {
+			const tcStatusVals = {
+				id: 1,
+				name: 'PROPOSED',
+				description: 'Unreviewed, new test cases',
+				'is_confirmed': false
+			};
+			const proposedStatus = new TestCaseStatus(tcStatusVals);
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [tcStatusVals]}));
+			const tc1Status = await tc1.getCaseStatus();
+			expect(tc1Status).toEqual(proposedStatus);
 		});
 		
 		it('Can get TC Status ID', () => {

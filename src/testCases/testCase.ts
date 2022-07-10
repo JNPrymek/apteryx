@@ -3,6 +3,7 @@ import TimeUtils from '../utils/timeUtils';
 
 import Priority from '../management/priority';
 import Category from './category';
+import TestCaseStatus from './testCaseStatus';
 
 export default class TestCase extends KiwiBaseItem {
 	
@@ -64,9 +65,9 @@ export default class TestCase extends KiwiBaseItem {
 		return this.serialized['case_status__name'] as string;
 	}
 	
-	// public async getCaseStatus(): Promise<TestCaseStatus> {
-	// 	return await TestCaseStatus.getById(this.getCaseStatusId);
-	// }
+	public async getCaseStatus(): Promise<TestCaseStatus> {
+		return await TestCaseStatus.getById(this.getCaseStatusId());
+	}
 	
 	public getCategoryId(): number {
 		return this.serialized['category'] as number;
