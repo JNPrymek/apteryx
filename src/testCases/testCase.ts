@@ -92,6 +92,20 @@ export default class TestCase extends KiwiBaseItem {
 	public async getPriority(): Promise<Priority> {
 		return await Priority.getById(this.getPriorityId());
 	}
+
+	public getSetupDuration(): number {
+		return this.serialized['setup_duration'] as number;
+	}
+
+	public getTestingDuration(): number {
+		return this.serialized['testing_duration'] as number;
+	}
+
+	public getTotalDuration(): number {
+		// Included in raw values
+		return this.serialized['expected_duration'] as number;
+		// return this.getSetupDuration() + this.getTestingDuration();
+	}
 	
 	public getAuthorId(): number {
 		return this.serialized['author'] as number;

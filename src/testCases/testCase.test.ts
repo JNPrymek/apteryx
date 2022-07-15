@@ -29,6 +29,9 @@ describe('TestCase', () => {
 		category__name: 'Regression',
 		priority: 1,
 		priority__value: 'P1',
+		setup_duration: 2700.0,
+		testing_duration: 60.0,
+		expected_duration: 2760.0,
 		author: 1,
 		author__username: 'jsmith',
 		default_tester: null,
@@ -44,7 +47,10 @@ describe('TestCase', () => {
 		default_tester__username: 'bob',
 		reviewer: 3,
 		reviewer__username: 'anne',
-		is_automated: true
+		is_automated: true,
+		setup_duration: 0.0,
+		testing_duration: 325.0,
+		expected_duration: 325.0
 	};
 		
 	const tc1 = new TestCase(case1Vals);
@@ -198,6 +204,21 @@ describe('TestCase', () => {
 		it('Can get TC Default Tester Username', () => {
 			expect(tc1.getDefaultTesterName()).toBeNull();
 			expect(tc2.getDefaultTesterName()).toEqual('bob');
+		});
+
+		it('Can get TC Setup Duration', () => {
+			expect(tc1.getSetupDuration()).toEqual(2700.0);
+			expect(tc2.getSetupDuration()).toEqual(0.0);
+		});
+
+		it('Can get TC Testing Duration', () => {
+			expect(tc1.getTestingDuration()).toEqual(60.0);
+			expect(tc2.getTestingDuration()).toEqual(325.0);
+		});
+
+		it('Can get TC Total Expected Duration', () => {
+			expect(tc1.getTotalDuration()).toEqual(2760.0);
+			expect(tc2.getTotalDuration()).toEqual(325.0);
 		});
 		
 	});
