@@ -104,7 +104,6 @@ export default class TestCase extends KiwiBaseItem {
 	public getTotalDuration(): number {
 		// Included in raw values
 		return this.serialized['expected_duration'] as number;
-		// return this.getSetupDuration() + this.getTestingDuration();
 	}
 	
 	public getAuthorId(): number {
