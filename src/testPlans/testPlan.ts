@@ -1,6 +1,6 @@
-
 import KiwiNamedItem from '../core/kiwiNamedItem';
 import Product from '../management/product';
+import Version from '../management/version';
 import TimeUtils from '../utils/timeUtils';
 import PlanType from './planType';
 
@@ -34,6 +34,14 @@ export default class TestPlan extends KiwiNamedItem {
 		return this.serialized['product_version'] as number;
 	}
 
+	public getProductVersionValue(): string {
+		return this.serialized['product_version__value'] as string;
+	}
+
+	public async getProductVersion(): Promise<Version> {
+		return await Version.getById(this.getProductVersionId());
+	}
+
 	public getProductId(): number {
 		return this.serialized['product'] as number;
 	}
@@ -62,11 +70,10 @@ export default class TestPlan extends KiwiNamedItem {
 		return this.serialized['parent'] as number;
 	}
 
-	public async getParent(): Promise<TestPlan> {
-		return await TestPlan.getById(this.getParentId());
+	public async getParent(): Promise<TestPlan|null> {
+		const parentId = this.getParentId();
+		return (parentId == null ? null : await TestPlan.getById(parentId));
 	}
-
-
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
@@ -79,7 +86,7 @@ export default class TestPlan extends KiwiNamedItem {
 	): Promise<TestPlan> {
 		return await super.getByName(name) as TestPlan;
 	}
-	
+
 	public static async serverFilter(
 		filterObj: Record<string, unknown>
 	): Promise<Array<TestPlan>> {
