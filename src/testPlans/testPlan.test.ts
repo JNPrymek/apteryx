@@ -2,6 +2,7 @@ import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import Product from '../management/product';
 import Version from '../management/version';
+import TestCase from '../testCases/testCase';
 import PlanType from './planType';
 
 import TestPlan from './testPlan';
@@ -209,6 +210,162 @@ describe('Test Plan', () => {
 			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
 			const name = 'Non-used name';
 			expect(TestPlan.getByName(name)).rejects.toThrowError(`TestPlan with name "${name}" could not be found.`);
+		});
+	});
+
+	describe('TestPlan -> TestCase relations', () => {
+		
+		const sortKeysRawResponse = {
+			'1': 30,
+			'2': 20,
+			'3': 10,
+			'4': 40
+		};
+
+		const testCaseRawValues = [
+			{
+				'id': 1,
+				'create_date': '2022-12-02T20:13:27.697',
+				'is_automated': false,
+				'script': '',
+				'arguments': '',
+				'extra_link': null,
+				'summary': 'Example Test Case p',
+				'requirement': null,
+				'notes': '',
+				'text': '',
+				'case_status': 1,
+				'case_status__name': 'PROPOSED',
+				'category': 1,
+				'category__name': '--default--',
+				'priority': 1,
+				'priority__value': 'P1',
+				'author': 3,
+				'author__username': 'debug',
+				'default_tester': null,
+				'default_tester__username': null,
+				'reviewer': null,
+				'reviewer__username': null,
+				'setup_duration': null,
+				'testing_duration': null,
+				'expected_duration': 0.0
+			},
+			{
+				'id': 2,
+				'create_date': '2022-12-02T20:13:40.061',
+				'is_automated': false,
+				'script': '',
+				'arguments': '',
+				'extra_link': null,
+				'summary': 'Example Test Case v',
+				'requirement': null,
+				'notes': '',
+				'text': '',
+				'case_status': 1,
+				'case_status__name': 'PROPOSED',
+				'category': 1,
+				'category__name': '--default--',
+				'priority': 1,
+				'priority__value': 'P1',
+				'author': 3,
+				'author__username': 'debug',
+				'default_tester': null,
+				'default_tester__username': null,
+				'reviewer': null,
+				'reviewer__username': null,
+				'setup_duration': null,
+				'testing_duration': null,
+				'expected_duration': 0.0
+			},
+			{
+				'id': 3,
+				'create_date': '2022-12-02T20:13:40.912',
+				'is_automated': false,
+				'script': '',
+				'arguments': '',
+				'extra_link': null,
+				'summary': 'Example Test Case n',
+				'requirement': null,
+				'notes': '',
+				'text': '',
+				'case_status': 1,
+				'case_status__name': 'PROPOSED',
+				'category': 1,
+				'category__name': '--default--',
+				'priority': 1,
+				'priority__value': 'P1',
+				'author': 3,
+				'author__username': 'debug',
+				'default_tester': null,
+				'default_tester__username': null,
+				'reviewer': null,
+				'reviewer__username': null,
+				'setup_duration': null,
+				'testing_duration': null,
+				'expected_duration': 0.0
+			},
+			{
+				'id': 4,
+				'create_date': '2022-12-02T20:13:41.700',
+				'is_automated': false,
+				'script': '',
+				'arguments': '',
+				'extra_link': null,
+				'summary': 'Example Test Case 3',
+				'requirement': null,
+				'notes': '',
+				'text': '',
+				'case_status': 1,
+				'case_status__name': 'PROPOSED',
+				'category': 1,
+				'category__name': '--default--',
+				'priority': 1,
+				'priority__value': 'P1',
+				'author': 3,
+				'author__username': 'debug',
+				'default_tester': null,
+				'default_tester__username': null,
+				'reviewer': null,
+				'reviewer__username': null,
+				'setup_duration': null,
+				'testing_duration': null,
+				'expected_duration': 0.0
+			}
+		];
+
+		const tcListIdSort = [
+			new TestCase(testCaseRawValues[0]),
+			new TestCase(testCaseRawValues[1]),
+			new TestCase(testCaseRawValues[2]),
+			new TestCase(testCaseRawValues[3])
+		];
+
+		const tcListKeySort = [
+			tcListIdSort[2],
+			tcListIdSort[1],
+			tcListIdSort[0],
+			tcListIdSort[3]
+		];
+
+		it('Can get list of TestCases - default order', async ()=> {
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({result: sortKeysRawResponse}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: testCaseRawValues}));
+			const planCases = await tp1.getTestCases();
+			expect(planCases).toEqual(tcListKeySort);
+		});
+
+		it('Can get list of TestCases - TC ID order', async ()=> {
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({result: sortKeysRawResponse}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: testCaseRawValues}));
+			const planCases = await tp1.getTestCases('TESTCASE_ID');
+			expect(planCases).toEqual(tcListIdSort);
+		});
+
+		it('Can get list of TestCases - SortKey order', async ()=> {
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({result: sortKeysRawResponse}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: testCaseRawValues}));
+			const planCases = await tp1.getTestCases('SORTKEY');
+			expect(planCases).toEqual(tcListKeySort);
 		});
 	});
 });
