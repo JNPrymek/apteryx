@@ -1,8 +1,10 @@
+import KiwiConnector from '../core/kiwiConnector';
 import KiwiNamedItem from '../core/kiwiNamedItem';
 import Product from '../management/product';
 import Version from '../management/version';
 import TimeUtils from '../utils/timeUtils';
 import PlanType from './planType';
+import TestCase from '../testCases/testCase';
 
 export default class TestPlan extends KiwiNamedItem {
 	// Constructor for all classes
@@ -73,6 +75,38 @@ export default class TestPlan extends KiwiNamedItem {
 	public async getParent(): Promise<TestPlan|null> {
 		const parentId = this.getParentId();
 		return (parentId == null ? null : await TestPlan.getById(parentId));
+	}
+
+	// Get TestCase's in plan
+	// use TestCase.sortkeys({'plan': #})
+	// Response is key/value pairs.  Key = TC.id, val = sort order
+	// Default sort order by sortkeys.  Alt by TestCase ID.
+	public async getTestCases(
+		sortOrder: 'TESTCASE_ID' | 'SORTKEY' = 'SORTKEY'
+	): Promise<Array<TestCase>> {
+		const rawResponse = await KiwiConnector.sendRPCMethod(
+			'TestCase.sortkeys', 
+			[{plan: this.getId()}]
+		) as Record<string, unknown>;
+
+		/*
+			example result: { "1": 10, "2": 20 ... }
+		*/
+		const tcIds = Object.keys(rawResponse).map(
+			strKey => { return parseInt(strKey); }
+		);
+
+		const testCases = await TestCase.getByIds(tcIds);
+		testCases.sort( (a, b) => {
+			if(sortOrder === 'SORTKEY') {
+				const aSortKey = rawResponse[a.getId()] as number;
+				const bSortKey = rawResponse[b.getId()] as number;
+				return (aSortKey - bSortKey);
+			}
+			return (a.getId() - b.getId());
+		});
+
+		return testCases;
 	}
 
 	// Inherited methods
