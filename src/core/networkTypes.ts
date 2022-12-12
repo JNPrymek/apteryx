@@ -1,5 +1,5 @@
 
-export type RpcResult = string | number | Array<string | number | Record<string, unknown>>;
+export type RpcResult = string | number | Record<string, unknown> | Array<string | number | Record<string, unknown>>;
 
 export type RpcParam = Array<string | number | Record<string, unknown>>;
 
