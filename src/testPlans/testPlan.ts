@@ -77,13 +77,13 @@ export default class TestPlan extends KiwiNamedItem {
 		return (parentId == null ? null : await TestPlan.getById(parentId));
 	}
 
-	// Get TestCase's in plan
-	// use TestCase.sortkeys({'plan': #})
-	// Response is key/value pairs.  Key = TC.id, val = sort order
-	// Default sort order by sortkeys.  Alt by TestCase ID.
 	public async getTestCases(
 		sortOrder: 'TESTCASE_ID' | 'SORTKEY' = 'SORTKEY'
 	): Promise<Array<TestCase>> {
+		if (sortOrder === 'TESTCASE_ID') {
+			return (await TestCase.serverFilter({'plan': this.getId()}));
+		}
+
 		const rawResponse = await KiwiConnector.sendRPCMethod(
 			'TestCase.sortkeys', 
 			[{plan: this.getId()}]
@@ -98,15 +98,44 @@ export default class TestPlan extends KiwiNamedItem {
 
 		const testCases = await TestCase.getByIds(tcIds);
 		testCases.sort( (a, b) => {
-			if(sortOrder === 'SORTKEY') {
-				const aSortKey = rawResponse[a.getId()] as number;
-				const bSortKey = rawResponse[b.getId()] as number;
-				return (aSortKey - bSortKey);
-			}
-			return (a.getId() - b.getId());
+			const aSortKey = rawResponse[a.getId()] as number;
+			const bSortKey = rawResponse[b.getId()] as number;
+			return (aSortKey - bSortKey);
+			
 		});
 
 		return testCases;
+	}
+
+	public static async getPlansWithTestCase(
+		test: TestCase | number
+	): Promise<Array<TestPlan>> {
+		const testCaseId: number = (test instanceof TestCase) ? test.getId() : test;
+		return (await TestPlan.serverFilter({case: testCaseId}));
+		
+	}
+
+	public async getDirectChildren(): Promise<Array<TestPlan>> {
+		return await TestPlan.serverFilter({parent: this.getId()});
+	}
+	
+	public async hasChildren(): Promise<boolean> {
+		return  ((await this.getDirectChildren()).length > 0);
+	}
+
+	public async getChildren(direct = false): Promise<Array<TestPlan>> {
+		if (direct) {
+			return await this.getDirectChildren();
+		}
+
+		let results: Array<TestPlan> = [];
+		const directChildren = await this.getDirectChildren();
+		for (const child of directChildren) {
+			results.push(child);
+			const grandChildren = await child.getChildren();
+			results = results.concat(grandChildren);
+		}
+		return results;
 	}
 
 	// Inherited methods
