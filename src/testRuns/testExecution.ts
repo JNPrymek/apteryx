@@ -2,6 +2,7 @@ import KiwiBaseItem from '../core/kiwiBaseItem';
 import Build from '../management/build';
 import TestCase from '../testCases/testCase';
 import TimeUtils from '../utils/timeUtils';
+import TestExecutionStatus from './testExecutionStatus';
 
 export default class TestExecution extends KiwiBaseItem {
 	// Constructor for all classes
@@ -85,7 +86,9 @@ export default class TestExecution extends KiwiBaseItem {
 		return this.serialized['status__name'] as string;
 	}
 
-	// TODO public async getStatus(): TestExecutionStatus
+	public async getStatus(): Promise<TestExecutionStatus> {
+		return await TestExecutionStatus.getById(this.getStatusId());
+	}
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
