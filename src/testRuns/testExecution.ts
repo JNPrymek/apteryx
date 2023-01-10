@@ -30,14 +30,22 @@ export default class TestExecution extends KiwiBaseItem {
 		return this.serialized['case_text_version'] as number;
 	}
 
-	public getStartDate(): Date {
+	public getStartDate(): Date | null {
 		const rawString = this.serialized['start_date'] as string;
-		return TimeUtils.serverStringToDate(rawString);
+		if (rawString) {
+			return TimeUtils.serverStringToDate(rawString);
+		} else {
+			return null;
+		}
 	}
 
-	public getStopDate(): Date {
+	public getStopDate(): Date | null {
 		const rawString = this.serialized['stop_date'] as string;
-		return TimeUtils.serverStringToDate(rawString);
+		if (rawString) {
+			return TimeUtils.serverStringToDate(rawString);
+		} else {
+			return null;
+		}
 	}
 
 	public getSortKey(): number {
