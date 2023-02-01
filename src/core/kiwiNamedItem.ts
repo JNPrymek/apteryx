@@ -27,14 +27,14 @@ export default class KiwiNamedItem extends KiwiBaseItem {
 	// Inherited methods
 	// ------------------------------------------------------------------------
 	
+	// Kiwi Base
+	// --------------------------------
+	
 	public static async serverFilter(
 		filterObj: Record<string, unknown>
 	): Promise<Array<KiwiBaseItem>> {
 		return await super.serverFilter(filterObj) as Array<KiwiNamedItem>;
 	}
-	
-	// Kiwi Base
-	// --------------------------------
 	
 	public static async getByIds(
 		id: number | Array<number>
