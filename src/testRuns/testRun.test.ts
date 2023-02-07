@@ -2,6 +2,10 @@ import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestRun from './testRun';
 import type { TestRunValues } from './testRun.type';
+import type { TestPlanValues } from '../testPlans/testPlan.type';
+import TestPlan from '../testPlans/testPlan';
+import type { ProductValues } from '../management/product.type';
+import Product from '../management/product';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -190,6 +194,42 @@ describe('Test Run', () => {
 			expect(tr1.getDefaultTesterUsername()).toEqual('Bob');
 			expect(tr2.getDefaultTesterUsername()).toBeNull();
 			expect(tr3.getDefaultTesterUsername()).toEqual('Charlie');
+		});
+
+		it('Can get TestRun Plan', async () => {
+			const planVals: TestPlanValues = {
+				id: 1,
+				name: '',
+				text: '',
+				create_date: '',
+				is_active: true,
+				extra_link: null,
+				product: 1,
+				product__name: 'Example.com Website',
+				product_version: 1,
+				product_version__value: 'unspecified',
+				author: 1,
+				author__username: 'Alice',
+				type: 1,
+				type__name: 'Unit',
+				parent: null
+			};
+
+			const expectedTestPlan = new TestPlan(planVals);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [planVals]}));
+			expect(await tr1.getPlan()).toEqual(expectedTestPlan);
+		});
+
+		it('Can get TestRun Product', async () => {
+			const productVals: ProductValues = {
+				id: 1,
+				name: 'Example.com Website',
+				description: 'An example product',
+				classification: 1
+			};
+			const expectedProduct = new Product(productVals);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [productVals]}));
+			expect(await tr1.getProduct()).toEqual(expectedProduct);
 		});
 	});
 });
