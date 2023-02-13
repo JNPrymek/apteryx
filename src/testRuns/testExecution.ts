@@ -3,6 +3,7 @@ import Build from '../management/build';
 import TestCase from '../testCases/testCase';
 import TimeUtils from '../utils/timeUtils';
 import TestExecutionStatus from './testExecutionStatus';
+import TestRun from './testRun';
 
 export default class TestExecution extends KiwiBaseItem {
 	// Constructor for all classes
@@ -56,7 +57,9 @@ export default class TestExecution extends KiwiBaseItem {
 		return this.serialized['run'] as number;
 	}
 
-	// TODO public getTestRun(): TestRun
+	public async getTestRun(): Promise<TestRun> {
+		return await TestRun.getById(this.getTestRunId());
+	}
 
 	public getTestCaseId(): number {
 		return this.serialized['case'] as number;
