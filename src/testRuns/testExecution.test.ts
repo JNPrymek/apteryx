@@ -2,13 +2,21 @@ import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestExecution from './testExecution';
 
+import type { TestExecutionValues } from './testExecution.type';
+import type { TestRunValues } from './testRun.type';
+import type { TestCaseValues } from '../testCases/testCase.type';
+import type { BuildValues } from '../management/build.type';
+import TestCase from '../testCases/testCase';
+import TestRun from './testRun';
+import Build from '../management/build';
+
 //Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Execution', () => {
 	// Raw values
-	const ex1Vals = {
+	const ex1Vals: TestExecutionValues = {
 		id: 1,
 		assignee: 1,
 		assignee__username: 'Alice',
@@ -27,7 +35,7 @@ describe('Test Execution', () => {
 		status__name: 'FAILED'
 	};
 
-	const ex2Vals = {
+	const ex2Vals: TestExecutionValues = {
 		id: 2,
 		assignee: 1,
 		assignee__username: 'Alice',
@@ -46,7 +54,7 @@ describe('Test Execution', () => {
 		status__name: 'PASSED'
 	};
 
-	const ex3Vals = {
+	const ex3Vals: TestExecutionValues = {
 		id: 3,
 		assignee: null,
 		assignee__username: null,
@@ -138,12 +146,11 @@ describe('Test Execution', () => {
 			expect(te3.getTestRunId()).toEqual(4);
 		});
 
-		// TODO
 		it('Can get TestExecution TestRun', async () => {
-			const run1Vals = {
+			const run1Vals: TestRunValues = {
 				id: 1,
 				plan__product_version: 1,
-				plan__product_version_value: 'unspecified',
+				plan__product_version__value: 'unspecified',
 				start_date: null,
 				stop_date: null,
 				planned_start: '2023-01-04T00:00:00',
@@ -154,17 +161,17 @@ describe('Test Execution', () => {
 				plan__product: 1,
 				plan__name: 'The first test plan',
 				build: 1,
-				build_name: 'unspecified',
+				build__name: 'unspecified',
 				manager: 1,
 				manager__username: 'bob',
 				default_tester: 1,
 				default_tester__username: 'bob'
 			};
 
-			const run4Vals = {
+			const run4Vals: TestRunValues = {
 				id: 1,
 				plan__product_version: 1,
-				plan__product_version_value: 'unspecified',
+				plan__product_version__value: 'unspecified',
 				start_date: null,
 				stop_date: null,
 				planned_start: '2023-01-04T00:00:00',
@@ -175,7 +182,7 @@ describe('Test Execution', () => {
 				plan__product: 1,
 				plan__name: 'The first test plan',
 				build: 2,
-				build_name: 'specified',
+				build__name: 'specified',
 				manager: 1,
 				manager__username: 'bob',
 				default_tester: 2,
@@ -186,7 +193,12 @@ describe('Test Execution', () => {
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({ result: [run1Vals]}));
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({ result: [run4Vals]}));
 
-			// Test Run not implemented yet.
+			const run1 = new TestRun(run1Vals);
+			const run4 = new TestRun(run4Vals);
+
+			expect(await te1.getTestRun()).toEqual(run1);
+			expect(await te2.getTestRun()).toEqual(run1);
+			expect(await te3.getTestRun()).toEqual(run4);
 		});
 
 		it('Can get TestExecution TestCase ID', () => {
@@ -201,7 +213,40 @@ describe('Test Execution', () => {
 			expect(te3.getTestCaseSummary()).toEqual('The second test case');
 		});
 
-		// TODO - Get Test Case
+		it('Can get TestExecution TestCase', async () => {
+			const tcRawVal: TestCaseValues = {
+				id: 1,
+				is_automated: false,
+				create_date: '',
+				arguments: '',
+				extra_link: null,
+				script: '',
+				summary: 'The first test case',
+				requirement: null,
+				notes: 'some notes',
+				text: 'The first test case',
+				case_status: 2,
+				case_status__name: 'CONFIRMED',
+				category: 1,
+				category__name: '--default--',
+				priority: 1,
+				priority__value: 'P1',
+				author: 2,
+				author__username: 'bob',
+				default_tester: 2,
+				default_tester__username: 'bob',
+				reviewer: null,
+				reviewer__username: null,
+				setup_duration: 60,
+				testing_duration: 120,
+				expected_duration: 180
+			};
+
+			// mock response
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [tcRawVal]}));
+			const testExecCase = await te1.getTestCase();
+			expect(testExecCase).toEqual(new TestCase(tcRawVal));
+		});
 
 		it('Can get TestExecution Build ID', () => {
 			expect(te1.getBuildId()).toEqual(1);
@@ -215,7 +260,18 @@ describe('Test Execution', () => {
 			expect(te3.getBuildName()).toEqual('specified');
 		});
 
-		// TODO - Get Build
+		it('Can get TestExecution Build', async () => {
+			const buildValues: BuildValues = {
+				id: 1,
+				name: 'unspecified',
+				version: 1,
+				version__value: 'unspecified',
+				is_active: true,
+			};
+			const expectedBuild = new Build(buildValues);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [buildValues]}));
+			expect(await te1.getBuild()).toEqual(expectedBuild);
+		});
 
 		it('Can get TestExecution Status ID', () => {
 			expect(te1.getStatusId()).toEqual(5);
