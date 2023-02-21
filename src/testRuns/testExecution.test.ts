@@ -9,6 +9,8 @@ import type { BuildValues } from '../management/build.type';
 import TestCase from '../testCases/testCase';
 import TestRun from './testRun';
 import Build from '../management/build';
+import TestExecutionStatus from './testExecutionStatus';
+import { TestExecutionStatusValues } from './testExecutionStatus.type';
 
 //Init Mock Axios
 jest.mock('axios');
@@ -285,5 +287,73 @@ describe('Test Execution', () => {
 			expect(te3.getStatusName()).toEqual('IDLE');
 		});
 
+		it('Can get TestExecution Status', async () => {
+			
+			const statusTypes: {
+				idle: TestExecutionStatusValues,
+				passed: TestExecutionStatusValues,
+				failed: TestExecutionStatusValues
+			} = {
+				idle: {
+					id: 1,
+					name: 'IDLE',
+					weight: 0,
+					icon: 'fa circle',
+					color: '#72767b'
+				},
+				passed: {
+					id: 4,
+					name: 'PASSED',
+					weight: 10,
+					icon: 'fa circle',
+					color: '#72767b'
+				},
+				failed: {
+					id: 5,
+					name: 'FAILED',
+					weight: -10,
+					icon: 'fa circle',
+					color: '#72767b'
+				}
+			}; 
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({ result: [statusTypes.idle] }));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({ result: [statusTypes.passed] }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [statusTypes.failed] }));
+
+			expect(await te1.getStatus()).toEqual(new TestExecutionStatus(statusTypes.idle));
+			expect(await te2.getStatus()).toEqual(new TestExecutionStatus(statusTypes.passed));
+			expect(await te3.getStatus()).toEqual(new TestExecutionStatus(statusTypes.failed));
+		});
+
+	});
+
+	describe('Fetch values from server', () => {
+		it('Can get a single TestExecution by ID', async () => {
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({result: [ex1Vals]}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({result: [ex2Vals]}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [ex3Vals]}));
+			expect(await TestExecution.getById(1)).toEqual(new TestExecution(ex1Vals));
+			expect(await TestExecution.getById(2)).toEqual(new TestExecution(ex2Vals));
+			expect(await TestExecution.getById(3)).toEqual(new TestExecution(ex3Vals));
+		});
+
+		it('Can get multiple TestExecutions by ID', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [ex1Vals, ex2Vals, ex3Vals]}));
+			expect(await TestExecution.getByIds([1, 2, 3])).toEqual(expect.arrayContaining([
+				new TestExecution(ex1Vals),
+				new TestExecution(ex2Vals),
+				new TestExecution(ex3Vals)
+			]));
+		});
+
+		it('Throws an error when fetching a TestExecution by ID that does not exist', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
+			expect(TestExecution.getById(5000)).rejects.toThrowError('Could not find any TestExecution with ID 5000');
+		});
+
+		it('Can get TestExecution by filtering arbitrary data', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [ex1Vals]}));
+			expect(await TestExecution.serverFilter({run: 1, case: 1})).toEqual([new TestExecution(ex1Vals)]);
+		});
 	});
 });
