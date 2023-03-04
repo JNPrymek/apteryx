@@ -35,18 +35,17 @@ export default class User extends KiwiNamedItem {
 	}
 
 	public static async getByUsername(name: string): Promise<User> {
-		const results = await this.serverFilter({username: name});
+		const results = await this.serverFilter({ username: name });
 		if (results.length == 0) {
 			throw new Error(`User with username "${name}" could not be found.`);
-		}
-		else {
+		} else {
 			return results[0] as User;
 		}
 	}
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
-	
+
 	// Kiwi Named
 	// --------------------------------
 
@@ -54,28 +53,23 @@ export default class User extends KiwiNamedItem {
 		return this.getUsername();
 	}
 
-	public static async getByName(
-		name: string
-	): Promise<User> {
+	public static async getByName(name: string): Promise<User> {
 		return this.getByUsername(name);
 	}
-	
-	
+
 	public static async serverFilter(
 		filterObj: Partial<UserValues>
 	): Promise<Array<User>> {
-		return await super.serverFilter(filterObj) as Array<User>;
+		return (await super.serverFilter(filterObj)) as Array<User>;
 	}
-	
+
 	public static async getByIds(
 		id: number | Array<number>
 	): Promise<Array<User>> {
-		return await super.getByIds(id) as Array<User>;
+		return (await super.getByIds(id)) as Array<User>;
 	}
-	
-	public static async getById(
-		id: number
-	): Promise<User> {
-		return await super.getById(id) as User;
+
+	public static async getById(id: number): Promise<User> {
+		return (await super.getById(id)) as User;
 	}
 }
