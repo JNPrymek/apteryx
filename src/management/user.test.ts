@@ -8,10 +8,9 @@ jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('User', () => {
-
 	const rawValues: {
-		alice: UserValues
-		bob: UserValues
+		alice: UserValues;
+		bob: UserValues;
 	} = {
 		alice: {
 			id: 1,
@@ -36,14 +35,17 @@ describe('User', () => {
 	};
 	it('Can instantiate a User object', () => {
 		expect(new User(rawValues.alice)).toBeInstanceOf(User);
-		expect(new User(rawValues.alice)).toHaveProperty('serialized', rawValues.alice);
+		expect(new User(rawValues.alice)).toHaveProperty(
+			'serialized',
+			rawValues.alice
+		);
 		expect(new User(rawValues.bob)).toHaveProperty('serialized', rawValues.bob);
 	});
 
 	describe('Access local properties', () => {
 		const alice = new User(rawValues.alice);
 		const bob = new User(rawValues.bob);
-		
+
 		it('Can get User username', () => {
 			expect(alice.getUsername()).toEqual('alice');
 			expect(bob.getUsername()).toEqual('bob');
