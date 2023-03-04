@@ -39,7 +39,8 @@ describe('User', () => {
 			'serialized',
 			rawValues.alice
 		);
-		expect(new User(rawValues.bob)).toHaveProperty('serialized', rawValues.bob);
+		expect(new User(rawValues.bob))
+			.toHaveProperty('serialized', rawValues.bob);
 	});
 
 	describe('Access local properties', () => {
@@ -84,6 +85,71 @@ describe('User', () => {
 		it('Can get User superuser flag', () => {
 			expect(alice.isSuperUser()).toEqual(true);
 			expect(bob.isSuperUser()).toEqual(false);
+		});
+	});
+
+	describe('Server Functions', () => {
+		it('Can get a User via single ID', async () => {
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [rawValues.alice] })
+			);
+
+			expect(await User.getById(1)).toEqual(new User(rawValues.alice));
+		});
+
+		it('Can get Users via a list of IDs', async () => {
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [rawValues.alice, rawValues.bob] })
+			);
+
+			const expectResults = [
+				new User(rawValues.alice),
+				new User(rawValues.bob)
+			];
+
+			expect(await User.getByIds([1, 2]))
+				.toEqual(expect.arrayContaining(expectResults));
+		});
+
+		it('Can get a User by their username', async () => {
+			mockAxios.post.mockResolvedValueOnce(
+				mockRpcResponse({ result: [rawValues.alice] })
+			);
+			mockAxios.post.mockResolvedValueOnce(
+				mockRpcResponse({ result: [rawValues.bob] })
+			);
+
+			expect(await User.getByUsername('alice'))
+				.toEqual(new User(rawValues.alice));
+
+			expect(await User.getByUsername('bob'))
+				.toEqual(new User(rawValues.bob));
+		});
+
+		it('Can get a User by their name', async () => {
+			mockAxios.post.mockResolvedValueOnce(
+				mockRpcResponse({ result: [rawValues.alice] })
+			);
+			mockAxios.post.mockResolvedValueOnce(
+				mockRpcResponse({ result: [rawValues.bob] })
+			);
+
+			expect(await User.getByName('alice'))
+				.toEqual(new User(rawValues.alice));
+
+			expect(await User.getByName('bob'))
+				.toEqual(new User(rawValues.bob));
+		});
+
+		it('Throws error when getting User with invalid username', async () => {
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [] })
+			);
+
+			expect(User.getByUsername('charlie'))
+				.rejects.toThrowError(
+					'User with username "charlie" could not be found.'
+				);
 		});
 	});
 });
