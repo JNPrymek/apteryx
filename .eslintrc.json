@@ -73,6 +73,19 @@
             {
                 "code": 80
             }
+        ],
+        "@typescript-eslint/member-delimiter-style": [
+            "warn",
+            {
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                },
+                "multiline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                }
+            }
         ]
     }
 }
