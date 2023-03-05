@@ -6,6 +6,8 @@ import type { TestPlanValues } from '../testPlans/testPlan.type';
 import TestPlan from '../testPlans/testPlan';
 import type { ProductValues } from '../management/product.type';
 import Product from '../management/product';
+import { UserValues } from '../management/user.type';
+import User from '../management/user';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -56,6 +58,32 @@ describe('Test Run', () => {
 		manager__username: 'Charlie',
 		default_tester: 3,
 		default_tester__username: 'Charlie'
+	};
+
+	const userVals : {
+		alice: UserValues;
+		bob: UserValues;
+	} = {
+		alice: {
+			id: 1,
+			email: 'alice@example.com',
+			username: 'alice',
+			first_name: 'Alice',
+			last_name: 'Foo',
+			is_active: true,
+			is_staff: true,
+			is_superuser: true
+		},
+		bob: {
+			id: 1,
+			email: 'bob@example.com',
+			username: 'bob',
+			first_name: 'Bob',
+			last_name: 'Bar',
+			is_active: true,
+			is_staff: false,
+			is_superuser: false
+		}
 	};
 
 	it('Can instantiate a TestRun', () => {
@@ -184,6 +212,15 @@ describe('Test Run', () => {
 			expect(tr3.getManagerUsername()).toEqual('Charlie');
 		});
 
+		it('Can get TestPlan Manager', async () => {
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [userVals.alice] })
+			);
+
+			const alice = new User(userVals.alice);
+			expect(await tr1.getManager()).toEqual(alice);
+		});
+
 		it('Can get TestPlan Default Tester ID', () => {
 			expect(tr1.getDefaultTesterId()).toEqual(2);
 			expect(tr2.getDefaultTesterId()).toBeNull();
@@ -194,6 +231,16 @@ describe('Test Run', () => {
 			expect(tr1.getDefaultTesterUsername()).toEqual('Bob');
 			expect(tr2.getDefaultTesterUsername()).toBeNull();
 			expect(tr3.getDefaultTesterUsername()).toEqual('Charlie');
+		});
+
+		it('Can get TestPlan Default Tester', async () => {
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [userVals.bob] })
+			);
+
+			expect(await tr1.getDefaultTester())
+				.toEqual(new User(userVals.bob));
+			expect(await tr2.getDefaultTester()).toBeNull();
 		});
 
 		it('Can get TestRun Plan', async () => {
@@ -216,7 +263,9 @@ describe('Test Run', () => {
 			};
 
 			const expectedTestPlan = new TestPlan(planVals);
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [planVals]}));
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [planVals] })
+			);
 			expect(await tr1.getPlan()).toEqual(expectedTestPlan);
 		});
 
@@ -228,7 +277,9 @@ describe('Test Run', () => {
 				classification: 1
 			};
 			const expectedProduct = new Product(productVals);
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [productVals]}));
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [productVals] })
+			);
 			expect(await tr1.getProduct()).toEqual(expectedProduct);
 		});
 	});

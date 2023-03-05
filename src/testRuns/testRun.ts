@@ -1,5 +1,6 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
 import Product from '../management/product';
+import User from '../management/user';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
 
@@ -113,7 +114,9 @@ export default class TestRun extends KiwiBaseItem {
 		return this.serialized['manager__username'] as string;
 	}
 
-	// TODO - implement getManager
+	public async getManager(): Promise<User> {
+		return User.getById(this.getManagerId());
+	}
 
 	public getDefaultTesterId(): number {
 		return this.serialized['default_tester'] as number;
@@ -123,7 +126,10 @@ export default class TestRun extends KiwiBaseItem {
 		return this.serialized['default_tester__username'] as string;
 	}
 
-	// TODO - implement getDefaultTester
+	public async getDefaultTester(): Promise<User | null> {
+		const testerId = this.getDefaultTesterId();
+		return (testerId === null) ? null : User.getById(testerId);
+	}
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
