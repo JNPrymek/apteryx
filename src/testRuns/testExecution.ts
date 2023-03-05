@@ -1,5 +1,6 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
 import Build from '../management/build';
+import User from '../management/user';
 import TestCase from '../testCases/testCase';
 import TimeUtils from '../utils/timeUtils';
 import TestExecutionStatus from './testExecutionStatus';
@@ -19,12 +20,22 @@ export default class TestExecution extends KiwiBaseItem {
 		return this.serialized['assignee__username'] as string;
 	}
 
+	public async getAssignee(): Promise<User | null> {
+		const assigneeId = this.getAssigneeId();
+		return (assigneeId === null) ? null : User.getById(assigneeId);
+	}
+
 	public getLastTesterId(): number {
 		return this.serialized['tested_by'] as number;
 	}
 
 	public getLastTesterName(): string {
 		return this.serialized['tested_by__username'] as string;
+	}
+
+	public async getLastTester(): Promise<User | null> {
+		const lastTesterId = this.getLastTesterId();
+		return (lastTesterId === null) ? null : User.getById(lastTesterId);
 	}
 
 	public getTestCaseVersion(): number {
