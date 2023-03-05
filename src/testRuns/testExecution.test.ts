@@ -164,11 +164,8 @@ describe('Test Execution', () => {
 			mockAxios.post.mockResolvedValueOnce(
 				mockRpcResponse({ result: [userVals.bob] })
 			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [userVals.alice] })
-			);
 			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [] })
+				mockRpcResponse({ result: [userVals.alice] })
 			);
 
 			const alice = new User(userVals.alice);
