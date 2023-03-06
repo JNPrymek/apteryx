@@ -10,8 +10,9 @@ export default class KiwiNamedItem extends KiwiBaseItem {
 		name: string
 	): Promise<KiwiNamedItem> {
 		
-		const results = await this.serverFilter({name: name});
+		const results = await this.serverFilter({ name: name });
 		if (results.length == 0) {
+			/* eslint-disable-next-line max-len */
 			throw new Error(`${this.name} with name "${name}" could not be found.`);
 		}
 		else {
