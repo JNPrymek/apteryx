@@ -23,7 +23,11 @@ export default class RequestHandler {
 	 * @param headers Headers of the POST request
 	 * @returns An AxiosResponse
 	 */
-	static async sendPostRequest(url: string, body: Record<string, unknown>, headers: Record<string, unknown> = {}): Promise<AxiosResponse<Record<string, unknown>>> {
+	static async sendPostRequest(
+		url: string, 
+		body: Record<string, unknown>, 
+		headers: Record<string, unknown> = {}
+	): Promise<AxiosResponse<Record<string, unknown>>> {
 		// Add cookies to request headers
 		const sendHeaders = await this.appendCookiesToHeader(url, headers);
 		
@@ -41,19 +45,25 @@ export default class RequestHandler {
 	 * Append cookies from cookie jar to a HTTP request's Header object
 	 * @param url URL to send the HTTP request is going to
 	 * @param headers Headers object of the HTTP request
-	 * @returns A copy of the Headers object, with a 'Cookie' header containing cookies from the jar
+	 * @returns A copy of the Headers object, with 'Cookie' header
 	 */
-	static async appendCookiesToHeader(url: string, headers: Record<string, unknown>): Promise<Record<string, string>> {
+	static async appendCookiesToHeader(
+		url: string, 
+		headers: Record<string, unknown>
+	): Promise<Record<string, string>> {
 		const cookieHeader = await this.cookieJar.getCookieString(url);
 		return { ...headers, Cookie:  cookieHeader };
 	}
 	
 	/**
-	 * Extract 'set-cookie' headers from a HTTP response and save the cookies to the jar
+	 * Save cookies from HTTP response to cookie jar
 	 * @param url URL that the Request went to
 	 * @param headers Headers object of the request's response
 	 */
-	static async saveCookiesFromHeader(url: string, headers: Record<string, unknown>): Promise<void> {
+	static async saveCookiesFromHeader(
+		url: string, 
+		headers: Record<string, unknown>
+	): Promise<void> {
 		const setCookieHeader = headers['set-cookie'];
 		
 		// Set single cookie to jar
