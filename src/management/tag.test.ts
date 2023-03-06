@@ -11,7 +11,7 @@ import Tag from './tag';
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
-describe('Component', () => {
+describe('Tag', () => {
 	
 	KiwiConnector.init({ hostName: serverDomain });
 	
