@@ -1,4 +1,10 @@
-import { IServerDetails, RpcResult, RpcParam, IRpcRequestBody, IRpcResponseBody } from './networkTypes';
+import { 
+	IServerDetails, 
+	RpcResult, 
+	RpcParam, 
+	IRpcRequestBody, 
+	IRpcResponseBody 
+} from './networkTypes';
 import RequestHandler from './requestHandler';
 
 const rpcEndpoint = '/json-rpc/';
@@ -8,6 +14,7 @@ export default class KiwiConnector {
 	private static serverUrl: string;
 	
 	public static init(serverDetails: IServerDetails): void {
+		/* eslint-disable-next-line max-len */
 		this.serverUrl = `http${serverDetails.useSSL ? 's' : ''}://${serverDetails.hostName}${serverDetails.port ? serverDetails.port : ''}`;
 		RequestHandler.clearCookieJar();
 	}
@@ -39,6 +46,7 @@ export default class KiwiConnector {
 		
 		// Check POST request status
 		if (response.status !== 200) {
+			/* eslint-disable-next-line max-len */
 			throw new Error(`Network Error ${response.status} : ${response.statusText}`);
 		}
 		
@@ -60,20 +68,27 @@ export default class KiwiConnector {
 	}
 	
 	// Type guard HTTP response data into RPC Response
-	private static isRpcResponse(rpcResponse: unknown): rpcResponse is IRpcResponseBody {
+	private static isRpcResponse(rpcResponse: unknown): 
+	rpcResponse is IRpcResponseBody {
 		const jsonRpcValid = 
 			((rpcResponse as IRpcResponseBody).id === 'jsonrpc') && 
 			((rpcResponse as IRpcResponseBody).jsonrpc === '2.0');
-		const hasResult = ((rpcResponse as IRpcResponseBody).result !== undefined);
-		const hasError = ((rpcResponse as IRpcResponseBody).error !== undefined);
+		const hasResult = ((rpcResponse as IRpcResponseBody)
+			.result !== undefined);
+		const hasError = ((rpcResponse as IRpcResponseBody)
+			.error !== undefined);
 		
 		// Has required JSON-RPC fields, and a single result / error
 		return (jsonRpcValid && (hasResult !== hasError));
 		
 	}
 	
-	public static async login(username: string, password: string): Promise<string> {
-		const sessionId =  await this.sendRPCMethod('Auth.login', [username, password]);
+	public static async login(username: string, password: string): 
+	Promise<string> {
+		const sessionId =  await this.sendRPCMethod(
+			'Auth.login', 
+			[username, password]
+		);
 		return sessionId as string; // Valid session IDs are alphanumeric
 	}
 	
