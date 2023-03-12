@@ -33,18 +33,26 @@ export default class Build extends KiwiNamedItem {
 	
 	// Build names are only unique per version
 	public static async getByName( name: string ): Promise<Build>;
-	public static async getByName( name: string, version: Version): Promise<Build>;
-	public static async getByName( name: string, version: number): Promise<Build>;
+	public static async getByName( 
+		name: string, 
+		version: Version
+	): Promise<Build>;
+	public static async getByName( 
+		name: string, 
+		version: number
+	): Promise<Build>;
 	public static async getByName(
 		name: string,
 		version?: Version | number
 	): Promise<Build> {
 		
-		const nameMatches = await Build.serverFilter({name: name});
+		const nameMatches = await Build.serverFilter({ name: name });
 		
 		switch (nameMatches.length) {
 			case 0: {
-				throw new Error(`${this.name} with name "${name}" could not be found.`);
+				throw new Error(
+					`${this.name} with name "${name}" could not be found.`
+				);
 			}
 			case 1: {
 				return nameMatches[0];
@@ -52,18 +60,24 @@ export default class Build extends KiwiNamedItem {
 			default: {
 				
 				if (version === undefined) {
-					throw new Error(`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`);
+					throw new Error(
+						/* eslint-disable-next-line max-len */
+						`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`
+					);
 				}
 				
 				// Coalesce to number
-				const versionId = (version instanceof Version) ? version.getId() : version;
+				const versionId = 
+					(version instanceof Version) ? version.getId() : version;
 				
 				const versionMatches = nameMatches.filter( (build) => {
 					return (build.getVersionId() === versionId);
 				});
 				
 				if (versionMatches.length === 0) {
-					throw new Error(`${this.name} with name "${name}" could not be found.`);
+					throw new Error(
+						`${this.name} with name "${name}" could not be found.`
+					);
 				}
 				else {
 					return versionMatches[0];

@@ -41,12 +41,17 @@ describe('Component', () => {
 		product: 2,
 		'initial_owner': 1,
 		'initial_qa_contact': 2,
+		/* eslint-disable-next-line max-len */
 		description: 'First Component of Prod2.  Happens to have a duplicate name as an existing component in Prod1.'
 	};
 	
 	it('Can get by single ID - 0 TCs linked', async () => {
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({result: [ { ...serverComp1base, cases: null }]}));
+		mockAxios
+			.post
+			.mockResolvedValue(
+				mockRpcResponse({ 
+					result: [ { ...serverComp1base, cases: null }] 
+				}));
 		
 		const comp = await Component.getById(1);
 		expect(comp['serialized']).toEqual(serverComp1base);
@@ -54,7 +59,7 @@ describe('Component', () => {
 	
 	it('Can get by single ID - 1 TC linked', async () => {
 		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({result: [ { ...serverComp1base, cases: 1 }]}));
+			mockRpcResponse({ result: [ { ...serverComp1base, cases: 1 }] }));
 		
 		const comp = await Component.getById(1);
 		expect(comp['serialized']).toEqual(serverComp1base);
@@ -62,10 +67,10 @@ describe('Component', () => {
 	
 	it('Can get by single ID - 2 TCs linked', async () => {
 		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({result: [ 
+			mockRpcResponse({ result: [ 
 				{ ...serverComp1base, cases: 1 },
 				{ ...serverComp1base, cases: 2 }
-			]}));
+			] }));
 		
 		const comp = await Component.getById(1);
 		expect(comp['serialized']).toEqual(serverComp1base);
@@ -74,13 +79,13 @@ describe('Component', () => {
 	
 	it('Can get by multiple IDs - mix of TCs linked', async () => {
 		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({result: [ 
+			mockRpcResponse({ result: [ 
 				{ ...serverComp1base, cases: 1 },
 				{ ...serverComp1base, cases: 2 },
 				{ ...serverComp2base, cases: null }
-			]}));
+			] }));
 		
-		const comps = await Component.getByIds([1,2]);
+		const comps = await Component.getByIds([1, 2]);
 		
 		expectArrayWithKiwiItem(comps, serverComp1base);
 		expectArrayWithKiwiItem(comps, serverComp2base);
@@ -114,7 +119,9 @@ describe('Component', () => {
 			classification: 1
 		};
 		
-		mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [ serverProd1 ] }));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: [ serverProd1 ] }));
 		
 		const comp = new Component(serverComp1base);
 		const compProd = await comp.getProduct();
@@ -124,7 +131,8 @@ describe('Component', () => {
 	
 	it('Can get Component description', () => {
 		const comp = new Component(serverComp1base);
-		expect(comp.getDescription()).toEqual('The first component added to Kiwi');
+		expect(comp.getDescription())
+			.toEqual('The first component added to Kiwi');
 	});
 	
 	it('Can get Component name', () => {
@@ -137,11 +145,11 @@ describe('Component', () => {
 		
 		// Mock distinct entries
 		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({result: [ 
+			mockRpcResponse({ result: [ 
 				{ ...serverComp1base, cases: 1 },
 				{ ...serverComp1base, cases: 2 },
 				{ ...serverComp1base, cases: 5 }
-			]}));
+			] }));
 		
 		const compTCs = await comp.getLinkedTestCaseIds();
 		
@@ -154,7 +162,8 @@ describe('Component', () => {
 			mockRpcResponse({ result: [] }));
 		
 		expect(Component.getByName('First Component'))
-			.rejects.toThrowError('Component "First Component" could not be found.');
+			.rejects
+			.toThrowError('Component "First Component" could not be found.');
 	});
 	
 	it('Can get Component by name - 1 matches', async () => {
@@ -170,75 +179,94 @@ describe('Component', () => {
 		
 	});
 	
-	it('Can get Component by name - multiple matches without product filter throws Error', async () => {
+	/* eslint-disable-next-line max-len */
+	it('Can get Component by name - multiple matches without product filter throws Error', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: [
-				{ ...serverComp1base, cases: null },
-				{ ...serverComp3base, cases: null }
-			] }));
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [
+					{ ...serverComp1base, cases: null },
+					{ ...serverComp3base, cases: null }
+				] }));
 		
-		const name = 'First Component';
-		expect(Component.getByName(name))
-			.rejects.toThrowError(`Component '${name}' exists for multiple products.  The 'product' param must be specified`);
-	});
+			const name = 'First Component';
+			expect(Component.getByName(name))
+				.rejects
+				/* eslint-disable-next-line max-len */
+				.toThrowError(`Component '${name}' exists for multiple products.  The 'product' param must be specified`);
+		});
 	
-	it('Can get Component by name - single match with non-matching Product results in error', async () => {
+	/* eslint-disable-next-line max-len */
+	it('Can get Component by name - single match with non-matching Product results in error', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: [
-				{ ...serverComp1base, cases: null }
-			] }));
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [
+					{ ...serverComp1base, cases: null }
+				] }));
 		
-		const name = 'First Component';
+			const name = 'First Component';
 		
-		expect(Component.getByName(name, 5))
-			.rejects.toThrowError(`Component "${name}" could not be found for product 5.`);
-	});
+			expect(Component.getByName(name, 5))
+				.rejects
+				/* eslint-disable-next-line max-len */
+				.toThrowError(`Component "${name}" could not be found for product 5.`);
+		});
 	
-	it('Can get Component by name - multiple matches with non-matching Product results in error', async () => {
+	/* eslint-disable-next-line max-len */
+	it('Can get Component by name - multiple matches with non-matching Product results in error', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: [
-				{ ...serverComp1base, cases: null },
-				{ ...serverComp3base, cases: null }
-			] }));
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [
+					{ ...serverComp1base, cases: null },
+					{ ...serverComp3base, cases: null }
+				] }));
 		
-		const name = 'First Component';
+			const name = 'First Component';
 		
-		expect(Component.getByName(name, 5))
-			.rejects.toThrowError(`Component "${name}" could not be found for product 5.`);
-	});
+			expect(Component.getByName(name, 5))
+				.rejects
+				/* eslint-disable-next-line max-len */
+				.toThrowError(`Component "${name}" could not be found for product 5.`);
+		});
 	
-	it('Can get Component by name - multiple matches filtered by product ID', async () => {
+	it('Can get Component by name - multiple matches filtered by product ID', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: [
-				{ ...serverComp1base, cases: null },
-				{ ...serverComp3base, cases: null }
-			] }));
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [
+					{ ...serverComp1base, cases: null },
+					{ ...serverComp3base, cases: null }
+				] }));
 		
-		const name = 'First Component';
-		const comp = await Component.getByName(name, 2);
+			const name = 'First Component';
+			const comp = await Component.getByName(name, 2);
 		
-		expect(comp['serialized']).toEqual(serverComp3base);
+			expect(comp['serialized']).toEqual(serverComp3base);
 		
-	});
+		});
 	
-	it('Can get Component by name - multiple matches filtered by Product', async () => {
+	it('Can get Component by name - multiple matches filtered by Product', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: [
-				{ ...serverComp1base, cases: null },
-				{ ...serverComp3base, cases: null }
-			] }));
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [
+					{ ...serverComp1base, cases: null },
+					{ ...serverComp3base, cases: null }
+				] }));
 		
-		const name = 'First Component';
-		const prod = new Product({id: 1, name: 'Product A', description: 'First product', classification: 1});
-		const comp = await Component.getByName(name, prod);
+			const name = 'First Component';
+			const prod = new Product({ 
+				id: 1, 
+				name: 'Product A', 
+				description: 'First product', 
+				classification: 1 
+			});
+			const comp = await Component.getByName(name, prod);
 		
-		expect(comp['serialized']).toEqual(serverComp1base);
+			expect(comp['serialized']).toEqual(serverComp1base);
 		
-	});
+		});
 	
 });

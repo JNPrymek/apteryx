@@ -16,8 +16,18 @@ describe('Version', () => {
 	
 	KiwiConnector.init({ hostName: serverDomain });
 	
-	const serverVer1 = {id: 1, value: '1.0.0', product: 2, 'product__name': 'Example Product 2'};
-	const serverVer2 = {id: 2, value: '1.0.3', product: 2, 'product__name': 'Example Product 2'};
+	const serverVer1 = { 
+		id: 1, 
+		value: '1.0.0', 
+		product: 2, 
+		'product__name': 'Example Product 2' 
+	};
+	const serverVer2 = { 
+		id: 2, 
+		value: '1.0.3', 
+		product: 2, 
+		'product__name': 'Example Product 2' 
+	};
 	
 	it('Can instantiate a Version', () => {
 		
@@ -27,14 +37,22 @@ describe('Version', () => {
 	});
 	
 	it('Can get Version by ID', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverVer1]}));
+		mockAxios
+			.post
+			.mockResolvedValue(
+				mockRpcResponse({ result: [serverVer1] })
+			);
 		const ver = await Version.getById(1);
 		
 		expect(ver['serialized']).toEqual(serverVer1);
 	});
 	
 	it('Can get multiple Versions by IDs', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverVer1, serverVer2]}));
+		mockAxios
+			.post.
+			mockResolvedValue(
+				mockRpcResponse({ result: [serverVer1, serverVer2] })
+			);
 		const vers = await Version.getByIds([1, 2]);
 		
 		expectArrayWithKiwiItem(vers, serverVer1);
@@ -71,16 +89,12 @@ describe('Version', () => {
 			description: 'Second Example Product'
 		};
 		
-		const serverProd2 = new Product(prod2Vals);
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: [prod2Vals] }));
 		
-		// Mock Product
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		Product.getById = jest.fn( (id: number) => { return Promise.resolve(serverProd2); } );
-		
-		const ver = new Version(serverVer1);
-		const verProduct = await ver.getProduct();
-		
-		expect(verProduct).toEqual(serverProd2);
+		const version1 = new Version(serverVer1);
+		expect(await version1.getProduct()).toEqual(new Product(prod2Vals));
 		
 	});
 });
