@@ -56,7 +56,9 @@ describe('Version', () => {
 	
 	it('Can get Version of Build', async () => {
 		const build = new Build(serverBuild1);
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverVer1]}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: [serverVer1] }));
 		
 		const versionExpected = new Version(serverVer1);
 		const buildVer = await build.getVersion();
@@ -84,7 +86,9 @@ describe('Version', () => {
 	});
 	
 	it('Can get Build by ID', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverBuild1]}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: [serverBuild1] }));
 		const build = await Build.getById(6);
 		
 		expect(build['serialized']).toEqual(serverBuild1);
@@ -94,7 +98,9 @@ describe('Version', () => {
 	
 	it('Can get Build by Name - unique entry matches name', async () => {
 		
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverBuild1]}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: [serverBuild1] }));
 		
 		const build = await Build.getByName('Android');
 		expect(build['serialized']).toEqual(serverBuild1);
@@ -102,56 +108,86 @@ describe('Version', () => {
 	
 	it('Can get Build by Name - 0 entries matching name', async () => {
 		
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
+		mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
 		
 		const name = 'Non-used name';
-		expect(Build.getByName(name)).rejects.toThrowError(`Build with name "${name}" could not be found.`);
+		expect(Build.getByName(name))
+			.rejects
+			.toThrowError(`Build with name "${name}" could not be found.`);
 	});
 	
-	it('Can get Build by Name - Multiple name matches require version to be specified', async () => {
+	/* eslint-disable-next-line max-len */
+	it('Can get Build by Name - Multiple name matches require version to be specified', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverBuild1, serverBuild2]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [serverBuild1, serverBuild2] })
+				);
 		
-		const name = 'Android';
-		expect(Build.getByName(name)).rejects.toThrowError(`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`);
+			const name = 'Android';
+			expect(Build.getByName(name))
+				.rejects
+				/* eslint-disable-next-line max-len */
+				.toThrowError(`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`);
 		
-	});
+		});
 	
-	it('Can get Build by Name - Multiple name matches are filtered by Version ID', async () => {
+	/* eslint-disable-next-line max-len */
+	it('Can get Build by Name - Multiple name matches are filtered by Version ID', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverBuild1, serverBuild2]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [serverBuild1, serverBuild2] })
+				);
 		
-		const name = 'Android';
-		const versionId = 5;
+			const name = 'Android';
+			const versionId = 5;
 		
-		const build = await Build.getByName(name, versionId);
-		const buildExpect = new Build(serverBuild1);
-		expect(build).toEqual(buildExpect);
+			const build = await Build.getByName(name, versionId);
+			const buildExpect = new Build(serverBuild1);
+			expect(build).toEqual(buildExpect);
 		
-	});
+		});
 	
-	it('Can get Build by Name - Multiple name matches are filtered by Version', async () => {
+	it('Can get Build by Name - Multiple name matches are filtered by Version', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverBuild1, serverBuild2]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [serverBuild1, serverBuild2] })
+				);
 		
-		const name = 'Android';
-		const version = new Version(serverVer1);
+			const name = 'Android';
+			const version = new Version(serverVer1);
 		
-		const build = await Build.getByName(name, version);
-		const buildExpect = new Build(serverBuild1);
-		expect(build).toEqual(buildExpect);
+			const build = await Build.getByName(name, version);
+			const buildExpect = new Build(serverBuild1);
+			expect(build).toEqual(buildExpect);
 		
-	});
+		});
 	
-	it('Can get Build by Name - Error thrown when multiple name matches, but no version ID match.', async () => {
+	/* eslint-disable-next-line max-len */
+	it('Can get Build by Name - Error thrown when multiple name matches, but no version ID match.', 
+		async () => {
 		
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverBuild1, serverBuild2]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [serverBuild1, serverBuild2] })
+				);
 		
-		const name = 'Android';
-		const versionId = 12;
+			const name = 'Android';
+			const versionId = 12;
 		
-		expect(Build.getByName(name, versionId)).rejects.toThrowError(`Build with name "${name}" could not be found.`);
+			expect(Build.getByName(name, versionId))
+				.rejects
+				.toThrowError(`Build with name "${name}" could not be found.`);
 		
-	});
+		});
 
 });
