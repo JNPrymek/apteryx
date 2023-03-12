@@ -3,7 +3,8 @@ import axios, { AxiosResponse } from 'axios';
 import KiwiConnector from './kiwiConnector';
 
 import { serverDomain, requestUrl } from '../../test/testServerDetails';
-import expectAxiosPostCalledWith from '../../test/axiosAssertions/postCalledWith';
+import expectAxiosPostCalledWith 
+	from '../../test/axiosAssertions/postCalledWith';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 
 // Mock Axios
@@ -31,11 +32,16 @@ describe('Kiwi Connector', () => {
 				})
 		);
 		
-		await expect(KiwiConnector.sendRPCMethod('Test.nonExistentMethod', ['arg', 1]))
+		await expect(KiwiConnector
+			.sendRPCMethod('Test.nonExistentMethod', ['arg', 1]))
 			.rejects
 			.toThrowError(/-32601 .* "Test\.nonExistentMethod"/);
 		
-		expectAxiosPostCalledWith(requestUrl, 'Test.nonExistentMethod', ['arg', 1]);
+		expectAxiosPostCalledWith(
+			requestUrl, 
+			'Test.nonExistentMethod', 
+			['arg', 1]
+		);
 		
 	});
 	
@@ -49,8 +55,12 @@ describe('Kiwi Connector', () => {
 		KiwiConnector.init({ hostName: serverDomain });
 		mockAxios.post.mockResolvedValue(mockResponse);
 		
-		await expect(KiwiConnector.login(username, password)).resolves.toBe(mockSessionId);
-		expectAxiosPostCalledWith(requestUrl, 'Auth.login', [username, password]);
+		await expect(KiwiConnector.login(username, password))
+			.resolves.toBe(mockSessionId);
+		expectAxiosPostCalledWith(
+			requestUrl, 
+			'Auth.login', 
+			[username, password]);
 	});
 	
 	// Logout
@@ -66,15 +76,28 @@ describe('Kiwi Connector', () => {
 	
 	// Bad login
 	it('Throws error when logging in with wrong credentials', async () => {
-		const mockResponse = mockRpcResponse({error: { code: -32603, message: 'Internal error: Wrong username or password'}});
+		const mockResponse = mockRpcResponse(
+			{ 
+				error: { 
+					code: -32603, 
+					message: 'Internal error: Wrong username or password' 
+				} 
+			}
+		);
 		const username = 'testUser';
 		const password = 'wrongPassword';
 		
-		KiwiConnector.init({hostName: serverDomain});
+		KiwiConnector.init({ hostName: serverDomain });
 		mockAxios.post.mockResolvedValue(mockResponse);
 		
-		await expect(KiwiConnector.login(username, password)).rejects.toThrowError(/-32603.*Wrong username or password/);
-		expectAxiosPostCalledWith(requestUrl, 'Auth.login', [username, password]);
+		await expect(KiwiConnector.login(username, password))
+			.rejects
+			.toThrowError(/-32603.*Wrong username or password/);
+		expectAxiosPostCalledWith(
+			requestUrl, 
+			'Auth.login', 
+			[username, password]
+		);
 	});
 	
 	// Malformed Server Reply
@@ -84,31 +107,36 @@ describe('Kiwi Connector', () => {
 				status: 400,
 				statusText: 'Bad Request',
 				config: {},
-				headers: { 'content-type' : 'application/json'},
+				headers: { 'content-type' : 'application/json' },
 				data: {}
 			};
-			KiwiConnector.init({hostName: serverDomain});
+			KiwiConnector.init({ hostName: serverDomain });
 			mockAxios.post.mockResolvedValue(mockResponse);
 			
-			await expect(KiwiConnector.login('username', 'password')).rejects.toThrowError(/Network Error 400 : Bad Request/);
+			await expect(KiwiConnector.login('username', 'password'))
+				.rejects
+				.toThrowError(/Network Error 400 : Bad Request/);
 		});
 		
-		it('Errors when RPC reply is missing "data" and "error" values', async () => {
-			const mockResponse: AxiosResponse<Record<string, unknown>> = {
-				status: 200,
-				statusText: 'OK',
-				config: {},
-				headers: { 'content-type' : 'application/json'},
-				data: {
-					id: 'jsonrpc',
-					jsonrpc: '2.0'
-				}
-			};
-			KiwiConnector.init({hostName: serverDomain});
-			mockAxios.post.mockResolvedValue(mockResponse);
+		it('Errors when RPC reply is missing "data" and "error" values', 
+			async () => {
+				const mockResponse: AxiosResponse<Record<string, unknown>> = {
+					status: 200,
+					statusText: 'OK',
+					config: {},
+					headers: { 'content-type' : 'application/json' },
+					data: {
+						id: 'jsonrpc',
+						jsonrpc: '2.0'
+					}
+				};
+				KiwiConnector.init({ hostName: serverDomain });
+				mockAxios.post.mockResolvedValue(mockResponse);
 			
-			await expect(KiwiConnector.login('username', 'password')).rejects.toThrowError(/Malformed JSON-RPC reply/);
-		});
+				await expect(KiwiConnector.login('username', 'password'))
+					.rejects
+					.toThrowError(/Malformed JSON-RPC reply/);
+			});
 		
 	}); 
 	

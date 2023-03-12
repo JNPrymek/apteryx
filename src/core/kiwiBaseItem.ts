@@ -15,7 +15,9 @@ export default class KiwiBaseItem {
 		filterObj: Record<string, unknown>
 	): Promise<Array<KiwiBaseItem>> {
 			
-		const response = await KiwiConnector.sendRPCMethod(`${this.name}.filter`, [filterObj]) as Array<Record<string, unknown>>;
+		const response = await KiwiConnector
+			.sendRPCMethod(`${this.name}.filter`, 
+				[filterObj]) as Array<Record<string, unknown>>;
 		const results: Array<KiwiBaseItem> = [];
 		
 		for (const item of response) {
@@ -30,7 +32,7 @@ export default class KiwiBaseItem {
 	): Promise<Array<KiwiBaseItem>> {
 			
 		const idArr = Array.isArray(id) ? id : [ id ];
-		return await this.serverFilter({'id__in' : idArr });
+		return await this.serverFilter({ 'id__in' : idArr });
 	}
 	
 	public static async getById(

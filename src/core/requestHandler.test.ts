@@ -18,6 +18,7 @@ describe('HTTP Request Handler', () => {
 		statusText: 'OK',
 		config: {},
 		headers: {
+			/* eslint-disable-next-line max-len */
 			'set-cookie' : `resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=${serverDomain}`
 		},
 		data: {
@@ -29,46 +30,47 @@ describe('HTTP Request Handler', () => {
 	
 	// Initialize some test cookies
 	const cookieVals: Array<Record<string, unknown>> = [
-		{key: 'test-a-key', value: 'test-a-value', domain: serverDomain},
-		{key: 'test-b-key', value: 'test-b-value', domain: serverDomain},
-		{key: 'test-c-key', value: 'test-c-value', domain: serverDomain}
+		{ key: 'test-a-key', value: 'test-a-value', domain: serverDomain },
+		{ key: 'test-b-key', value: 'test-b-value', domain: serverDomain },
+		{ key: 'test-c-key', value: 'test-c-value', domain: serverDomain }
 	];
-	//console.log((new Cookie(cookieVals[2])).cookieString());
+	// console.log((new Cookie(cookieVals[2])).cookieString());
 	
 	// Remove all cookies from Cookie Jar before each test
 	beforeEach( async () => {
-		//console.log(expect.getState().currentTestName);
+		// console.log(expect.getState().currentTestName);
 		RequestHandler.cookieJar.removeAllCookies();
 	});
 	
 	// Handler can send a POST request with given data and return the response
-	it('Can send a POST request with provided data and get response data', async () => {
-		const reqHeaders = {
-			accept:  'application/json',
-			'X-Requested-With': 'Axios'
-		};
+	it('Can send a POST request with provided data and get response data', 
+		async () => {
+			const reqHeaders = {
+				accept:  'application/json',
+				'X-Requested-With': 'Axios'
+			};
 		
-		const reqBody = {
-			foo: 'bar',
-			baz: true,
-			arr: ['a', 'b', 'c']
-		};
+			const reqBody = {
+				foo: 'bar',
+				baz: true,
+				arr: ['a', 'b', 'c']
+			};
 		
-		//Mock response
-		mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
+			// Mock response
+			mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
 		
-		const response = await RequestHandler.sendPostRequest(
-			requestPath,
-			reqBody,
-			reqHeaders
-		);
-		expect(axios.post).toHaveBeenCalledWith(
-			requestPath, 
-			reqBody, 
-			{ headers: expect.objectContaining(reqHeaders) }
-		);
-		expect(response).toEqual(mockSuccessPostResponse);
-	});
+			const response = await RequestHandler.sendPostRequest(
+				requestPath,
+				reqBody,
+				reqHeaders
+			);
+			expect(axios.post).toHaveBeenCalledWith(
+				requestPath, 
+				reqBody, 
+				{ headers: expect.objectContaining(reqHeaders) }
+			);
+			expect(response).toEqual(mockSuccessPostResponse);
+		});
 	
 	
 	describe('Save Cookies to Jar', () => {
@@ -77,10 +79,13 @@ describe('HTTP Request Handler', () => {
 		// Save cookie string to jar
 		it('Can save single cookie string to jar', async () => {
 			await RequestHandler.saveCookiesFromHeader(serverUrl,
-				{ 'set-cookie': cookieA.cookieString()}
+				{ 'set-cookie': cookieA.cookieString() }
 			);
-			const cookiesInJar = await RequestHandler.cookieJar.getCookies(serverUrl);
-			expect(cookiesInJar).toEqual([expect.objectContaining(cookieVals[0])]);
+			const cookiesInJar = await RequestHandler
+				.cookieJar
+				.getCookies(serverUrl);
+			expect(cookiesInJar)
+				.toEqual([expect.objectContaining(cookieVals[0])]);
 		});
 		
 		// Save multiple cookie strings to jar
@@ -91,7 +96,9 @@ describe('HTTP Request Handler', () => {
 					cookieB.cookieString()
 				] }
 			);
-			const cookiesInJar = await RequestHandler.cookieJar.getCookies(serverUrl);
+			const cookiesInJar = await RequestHandler
+				.cookieJar
+				.getCookies(serverUrl);
 			expect(cookiesInJar).toEqual([
 				expect.objectContaining(cookieVals[0]), 
 				expect.objectContaining(cookieVals[1])
@@ -111,7 +118,7 @@ describe('HTTP Request Handler', () => {
 				arr: ['a', 'b', 'c']
 			};
 			
-			//Mock response
+			// Mock response
 			mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
 			
 			const response = await RequestHandler.sendPostRequest(
@@ -120,9 +127,14 @@ describe('HTTP Request Handler', () => {
 				reqHeaders
 			);
 			
-			expect(response.headers).toEqual(expect.objectContaining(mockSuccessPostResponse.headers));
+			expect(response.headers)
+				.toEqual(expect.objectContaining(
+					mockSuccessPostResponse.headers
+				));
 			
-			const cookiesInJar = await RequestHandler.cookieJar.getCookies(requestPath);
+			const cookiesInJar = await RequestHandler
+				.cookieJar
+				.getCookies(requestPath);
 			console.log(cookiesInJar[0]);
 			expect(cookiesInJar)
 				.toEqual(
@@ -134,7 +146,7 @@ describe('HTTP Request Handler', () => {
 								key: 'resCustomCookie',
 								value: 'abcdefg',
 								hostOnly: false,
-								// Expiration time cannot be matched exactly from within object assertion
+								// Nested assertions, can't exact match date
 								expires: expect.any(Date) 
 							}
 						)
@@ -144,41 +156,48 @@ describe('HTTP Request Handler', () => {
 	});
 	
 	// Cookies Send with POST request
-	it('Can send a POST request with provided data and get response data', async () => {
+	it('Can send a POST request with provided data and get response data', 
+		async () => {
 		
-		// Prep Test Cookies
-		await RequestHandler.cookieJar.setCookie(new Cookie(cookieVals[0]), serverUrl);
-		await RequestHandler.cookieJar.setCookie(new Cookie(cookieVals[2]), serverUrl);
-		const cookieHeaderString = await RequestHandler.cookieJar.getCookieString(serverUrl);
+			// Prep Test Cookies
+			await RequestHandler
+				.cookieJar
+				.setCookie(new Cookie(cookieVals[0]), serverUrl);
+			await RequestHandler
+				.cookieJar
+				.setCookie(new Cookie(cookieVals[2]), serverUrl);
+			const cookieHeaderString = await RequestHandler
+				.cookieJar
+				.getCookieString(serverUrl);
 
-		const reqHeaders = {
-			accept:  'application/json',
-			'X-Requested-With': 'Axios'
-		};
+			const reqHeaders = {
+				accept:  'application/json',
+				'X-Requested-With': 'Axios'
+			};
 		
-		const reqBody = {
-			foo: 'bar',
-			baz: true,
-			arr: ['a', 'b', 'c']
-		};
+			const reqBody = {
+				foo: 'bar',
+				baz: true,
+				arr: ['a', 'b', 'c']
+			};
 		
-		//Mock response
-		mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
+			// Mock response
+			mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
 		
-		const response = await RequestHandler.sendPostRequest(
-			requestPath,
-			reqBody,
-			reqHeaders
-		);
-		expect(axios.post).toHaveBeenCalledWith(
-			requestPath, 
-			reqBody, 
-			{ headers: expect.objectContaining({
-				Cookie: cookieHeaderString
-			}) }
-		);
-		expect(response).toEqual(mockSuccessPostResponse);
-	});
+			const response = await RequestHandler.sendPostRequest(
+				requestPath,
+				reqBody,
+				reqHeaders
+			);
+			expect(axios.post).toHaveBeenCalledWith(
+				requestPath, 
+				reqBody, 
+				{ headers: expect.objectContaining({
+					Cookie: cookieHeaderString
+				}) }
+			);
+			expect(response).toEqual(mockSuccessPostResponse);
+		});
 	
 	// POST response can delete cookies
 	// TODO
@@ -187,10 +206,12 @@ describe('HTTP Request Handler', () => {
 	it('Can clear all cookies from the jar', async () => {
 		
 		for (const cookieVal of cookieVals) {
-			await RequestHandler.cookieJar.setCookie(new Cookie(cookieVal), serverUrl);
+			await RequestHandler
+				.cookieJar
+				.setCookie(new Cookie(cookieVal), serverUrl);
 		}
 		
-		//Verify cookies are present
+		// Verify cookies are present
 		let cookiesInJar = await RequestHandler.cookieJar.getCookies(serverUrl);
 		expect(cookiesInJar)
 			.toEqual(expect.arrayContaining([
