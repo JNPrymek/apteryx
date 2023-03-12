@@ -49,26 +49,40 @@ describe('PlanType', () => {
 		const type1 = new PlanType(type1Vals);
 
 		it('Can get PlanType by a single ID (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [type1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [type1Vals] }));
 			const result = await PlanType.getById(1);
 			expect(result).toEqual(type1);
 		});
 
 		it('Can get PlanType by single ID (no match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
-			expect(PlanType.getById(1)).rejects.toThrowError('Could not find any PlanType with ID 1');
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [] }));
+			expect(PlanType.getById(1))
+				.rejects
+				.toThrowError('Could not find any PlanType with ID 1');
 		});
 
 		it('Can get PlanType by Name (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [type1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [type1Vals] }));
 			const cat = await PlanType.getByName('Unit');
 			expect(cat).toEqual(type1);
 		});
 
 		it('Can get PlanType by Name (0 matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [] }));
 			const name = 'Non-used name';
-			expect(PlanType.getByName(name)).rejects.toThrowError(`PlanType with name "${name}" could not be found.`);
+			expect(PlanType.getByName(name))
+				.rejects
+				.toThrowError(
+					`PlanType with name "${name}" could not be found.`
+				);
 		});
 	});
 });
