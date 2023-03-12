@@ -12,7 +12,7 @@ export default class Priority extends KiwiBaseItem {
 	}
 	
 	public static async getByValue(value: string): Promise<Priority> {
-		const matches = await this.serverFilter({value});
+		const matches = await this.serverFilter({ value });
 		if (matches.length === 0) {
 			throw new Error(`Priority with value "${value}" was not found.`);
 		}

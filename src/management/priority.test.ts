@@ -26,14 +26,20 @@ describe('Priority', () => {
 	});
 	
 	it('Can get Priority by ID', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverPriority1]}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: [serverPriority1] }));
 		const priority = await Priority.getById(1);
 		
 		expect(priority['serialized']).toEqual(serverPriority1);
 	});
 	
 	it('Can get multiple Priorities by IDs', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverPriority1, serverPriority2]}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ 
+				result: [serverPriority1, serverPriority2] 
+			}));
 		const vers = await Priority.getByIds([1, 2]);
 		
 		expectArrayWithKiwiItem(vers, serverPriority1);
@@ -48,16 +54,20 @@ describe('Priority', () => {
 	});
 	
 	it('Can get Priority by Value', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverPriority1]}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: [serverPriority1] }));
 		const priority = await Priority.getByValue('P1');
 		
 		expect(priority['serialized']).toEqual(serverPriority1);
 	});
 	
 	it('Can get Priority by Value - Throw error if no matches', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
+		mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
 		const value = 'Bad Priority';
-		expect(Priority.getByValue(value)).rejects.toThrowError(`Priority with value "${value}" was not found.`);
+		expect(Priority.getByValue(value))
+			.rejects
+			.toThrowError(`Priority with value "${value}" was not found.`);
 	});
 	
 	it('Can read if Priority is active', () => {
