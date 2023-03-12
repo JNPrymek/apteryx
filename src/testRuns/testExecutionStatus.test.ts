@@ -2,7 +2,7 @@ import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestExecutionStatus from './testExecutionStatus';
 
-//Init Mock Axios
+// Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
@@ -102,34 +102,55 @@ describe('Test Execution Status', () => {
 	describe('Basic Server Functions', () => {
 		// get by id - 0 & 1 matches
 		it('Can get TestExecutionStatus by single ID (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [stat1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
 			const result = await TestExecutionStatus.getById(1);
 			expect(result).toEqual(tes1);
 		});
 
-		it('Can get TestExecutionStatus by single ID (no matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
-			expect(TestExecutionStatus.getById(1)).rejects.toThrowError('Could not find any TestExecutionStatus with ID 1');
-		});
+		it('Can get TestExecutionStatus by single ID (no matches)', 
+			async () => {
+				mockAxios
+					.post
+					.mockResolvedValue(mockRpcResponse({ result: [] }));
+				expect(TestExecutionStatus.getById(1))
+					.rejects
+					.toThrowError(
+						'Could not find any TestExecutionStatus with ID 1'
+					);
+			});
 
-		it('Can get multiple TestExecutionStatus from array of IDs', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [stat1Vals, stat2Vals]}));
-			const results = await TestExecutionStatus.getByIds([1, 4]);
-			expect(results).toEqual(expect.arrayContaining([tes1, tes2]));
-			expect(results).toEqual(expect.not.arrayContaining([tes3]));
-		});
+		it('Can get multiple TestExecutionStatus from array of IDs', 
+			async () => {
+				mockAxios
+					.post
+					.mockResolvedValue(
+						mockRpcResponse({ result: [stat1Vals, stat2Vals] })
+					);
+				const results = await TestExecutionStatus.getByIds([1, 4]);
+				expect(results).toEqual(expect.arrayContaining([tes1, tes2]));
+				expect(results).toEqual(expect.not.arrayContaining([tes3]));
+			});
 
 		// get by name - 0 & 1 matches
 		it('Can get TestExecutionStatus by name (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [stat1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
 			const result = await TestExecutionStatus.getByName('IDLE');
 			expect(result).toEqual(tes1);
 		});
 
 		it('Can get TestExecutionStatus by name (no matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
 			const name = 'NON-EXISTENT-NAME';
-			expect(TestExecutionStatus.getByName(name)).rejects.toThrowError(`TestExecutionStatus with name "${name}" could not be found.`);
+			expect(TestExecutionStatus.getByName(name))
+				.rejects
+				.toThrowError(
+					/* eslint-disable-next-line max-len */
+					`TestExecutionStatus with name "${name}" could not be found.`
+				);
 		});
 	});
 });

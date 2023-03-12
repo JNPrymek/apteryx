@@ -50,7 +50,8 @@ export default class TestExecutionStatus extends KiwiNamedItem {
 	public static async serverFilter(
 		filterObj: Record<string, unknown>
 	): Promise<Array<TestExecutionStatus>> {
-		return await super.serverFilter(filterObj) as Array<TestExecutionStatus>;
+		return await super
+			.serverFilter(filterObj) as Array<TestExecutionStatus>;
 	}
 	
 	public static async getByIds(
