@@ -45,8 +45,10 @@ describe('Test Case Status', () => {
 		});
 
 		it('Can get TestCase Status Description', () => {
-			expect(stat1.getDescription()).toEqual('Test case is pending approval');
-			expect(stat2.getDescription()).toEqual('Test case is fully approved and usable');
+			expect(stat1.getDescription())
+				.toEqual('Test case is pending approval');
+			expect(stat2.getDescription())
+				.toEqual('Test case is fully approved and usable');
 		});
 
 		it('Can get if TestCase Status is confirmed', () => {
@@ -64,18 +66,26 @@ describe('Test Case Status', () => {
 		const stat1 = new TestCaseStatus(stat1Vals);
 
 		it('Can get TestCaseStatus by a single ID (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [stat1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
 			const result = await TestCaseStatus.getById(1);
 			expect(result).toEqual(stat1);
 		});	
 		
 		it('Can get TestCaseStatus by single ID (no match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
-			expect(TestCaseStatus.getById(1)).rejects.toThrowError('Could not find any TestCaseStatus with ID 1');
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [] }));
+			expect(TestCaseStatus.getById(1))
+				.rejects
+				.toThrowError('Could not find any TestCaseStatus with ID 1');
 		});
 
 		it('Can get TestCaseStatus by Name (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [stat1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
 			const result = await TestCaseStatus.getByName('PROPOSED');
 			expect(result).toEqual(stat1);
 		});
@@ -83,7 +93,11 @@ describe('Test Case Status', () => {
 		it('Can get TestCaseStatus by Name (0 matches)', async () => {
 			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
 			const name = 'Non-used name';
-			expect(TestCaseStatus.getByName(name)).rejects.toThrowError(`TestCaseStatus with name "${name}" could not be found.`);
+			expect(TestCaseStatus.getByName(name))
+				.rejects
+				.toThrowError(
+					`TestCaseStatus with name "${name}" could not be found.`
+				);
 		});
 	});
 	
