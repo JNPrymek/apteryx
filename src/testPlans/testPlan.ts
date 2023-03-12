@@ -17,7 +17,8 @@ export default class TestPlan extends KiwiNamedItem {
 	}
 
 	public getCreateDate(): Date {
-		return TimeUtils.serverStringToDate(this.serialized['create_date'] as string);
+		return TimeUtils
+			.serverStringToDate(this.serialized['create_date'] as string);
 	}
 
 	public isActive(): boolean {
@@ -81,12 +82,12 @@ export default class TestPlan extends KiwiNamedItem {
 		sortOrder: 'TESTCASE_ID' | 'SORTKEY' = 'SORTKEY'
 	): Promise<Array<TestCase>> {
 		if (sortOrder === 'TESTCASE_ID') {
-			return (await TestCase.serverFilter({'plan': this.getId()}));
+			return (await TestCase.serverFilter({ 'plan': this.getId() }));
 		}
 
 		const rawResponse = await KiwiConnector.sendRPCMethod(
 			'TestCase.sortkeys', 
-			[{plan: this.getId()}]
+			[{ plan: this.getId() }]
 		) as Record<string, unknown>;
 
 		/*
@@ -110,13 +111,14 @@ export default class TestPlan extends KiwiNamedItem {
 	public static async getPlansWithTestCase(
 		test: TestCase | number
 	): Promise<Array<TestPlan>> {
-		const testCaseId: number = (test instanceof TestCase) ? test.getId() : test;
-		return (await TestPlan.serverFilter({case: testCaseId}));
+		const testCaseId: number = 
+			(test instanceof TestCase) ? test.getId() : test;
+		return (await TestPlan.serverFilter({ case: testCaseId }));
 		
 	}
 
 	public async getDirectChildren(): Promise<Array<TestPlan>> {
-		return await TestPlan.serverFilter({parent: this.getId()});
+		return await TestPlan.serverFilter({ parent: this.getId() });
 	}
 	
 	public async hasChildren(): Promise<boolean> {
