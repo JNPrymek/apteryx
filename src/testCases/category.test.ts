@@ -40,8 +40,17 @@ describe('Category', () => {
 		});
 
 		it('Can get Category Product', async () => {
-			const serverProd1 = {id: 1, name: 'Example.com Website', classification: 2, description: 'Example Product 1'};
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [serverProd1]}));
+			const serverProd1 = { 
+				id: 1, 
+				name: 'Example.com Website', 
+				classification: 2, 
+				description: 'Example Product 1' 
+			};
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [serverProd1] })
+				);
 			const categoryProduct = await cat1.getProduct();
 			expect(categoryProduct).toEqual(new Product(serverProd1));
 		});
@@ -62,26 +71,40 @@ describe('Category', () => {
 		const cat1 = new Category(cat1Vals);
 
 		it('Can get Category by a single ID (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [cat1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [cat1Vals] })
+				);
 			const result = await Category.getById(1);
 			expect(result).toEqual(cat1);
 		});
 		
 		it('Can get Category by single ID (no match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
-			expect(Category.getById(1)).rejects.toThrowError('Could not find any Category with ID 1');
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			expect(Category.getById(1))
+				.rejects
+				.toThrowError('Could not find any Category with ID 1');
 		});
 
 		it('Can get Category by Name (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [cat1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [cat1Vals] })
+				);
 			const cat = await Category.getByName('Regression');
 			expect(cat).toEqual(cat1);
 		});
 
 		it('Can get Category by Name (0 matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
 			const name = 'Non-used name';
-			expect(Category.getByName(name)).rejects.toThrowError(`Category with name "${name}" could not be found.`);
+			expect(Category.getByName(name))
+				.rejects
+				.toThrowError(
+					`Category with name "${name}" could not be found.`
+				);
 		});
 
 	});
