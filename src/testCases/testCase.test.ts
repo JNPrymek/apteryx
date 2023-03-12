@@ -14,7 +14,7 @@ describe('TestCase', () => {
 	
 	const case1Vals = {
 		id: 1,
-		create_date: '2021-01-02T03:15:00.000',  //3:15am Jan 3rd 2021 (UTC)
+		create_date: '2021-01-02T03:15:00.000',  // 3:15am Jan 3rd 2021 (UTC)
 		is_automated: false,
 		script: 'Sample script or an empty string',
 		arguments: 'Sample args or an empty string',
@@ -88,7 +88,8 @@ describe('TestCase', () => {
 		});
 		
 		it('Can get TC Arguments', () => {
-			expect(tc1.getArguments()).toEqual('Sample args or an empty string');
+			expect(tc1.getArguments())
+				.toEqual('Sample args or an empty string');
 		});
 		
 		it('Can get TC Requirements', () => {
@@ -96,11 +97,13 @@ describe('TestCase', () => {
 		});
 		
 		it('Can get TC Reference Link', () => {
-			expect(tc1.getExtraLink()).toEqual('Sample text or an empty string');
+			expect(tc1.getExtraLink())
+				.toEqual('Sample text or an empty string');
 		});
 		
 		it('Can get TC Reference Link', () => {
-			expect(tc1.getReferenceLink()).toEqual('Sample text or an empty string');
+			expect(tc1.getReferenceLink())
+				.toEqual('Sample text or an empty string');
 		});
 		
 		it('Can get TC Summary', () => {
@@ -128,7 +131,11 @@ describe('TestCase', () => {
 			};
 			const proposedStatus = new TestCaseStatus(tcStatusVals);
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [tcStatusVals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [tcStatusVals] })
+				);
 			const tc1Status = await tc1.getCaseStatus();
 			expect(tc1Status).toEqual(proposedStatus);
 		});
@@ -156,14 +163,23 @@ describe('TestCase', () => {
 				product: 1,
 				'product_name': 'Example.com Website'
 			};
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [regressionCategoryVals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [regressionCategoryVals] })
+				);
 			const regressionCategory = await tc1.getCategory();
-			expect(regressionCategory).toEqual(new Category(regressionCategoryVals));
+			expect(regressionCategory)
+				.toEqual(new Category(regressionCategoryVals));
 		});
 		
 		it('Can get TC Priority', async () => {
 			const priorityOneVals = { id: 1, value: 'P1', is_active: true };
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [priorityOneVals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [priorityOneVals] })
+				);
 			const tcPriority = await tc1.getPriority();
 			expect(tcPriority).toEqual(new Priority(priorityOneVals));
 		});
@@ -226,14 +242,20 @@ describe('TestCase', () => {
 	describe('Basic Server Functions', () => {
 		
 		it('Can get TC by a single ID (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: [case1Vals]}));
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [case1Vals] })
+				);
 			const testCaseOne = await TestCase.getById(1);
 			expect(testCaseOne).toEqual(tc1);
 		});
 		
 		it('Can get TC by a single ID (no match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({result: []}));
-			expect(TestCase.getById(1)).rejects.toThrowError('Could not find any TestCase with ID 1');
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			expect(TestCase.getById(1))
+				.rejects
+				.toThrowError('Could not find any TestCase with ID 1');
 		});
 	});
 });
