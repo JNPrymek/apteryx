@@ -13,7 +13,8 @@ export default class TestCase extends KiwiBaseItem {
 	}
 	
 	public getCreateDate(): Date {
-		return TimeUtils.serverStringToDate(this.serialized['create_date'] as string);
+		return TimeUtils
+			.serverStringToDate(this.serialized['create_date'] as string);
 	}
 	
 	public isAutomated(): boolean {
