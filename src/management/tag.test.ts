@@ -22,11 +22,31 @@ describe('Tag', () => {
 	it('Can get single by ID', async () => {
 		mockAxios.post.mockResolvedValue(
 			mockRpcResponse(
-				{result: [
-					{ ...tag1Base, 'case': null, plan: null, run: null, bugs: null },
-					{ ...tag1Base, 'case': 1, plan: null, run: null, bugs: null },
-					{ ...tag1Base, 'case': 2, plan: null, run: null, bugs: null }
-				]}));
+				{ 
+					result: [
+						{ 
+							...tag1Base, 
+							'case': null, 
+							plan: null, 
+							run: null, 
+							bugs: null 
+						},
+						{ 
+							...tag1Base, 
+							'case': 1, 
+							plan: null, 
+							run: null, 
+							bugs: null 
+						},
+						{ 
+							...tag1Base, 
+							'case': 2, 
+							plan: null, 
+							run: null, 
+							bugs: null 
+						}
+					] 
+				}));
 		
 		const tag1 = await Tag.getById(1);
 		expect(tag1['serialized']).toEqual(tag1Base);
@@ -35,13 +55,45 @@ describe('Tag', () => {
 	it('Can get multiple by ID', async () => {
 		mockAxios.post.mockResolvedValue(
 			mockRpcResponse(
-				{result: [
-					{ ...tag1Base, 'case': null, plan: null, run: null, bugs: null },
-					{ ...tag1Base, 'case': 1, plan: null, run: null, bugs: null },
-					{ ...tag1Base, 'case': 2, plan: null, run: null, bugs: null },
-					{ ...tag2Base, 'case': 1, plan: null, run: null, bugs: null },
-					{ ...tag2Base, 'case': null, plan: 2, run: null, bugs: null }
-				]}));
+				{ 
+					result: [
+						{ 
+							...tag1Base, 
+							'case': null, 
+							plan: null, 
+							run: null, 
+							bugs: null 
+						},
+						{ 
+							...tag1Base, 
+							'case': 1, 
+							plan: null, 
+							run: null, 
+							bugs: null 
+						},
+						{ 
+							...tag1Base, 
+							'case': 2, 
+							plan: null, 
+							run: null, 
+							bugs: null 
+						},
+						{ 
+							...tag2Base, 
+							'case': 1, 
+							plan: null, 
+							run: null, 
+							bugs: null 
+						},
+						{ 
+							...tag2Base, 
+							'case': null, 
+							plan: 2, 
+							run: null, 
+							bugs: null 
+						}
+					] 
+				}));
 		
 		const tags = await Tag.getByIds([1, 2]);
 		expect(tags).toHaveLength(2);
@@ -60,15 +112,17 @@ describe('Tag', () => {
 	});
 	
 	it('Can get Tag by name - 0 matches throws error', async () => {
-		mockAxios.post.mockResolvedValue(mockRpcResponse({ result: []}));
+		mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
 		const name = 'UnusedName';
-		expect(Tag.getByName(name)).rejects.toThrowError(`Tag with name '${name}' not found.`);
+		expect(Tag.getByName(name))
+			.rejects
+			.toThrowError(`Tag with name '${name}' not found.`);
 	});
 	
 	it('Can get Tag by name - 1 discrete match returns Tag', async () => {
 		mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [
 			{ ...tag1Base, 'case': 2, plan: null, run: null, bugs: null }
-		]}));
+		] }));
 		const name = 'FirstTag';
 		const tag = await Tag.getByName(name);
 		expect(tag['serialized']).toEqual(tag1Base);
@@ -81,7 +135,7 @@ describe('Tag', () => {
 			{ ...tag1Base, 'case': 5, plan: null, run: null, bugs: null },
 			{ ...tag1Base, 'case': null, plan: null, run: 3, bugs: null },
 			{ ...tag1Base, 'case': null, plan: 1, run: null, bugs: null }
-		]}));
+		] }));
 		const name = 'FirstTag';
 		const tag = await Tag.getByName(name);
 		expect(tag['serialized']).toEqual(tag1Base);
@@ -92,9 +146,13 @@ describe('Tag', () => {
 			{ ...tag1Base, 'case': null, plan: null, run: null, bugs: null },
 			{ ...tag1Base, 'case': null, plan: null, run: 1, bugs: null },
 			{ ...tag3Base, 'case': null, plan: null, run: null, bugs: null }
-		]}));
+		] }));
 		const name = 'FirstTag';
-		expect(Tag.getByName(name)).rejects.toThrowError(`Attempted to get Tag with non-unique name '${name}'`);
+		expect(Tag.getByName(name))
+			.rejects
+			.toThrowError(
+				`Attempted to get Tag with non-unique name '${name}'`
+			);
 	});
 	
 	it('Can get IDs of TestCases with Tag - Multiple matches', async () => {
@@ -104,7 +162,7 @@ describe('Tag', () => {
 			{ ...tag1Base, 'case': 5, plan: null, run: null, bugs: null },
 			{ ...tag1Base, 'case': 10, plan: null, run: null, bugs: null },
 			{ ...tag1Base, 'case': 23, plan: null, run: null, bugs: null }
-		]}));
+		] }));
 		
 		const tag = new Tag(tag1Base);
 		const caseIds = await tag.getTaggedTestCaseIds();
@@ -130,7 +188,7 @@ describe('Tag', () => {
 			{ ...tag1Base, 'case': null, plan: 5, run: null, bugs: null },
 			{ ...tag1Base, 'case': null, plan: 10, run: null, bugs: null },
 			{ ...tag1Base, 'case': null, plan: 23, run: null, bugs: null }
-		]}));
+		] }));
 		
 		const tag = new Tag(tag1Base);
 		const caseIds = await tag.getTaggedTestPlanIds();
@@ -156,7 +214,7 @@ describe('Tag', () => {
 			{ ...tag1Base, 'case': null, plan: null, run: 5, bugs: null },
 			{ ...tag1Base, 'case': null, plan: null, run: 10, bugs: null },
 			{ ...tag1Base, 'case': null, plan: null, run: 23, bugs: null }
-		]}));
+		] }));
 		
 		const tag = new Tag(tag1Base);
 		const caseIds = await tag.getTaggedTestRunIds();
@@ -182,7 +240,7 @@ describe('Tag', () => {
 			{ ...tag1Base, 'case': null, plan: null, run: null, bugs: 5 },
 			{ ...tag1Base, 'case': null, plan: null, run: null, bugs: 10 },
 			{ ...tag1Base, 'case': null, plan: null, run: null, bugs: 23 }
-		]}));
+		] }));
 		
 		const tag = new Tag(tag1Base);
 		const caseIds = await tag.getTaggedBugIds();

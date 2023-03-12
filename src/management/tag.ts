@@ -24,12 +24,15 @@ export default class Tag extends KiwiBaseItem {
 			case 1:
 				return tagList[0];
 			default:
-				throw new Error(`Attempted to get Tag with non-unique name '${name}'`);
+				throw new Error(
+					`Attempted to get Tag with non-unique name '${name}'`
+				);
 		}
 	}
 	
 	
-	// Get serialized entries as returned by kiwi (1x entry per link to a case, plan, run, or bug)
+	// Get serialized entries as returned by Kiwi
+	// (1x entry per link to a case, plan, run, or bug)
 	private static async serverFilterDistinct(
 		filterObject: Record<string, unknown>
 	): Promise<Array<Record<string, unknown>>> {
@@ -42,28 +45,37 @@ export default class Tag extends KiwiBaseItem {
 	private static async serverFilterCaseTags(
 		filterObject: Record<string, unknown>
 	): Promise<Array<Record<string, unknown>>> {
-		return await this.serverFilterDistinct({ ...filterObject, 'case__isnull': false});
+		return await this.serverFilterDistinct(
+			{ ...filterObject, 'case__isnull': false }
+		);
 	}
 	
 	private static async serverFilterPlanTags(
 		filterObject: Record<string, unknown>
 	): Promise<Array<Record<string, unknown>>> {
-		return await this.serverFilterDistinct({ ...filterObject, 'plan__isnull': false});
+		return await this.serverFilterDistinct(
+			{ ...filterObject, 'plan__isnull': false }
+		);
 	}
 	
 	private static async serverFilterRunTags(
 		filterObject: Record<string, unknown>
 	): Promise<Array<Record<string, unknown>>> {
-		return await this.serverFilterDistinct({ ...filterObject, 'run__isnull': false});
+		return await this.serverFilterDistinct(
+			{ ...filterObject, 'run__isnull': false }
+		);
 	}
 	
 	private static async serverFilterBugTags(
 		filterObject: Record<string, unknown>
 	): Promise<Array<Record<string, unknown>>> {
-		return await this.serverFilterDistinct({ ...filterObject, 'bugs__isnull': false});
+		return await this.serverFilterDistinct(
+			{ ...filterObject, 'bugs__isnull': false }
+		);
 	}
 	
-	// Remove properties for cases, runs, plans, and bugs from serialized entries, then return de-duped list as Tags.
+	// Remove properties for cases, runs, plans, and bugs
+	// Then return de-duped list as Tags.
 	private static async getUniqueTags(
 		filterObj: Record<string, unknown>
 	): Promise<Array<Tag>> {
@@ -87,7 +99,8 @@ export default class Tag extends KiwiBaseItem {
 	}
 	
 	public async getTaggedTestCaseIds(): Promise<Array<number>> {
-		const distinctTags = await Tag.serverFilterCaseTags({id: this.getId()});
+		const distinctTags = 
+		await Tag.serverFilterCaseTags({ id: this.getId() });
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
@@ -97,7 +110,8 @@ export default class Tag extends KiwiBaseItem {
 	}
 	
 	public async getTaggedTestRunIds(): Promise<Array<number>> {
-		const distinctTags = await Tag.serverFilterRunTags({id: this.getId()});
+		const distinctTags = 
+		await Tag.serverFilterRunTags({ id: this.getId() });
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
@@ -107,7 +121,8 @@ export default class Tag extends KiwiBaseItem {
 	}
 	
 	public async getTaggedTestPlanIds(): Promise<Array<number>> {
-		const distinctTags = await Tag.serverFilterPlanTags({id: this.getId()});
+		const distinctTags = 
+		await Tag.serverFilterPlanTags({ id: this.getId() });
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
@@ -117,7 +132,8 @@ export default class Tag extends KiwiBaseItem {
 	}
 	
 	public async getTaggedBugIds(): Promise<Array<number>> {
-		const distinctTags = await Tag.serverFilterBugTags({id: this.getId()});
+		const distinctTags = 
+		await Tag.serverFilterBugTags({ id: this.getId() });
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
