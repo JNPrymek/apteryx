@@ -14,7 +14,7 @@ describe('Classification', () => {
 	
 	KiwiConnector.init({ hostName: serverDomain });
 	
-	const serverClass1 = {id: 1, name: 'Class1'};
+	const serverClass1 = { id: 1, name: 'Class1' };
 	
 	it('Can instantiate a Classification', () => {
 		const initVals = serverClass1;
@@ -25,7 +25,9 @@ describe('Classification', () => {
 	
 	it('Can get Classification by ID', async () => {
 		const serverItems: Array<Record<string, unknown>> = [serverClass1];
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: serverItems}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: serverItems }));
 		
 		const class1 = await Classification.getById(1);
 		expect(class1['serialized']).toEqual(serverItems[0]);
@@ -33,7 +35,9 @@ describe('Classification', () => {
 	
 	it('Can get Classification by Name', async () => {
 		const serverItems: Array<Record<string, unknown>> = [serverClass1];
-		mockAxios.post.mockResolvedValue(mockRpcResponse({result: serverItems}));
+		mockAxios
+			.post
+			.mockResolvedValue(mockRpcResponse({ result: serverItems }));
 		
 		const class1 = await Classification.getByName('Class1');
 		expect(class1['serialized']).toEqual(serverItems[0]);

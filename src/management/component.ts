@@ -41,7 +41,8 @@ export default class Component extends KiwiNamedItem {
 	
 	// Get IDs of all the test cases linked to this component
 	public async getLinkedTestCaseIds(): Promise<Array<number>> {
-		const distinctComps = await Component.serverFilterDistinct({id: this.getId()});
+		const distinctComps = await Component
+			.serverFilterDistinct({ id: this.getId() });
 		const testCaseIds: Array<number> = [];
 		for (const comp of distinctComps) {
 			testCaseIds.push(comp.cases as number);
@@ -56,14 +57,20 @@ export default class Component extends KiwiNamedItem {
 	// --------------------------------
 	// Component names are only unique per product
 	public static async getByName( name: string ): Promise<Component>;
-	public static async getByName( name: string, product: Product): Promise<Component>;
-	public static async getByName( name: string, product: number): Promise<Component>;
+	public static async getByName( 
+		name: string, 
+		product: Product
+	): Promise<Component>;
+	public static async getByName( 
+		name: string, 
+		product: number
+	): Promise<Component>;
 	public static async getByName(
 		name: string,
 		product?: Product | number
 	): Promise<Component> {
 		
-		const nameMatches = await this.serverFilter({name: name});
+		const nameMatches = await this.serverFilter({ name: name });
 		
 		// Coalesce product to ID number
 		let prodId = -1;
@@ -72,10 +79,15 @@ export default class Component extends KiwiNamedItem {
 		}
 		
 		// Not found Errors
-		const nameFailErr = new Error(`Component "${name}" could not be found.`);
+		const nameFailErr = new Error(
+			`Component "${name}" could not be found.`
+		);
 		const prodNotSpecifiedErr = new Error(
+			/* eslint-disable-next-line max-len */
 			`Component '${name}' exists for multiple products.  The 'product' param must be specified.`);
-		const prodFailErr = new Error(`Component "${name}" could not be found for product ${prodId}.`);
+		const prodFailErr = new Error(
+			`Component "${name}" could not be found for product ${prodId}.`
+		);
 		
 		switch (nameMatches.length) {
 			case 0: {
@@ -113,7 +125,8 @@ export default class Component extends KiwiNamedItem {
 	// Kiwi Base
 	// --------------------------------
 	
-	// Get serialized entries as returned by kiwi (1x entry per TestCase-Component relationship)
+	// Get serialized entries as returned by kiwi 
+	// (1x entry per TestCase-Component relationship)
 	private static async serverFilterDistinct(
 		filterObj: Record<string, unknown>
 	): Promise<Array<Record<string, unknown>>> {
@@ -123,7 +136,8 @@ export default class Component extends KiwiNamedItem {
 		) as Array<Record<string, unknown>>;
 	}
 	
-	// Remove 'cases' property from serialized entries, and return deduped list as Components
+	// Remove 'cases' property from serialized entries
+	// Return deduped list as Components
 	private static async getUniqueComponents(
 		filterObj: Record<string, unknown>
 	): Promise<Array<Component>> {
