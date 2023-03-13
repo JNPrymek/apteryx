@@ -1,0 +1,10 @@
+{
+	"email": "alice@example.com",
+	"first_name": "Alice",
+	"id": 1,
+	"is_active": true,
+	"is_staff": true,
+	"is_superuser": true,
+	"last_name": "Foo",
+	"username": "alice"
+}
