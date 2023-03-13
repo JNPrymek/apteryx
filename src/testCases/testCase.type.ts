@@ -21,7 +21,7 @@ export type TestCaseValues = {
 	default_tester__username: string | null;
 	reviewer: number | null;
 	reviewer__username: string | null;
-	setup_duration: number;
-	testing_duration: number;
+	setup_duration: number | null;
+	testing_duration: number | null;
 	expected_duration: number;
 }
