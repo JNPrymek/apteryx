@@ -1,11 +1,12 @@
 import KiwiConnector from '../core/kiwiConnector';
 import KiwiNamedItem from '../core/kiwiNamedItem';
+import { ComponentServerValues, ComponentValues } from './component.type';
 import Product from './product';
 
 export default class Component extends KiwiNamedItem {
 	
 	// Constructor for all classes
-	constructor(serializedValues: Record<string, unknown>) {
+	constructor(serializedValues: ComponentValues) {
 		super(serializedValues);
 	}
 	
@@ -128,18 +129,18 @@ export default class Component extends KiwiNamedItem {
 	// Get serialized entries as returned by kiwi 
 	// (1x entry per TestCase-Component relationship)
 	private static async serverFilterDistinct(
-		filterObj: Record<string, unknown>
-	): Promise<Array<Record<string, unknown>>> {
+		filterObj: Partial<ComponentServerValues>
+	): Promise<Array<ComponentServerValues>> {
 		return await KiwiConnector.sendRPCMethod(
 			`${this.name}.filter`, 
 			[filterObj]
-		) as Array<Record<string, unknown>>;
+		) as Array<ComponentServerValues>;
 	}
 	
 	// Remove 'cases' property from serialized entries
 	// Return deduped list as Components
 	private static async getUniqueComponents(
-		filterObj: Record<string, unknown>
+		filterObj: Partial<ComponentServerValues>
 	): Promise<Array<Component>> {
 		const distinctResults = await this.serverFilterDistinct(filterObj);
 		const compList: Array<Component> = [];
@@ -150,7 +151,7 @@ export default class Component extends KiwiNamedItem {
 			if (!compIds.includes(id)) {
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				const { cases, ...compProps } = distinctItem;
-				const comp = new Component(compProps);
+				const comp = new Component(compProps as ComponentValues);
 				compIds.push(id);
 				compList.push(comp);
 			}
@@ -159,7 +160,7 @@ export default class Component extends KiwiNamedItem {
 	}
 	
 	public static async serverFilter(
-		filterObj: Record<string, unknown>
+		filterObj: Partial<ComponentServerValues>
 	): Promise<Array<Component>> {
 		return await this.getUniqueComponents(filterObj);
 	}
