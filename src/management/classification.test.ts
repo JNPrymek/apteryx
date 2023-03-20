@@ -5,6 +5,7 @@ import KiwiConnector from '../core/kiwiConnector';
 import { serverDomain } from '../../test/testServerDetails';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import Classification from './classification';
+import { ClassificationValues } from './classification.type';
 
 // Mock Axios
 jest.mock('axios');
@@ -14,7 +15,10 @@ describe('Classification', () => {
 	
 	KiwiConnector.init({ hostName: serverDomain });
 	
-	const serverClass1 = { id: 1, name: 'Class1' };
+	const serverClass1: ClassificationValues = {
+		id: 1, 
+		name: 'Class1' 
+	};
 	
 	it('Can instantiate a Classification', () => {
 		const initVals = serverClass1;
