@@ -10,7 +10,9 @@ import {
 } from './mockValues/management/mockManagementValues';
 
 import {
-	mockTestCase
+	mockTestCase,
+	mockTestCaseStatus,
+	mockCategory
 } from './mockValues/testCases/mockTestCaseValues';
 
 export {
@@ -22,5 +24,7 @@ export {
 	mockTag,
 	mockUser,
 	mockVersion,
-	mockTestCase
+	mockTestCase,
+	mockTestCaseStatus,
+	mockCategory
 };
