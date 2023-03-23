@@ -1,11 +1,26 @@
+import {
+	mockBuild,
+	mockClassification,
+	mockComponent,
+	mockPriority,
+	mockProduct,
+	mockTag,
+	mockUser,
+	mockVersion
+} from './mockValues/management/mockManagementValues';
 
-import { TestCaseValues } from '../src/testCases/testCase.type';
-import testCaseDefaults from './mockValues/testCases/testCase.json';
-export function mockTestCase(
-	overrideValues: Partial<TestCaseValues>
-): TestCaseValues {
-	return {
-		...testCaseDefaults,
-		...overrideValues
-	};
-}
+import {
+	mockTestCase
+} from './mockValues/testCases/mockTestCaseValues';
+
+export {
+	mockBuild,
+	mockClassification,
+	mockComponent,
+	mockPriority,
+	mockProduct,
+	mockTag,
+	mockUser,
+	mockVersion,
+	mockTestCase
+};
