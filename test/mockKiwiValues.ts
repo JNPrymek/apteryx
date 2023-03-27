@@ -21,6 +21,12 @@ import {
 	mockTestPlanType
 } from './mockValues/testPlans/mockTestPlanValues';
 
+import {
+	mockTestExecution,
+	mockTestExecutionStatus,
+	mockTestRun
+} from './mockValues/testRuns/mockTestRunValues';
+
 export {
 	// Management
 	mockBuild,
@@ -40,4 +46,7 @@ export {
 	mockTestPlan,
 	mockTestPlanType,
 	// Test Runs
+	mockTestExecution,
+	mockTestExecutionStatus,
+	mockTestRun,
 };
