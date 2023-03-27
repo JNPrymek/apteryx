@@ -15,7 +15,14 @@ import {
 	mockCategory
 } from './mockValues/testCases/mockTestCaseValues';
 
+import {
+	mockPlanType,
+	mockTestPlan,
+	mockTestPlanType
+} from './mockValues/testPlans/mockTestPlanValues';
+
 export {
+	// Management
 	mockBuild,
 	mockClassification,
 	mockComponent,
@@ -24,7 +31,13 @@ export {
 	mockTag,
 	mockUser,
 	mockVersion,
+	// Test Cases
 	mockTestCase,
 	mockTestCaseStatus,
-	mockCategory
+	mockCategory,
+	// Test Plans
+	mockPlanType,
+	mockTestPlan,
+	mockTestPlanType,
+	// Test Runs
 };
