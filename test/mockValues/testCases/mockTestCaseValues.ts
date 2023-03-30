@@ -1,7 +1,7 @@
 import { TestCaseValues } from '../../../src/testCases/testCase.type';
 import testCaseDefaults from './testCase.json';
 export function mockTestCase(
-	overrideValues: Partial<TestCaseValues>
+	overrideValues?: Partial<TestCaseValues>
 ): TestCaseValues {
 	return {
 		...testCaseDefaults,
@@ -13,7 +13,7 @@ import { TestCaseStatusValues }
 	from '../../../src/testCases/testCaseStatus.type';
 import testCaseStatusDefaults from './testCaseStatus.json';
 export function mockTestCaseStatus(
-	overrideValues: Partial<TestCaseStatusValues>
+	overrideValues?: Partial<TestCaseStatusValues>
 ): TestCaseStatusValues {
 	return {
 		...testCaseStatusDefaults,
@@ -25,7 +25,7 @@ import { CategoryValues }
 	from '../../../src/testCases/category.type';
 import categoryDefaults from './category.json';
 export function mockCategory(
-	overrideValues: Partial<CategoryValues>
+	overrideValues?: Partial<CategoryValues>
 ): CategoryValues {
 	return {
 		...categoryDefaults,

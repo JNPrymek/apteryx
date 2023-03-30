@@ -3,7 +3,7 @@ import { TestExecutionValues } from '../../../src/testRuns/testExecution.type';
 import testExecutionDefaults from './testExecution.json';
 
 export function mockTestExecution(
-	overrideValues: Partial<TestExecutionValues>
+	overrideValues?: Partial<TestExecutionValues>
 ): TestExecutionValues {
 	return {
 		...testExecutionDefaults,
@@ -16,7 +16,7 @@ import { TestExecutionStatusValues }
 import testExecutionStatusDefaults from './testExecutionStatus.json';
 
 export function mockTestExecutionStatus(
-	overrideValues: Partial<TestExecutionStatusValues>
+	overrideValues?: Partial<TestExecutionStatusValues>
 ): TestExecutionStatusValues {
 	return {
 		...testExecutionStatusDefaults,
@@ -29,7 +29,7 @@ import { TestRunValues }
 import testRunDefaults from './testRun.json';
 
 export function mockTestRun(
-	overrideValues: Partial<TestRunValues>
+	overrideValues?: Partial<TestRunValues>
 ): TestRunValues {
 	return {
 		...testRunDefaults,
