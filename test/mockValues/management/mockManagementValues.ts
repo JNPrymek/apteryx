@@ -15,7 +15,7 @@ import { ClassificationValues }
 import classificationDefaults from './classification.json';
 
 export function mockClassification(
-	overrideValues: Partial<ClassificationValues>
+	overrideValues?: Partial<ClassificationValues>
 ): ClassificationValues {
 	return {
 		...classificationDefaults,
@@ -29,7 +29,7 @@ import { ComponentServerValues }
 import componentDefaults from './component.json';
 
 export function mockComponent(
-	overrideValues: Partial<ComponentServerValues>
+	overrideValues?: Partial<ComponentServerValues>
 ): ComponentServerValues {
 	return {
 		...componentDefaults,
@@ -42,7 +42,7 @@ import { PriorityValues }
 import priorityDefaults from './priority.json';
 
 export function mockPriority(
-	overrideValues: Partial<PriorityValues>
+	overrideValues?: Partial<PriorityValues>
 ): PriorityValues {
 	return {
 		...priorityDefaults,
@@ -55,7 +55,7 @@ import { ProductValues }
 import productDefaults from './product.json';
 
 export function mockProduct(
-	overrideValues: Partial<ProductValues>
+	overrideValues?: Partial<ProductValues>
 ): ProductValues {
 	return {
 		...productDefaults,
@@ -68,7 +68,7 @@ import { TagValues }
 import tagDefaults from './tag.json';
 
 export function mockTag(
-	overrideValues: Partial<TagValues>
+	overrideValues?: Partial<TagValues>
 ): TagValues {
 	return {
 		...tagDefaults,
@@ -81,7 +81,7 @@ import { UserValues }
 import userDefaults from './user.json';
 
 export function mockUser(
-	overrideValues: Partial<UserValues>
+	overrideValues?: Partial<UserValues>
 ): UserValues {
 	return {
 		...userDefaults,
@@ -94,7 +94,7 @@ import { VersionValues }
 import versionDefaults from './version.json';
 
 export function mockVersion(
-	overrideValues: Partial<VersionValues>
+	overrideValues?: Partial<VersionValues>
 ): VersionValues {
 	return {
 		...versionDefaults,
