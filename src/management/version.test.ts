@@ -7,6 +7,7 @@ import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import Version from './version';
 import Product from './product';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
+import { mockVersion, mockProduct } from '../../test/mockKiwiValues';
 
 // Mock Axios
 jest.mock('axios');
@@ -16,85 +17,81 @@ describe('Version', () => {
 	
 	KiwiConnector.init({ hostName: serverDomain });
 	
-	const serverVer1 = { 
-		id: 1, 
-		value: '1.0.0', 
-		product: 2, 
-		'product__name': 'Example Product 2' 
-	};
-	const serverVer2 = { 
-		id: 2, 
-		value: '1.0.3', 
-		product: 2, 
-		'product__name': 'Example Product 2' 
-	};
+	const version1Vals = mockVersion();
+	const version2Vals = mockVersion({
+		id: 2,
+		value: '1.0.3',
+		product: 2,
+		product__name: 'The other product'
+	});
 	
 	it('Can instantiate a Version', () => {
-		
-		const ver = new Version(serverVer1);
-		
-		expect(ver['serialized']).toEqual(serverVer1);
+		const ver = new Version(version1Vals);
+		expect(ver['serialized']).toEqual(version1Vals);
 	});
 	
-	it('Can get Version by ID', async () => {
-		mockAxios
-			.post
-			.mockResolvedValue(
-				mockRpcResponse({ result: [serverVer1] })
+	describe('Access local properties', () => {
+		const version1 = new Version(version1Vals);
+		const version2 = new Version(version2Vals);
+		it('Can read the value of the Version', () => {
+			expect(version1.getValue()).toEqual('unspecified');
+			expect(version2.getValue()).toEqual('1.0.3');
+		});
+		
+		it('Can read the Product ID of the Version', () => {
+			expect(version1.getProductId()).toEqual(1);
+			expect(version2.getProductId()).toEqual(2);
+		});
+		
+		it('Can read the Product name of the Version', () => {
+			expect(version1.getProductName()).toEqual('Example.com Website');
+			expect(version2.getProductName()).toEqual('The other product');
+		});
+		
+		it('Can read the Product of the Version', async () => {
+			const product1Vals = mockProduct();
+			const product2Vals = mockProduct({
+				id: 2,
+				name: 'The other product'
+			});
+			
+			mockAxios.post.mockResolvedValueOnce(
+				mockRpcResponse({ result: [product1Vals] })
 			);
-		const ver = await Version.getById(1);
-		
-		expect(ver['serialized']).toEqual(serverVer1);
-	});
-	
-	it('Can get multiple Versions by IDs', async () => {
-		mockAxios
-			.post.
-			mockResolvedValue(
-				mockRpcResponse({ result: [serverVer1, serverVer2] })
+			mockAxios.post.mockResolvedValue(
+				mockRpcResponse({ result: [product2Vals] })
 			);
-		const vers = await Version.getByIds([1, 2]);
-		
-		expectArrayWithKiwiItem(vers, serverVer1);
-		expectArrayWithKiwiItem(vers, serverVer2);
+			
+			expect(await version1.getProduct())
+				.toEqual(new Product(product1Vals));
+			expect(await version2.getProduct())
+				.toEqual(new Product(product2Vals));
+			
+		});
 	});
 	
-	it('Can read the value of the Version', () => {
+	describe('Server lookups', () => {
+		it('Can get Version by ID', async () => {
+			mockAxios
+				.post
+				.mockResolvedValue(
+					mockRpcResponse({ result: [version1Vals] })
+				);
+			const ver = await Version.getById(1);
+			
+			expect(ver['serialized']).toEqual(version1Vals);
+		});
 		
-		const ver = new Version(serverVer1);
-		
-		expect(ver.getValue()).toEqual('1.0.0');
-	});
-	
-	it('Can read the Product ID of the Version', () => {
-		
-		const ver = new Version(serverVer1);
-		
-		expect(ver.getProductId()).toEqual(2);
-	});
-	
-	it('Can read the Product name of the Version', () => {
-		
-		const ver = new Version(serverVer1);
-		
-		expect(ver.getProductName()).toEqual('Example Product 2');
-	});
-	
-	it('Can read the Product of the Version', async () => {
-		
-		const prod2Vals = {
-			id: 2, 
-			name: 'Example Product 2', 
-			classification: 2, 
-			description: 'Second Example Product'
-		};
-		
-		mockAxios
-			.post
-			.mockResolvedValue(mockRpcResponse({ result: [prod2Vals] }));
-		
-		const version1 = new Version(serverVer1);
-		expect(await version1.getProduct()).toEqual(new Product(prod2Vals));
-		
+		it('Can get multiple Versions by IDs', async () => {
+			mockAxios
+				.post.
+				mockResolvedValue(
+					mockRpcResponse({ result: [version1Vals, version2Vals] })
+				);
+			const vers = await Version.getByIds([1, 2]);
+			
+			expectArrayWithKiwiItem(vers, version1Vals);
+			expectArrayWithKiwiItem(vers, version2Vals);
+		});
 	});
 });
