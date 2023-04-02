@@ -2,7 +2,7 @@ import { BuildValues } from '../../../src/management/build.type';
 import buildDefaults from './build.json';
 
 export function mockBuild(
-	overrideValues: Partial<BuildValues>
+	overrideValues?: Partial<BuildValues>
 ): BuildValues {
 	return {
 		...buildDefaults,
