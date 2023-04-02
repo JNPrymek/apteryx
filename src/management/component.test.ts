@@ -7,6 +7,7 @@ import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
 import Component from './component';
 import Product from './product';
+import { ComponentValues, ComponentServerValues } from './component.type';
 
 // Mock Axios
 jest.mock('axios');
@@ -16,8 +17,7 @@ describe('Component', () => {
 	
 	KiwiConnector.init({ hostName: serverDomain });
 	
-	//  Base values (without 'cases') of Components
-	const serverComp1base = {
+	const serverComp1base: ComponentValues = {
 		id: 1,
 		name: 'First Component',
 		product: 1,
@@ -25,17 +25,25 @@ describe('Component', () => {
 		'initial_qa_contact': 2,
 		description: 'The first component added to Kiwi'
 	};
+	const serverComp1: ComponentServerValues = {
+		...serverComp1base,
+		cases: null
+	};
 	
-	const serverComp2base = {
+	const serverComp2base: ComponentValues = {
 		id: 2,
 		name: 'Second Component',
 		product: 1,
 		'initial_owner': 2,
 		'initial_qa_contact': 1,
-		description: 'The second component added to Kiwi'
+		description: 'The second component added to Kiwi',
+	};
+	const serverComp2: ComponentServerValues = {
+		...serverComp2base,
+		cases: null
 	};
 	
-	const serverComp3base = {
+	const serverComp3base: ComponentValues = {
 		id: 3,
 		name: 'First Component',
 		product: 2,
@@ -44,13 +52,17 @@ describe('Component', () => {
 		/* eslint-disable-next-line max-len */
 		description: 'First Component of Prod2.  Happens to have a duplicate name as an existing component in Prod1.'
 	};
+	const serverComp3: ComponentServerValues = {
+		...serverComp3base,
+		cases: null
+	};
 	
 	it('Can get by single ID - 0 TCs linked', async () => {
 		mockAxios
 			.post
 			.mockResolvedValue(
 				mockRpcResponse({ 
-					result: [ { ...serverComp1base, cases: null }] 
+					result: [ serverComp1 ] 
 				}));
 		
 		const comp = await Component.getById(1);
@@ -59,7 +71,7 @@ describe('Component', () => {
 	
 	it('Can get by single ID - 1 TC linked', async () => {
 		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: [ { ...serverComp1base, cases: 1 }] }));
+			mockRpcResponse({ result: [ { ...serverComp1, cases: 1 }] }));
 		
 		const comp = await Component.getById(1);
 		expect(comp['serialized']).toEqual(serverComp1base);
@@ -68,8 +80,8 @@ describe('Component', () => {
 	it('Can get by single ID - 2 TCs linked', async () => {
 		mockAxios.post.mockResolvedValue(
 			mockRpcResponse({ result: [ 
-				{ ...serverComp1base, cases: 1 },
-				{ ...serverComp1base, cases: 2 }
+				{ ...serverComp1, cases: 1 },
+				{ ...serverComp1, cases: 2 }
 			] }));
 		
 		const comp = await Component.getById(1);
@@ -80,9 +92,9 @@ describe('Component', () => {
 	it('Can get by multiple IDs - mix of TCs linked', async () => {
 		mockAxios.post.mockResolvedValue(
 			mockRpcResponse({ result: [ 
-				{ ...serverComp1base, cases: 1 },
-				{ ...serverComp1base, cases: 2 },
-				{ ...serverComp2base, cases: null }
+				{ ...serverComp1, cases: 1 },
+				{ ...serverComp1, cases: 2 },
+				{ ...serverComp2 }
 			] }));
 		
 		const comps = await Component.getByIds([1, 2]);
@@ -146,9 +158,9 @@ describe('Component', () => {
 		// Mock distinct entries
 		mockAxios.post.mockResolvedValue(
 			mockRpcResponse({ result: [ 
-				{ ...serverComp1base, cases: 1 },
-				{ ...serverComp1base, cases: 2 },
-				{ ...serverComp1base, cases: 5 }
+				{ ...serverComp1, cases: 1 },
+				{ ...serverComp1, cases: 2 },
+				{ ...serverComp1, cases: 5 }
 			] }));
 		
 		const compTCs = await comp.getLinkedTestCaseIds();
@@ -170,7 +182,7 @@ describe('Component', () => {
 		
 		mockAxios.post.mockResolvedValue(
 			mockRpcResponse({ result: [
-				{ ...serverComp1base, cases: null }
+				{ ...serverComp1 }
 			] }));
 		
 		const comp = await Component.getByName('First Component');
@@ -185,8 +197,8 @@ describe('Component', () => {
 		
 			mockAxios.post.mockResolvedValue(
 				mockRpcResponse({ result: [
-					{ ...serverComp1base, cases: null },
-					{ ...serverComp3base, cases: null }
+					{ ...serverComp1 },
+					{ ...serverComp3 }
 				] }));
 		
 			const name = 'First Component';
@@ -202,7 +214,7 @@ describe('Component', () => {
 		
 			mockAxios.post.mockResolvedValue(
 				mockRpcResponse({ result: [
-					{ ...serverComp1base, cases: null }
+					{ ...serverComp1 }
 				] }));
 		
 			const name = 'First Component';
@@ -219,8 +231,8 @@ describe('Component', () => {
 		
 			mockAxios.post.mockResolvedValue(
 				mockRpcResponse({ result: [
-					{ ...serverComp1base, cases: null },
-					{ ...serverComp3base, cases: null }
+					{ ...serverComp1 },
+					{ ...serverComp3 }
 				] }));
 		
 			const name = 'First Component';
@@ -236,8 +248,8 @@ describe('Component', () => {
 		
 			mockAxios.post.mockResolvedValue(
 				mockRpcResponse({ result: [
-					{ ...serverComp1base, cases: null },
-					{ ...serverComp3base, cases: null }
+					{ ...serverComp1 },
+					{ ...serverComp3 }
 				] }));
 		
 			const name = 'First Component';
@@ -252,8 +264,8 @@ describe('Component', () => {
 		
 			mockAxios.post.mockResolvedValue(
 				mockRpcResponse({ result: [
-					{ ...serverComp1base, cases: null },
-					{ ...serverComp3base, cases: null }
+					{ ...serverComp1 },
+					{ ...serverComp3 }
 				] }));
 		
 			const name = 'First Component';

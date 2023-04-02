@@ -1,4 +1,5 @@
 import KiwiNamedItem from '../core/kiwiNamedItem';
+import { ClassificationValues } from './classification.type';
 
 export default class Classification extends KiwiNamedItem {
 	
@@ -19,7 +20,7 @@ export default class Classification extends KiwiNamedItem {
 	}
 	
 	public static async serverFilter(
-		filterObj: Record<string, unknown>
+		filterObj: ClassificationValues
 	): Promise<Array<Classification>> {
 		return await super.serverFilter(filterObj) as Array<Classification>;
 	}

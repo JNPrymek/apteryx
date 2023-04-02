@@ -1,0 +1,18 @@
+{
+	"id": 1,
+	"assignee": 1,
+	"assignee__username": "alice",
+	"tested_by": null,
+	"tested_by__username": null,
+	"case_text_version": 1,
+	"start_date": null,
+	"stop_date": null,
+	"sortkey": 0,
+	"run": 1,
+	"case": 1,
+	"case__summary": "Example Test Case",
+	"build": 1,
+	"build__name": "unspecified",
+	"status": 1,
+	"status__name": "IDLE"
+}

@@ -1,0 +1,17 @@
+{
+	"id": 1,
+	"name": "TestPlan h",
+	"text": "Example Test Plan\nauxiliary\na",
+	"create_date": "2022-12-02T20:11:13.015",
+	"is_active": true,
+	"extra_link": null,
+	"product_version": 1,
+	"product_version__value": "unspecified",
+	"product": 1,
+	"product__name": "Example.com Website",
+	"author": 3,
+	"author__username": "debug",
+	"type": 1,
+	"type__name": "Unit",
+	"parent": null
+}

@@ -1,0 +1,20 @@
+{
+	"id": 5,
+	"plan__product_version": 1,
+	"plan__product_version__value": "unspecified",
+	"start_date": null,
+	"stop_date": null,
+	"planned_start": null,
+	"planned_stop": null,
+	"summary": "another run",
+	"notes": "run with null values",
+	"plan": 1,
+	"plan__product": 1,
+	"plan__name": "TestPlan h",
+	"build": 1,
+	"build__name": "unspecified",
+	"manager": 2,
+	"manager__username": "jnprymek",
+	"default_tester": null,
+	"default_tester__username": null
+}
