@@ -6,8 +6,10 @@ import Product from './product';
 import { 
 	mockComponent, 
 	mockComponentServerEntry, 
-	mockProduct 
+	mockProduct, 
+	mockUser
 } from '../../test/mockKiwiValues';
+import User from './user';
 
 // Mock Axios
 jest.mock('axios');
@@ -66,10 +68,66 @@ describe('Component', () => {
 			expect(component3.getInitialOwnerId()).toEqual(1);
 		});
 	
+		it('Can get Component Initial Owner', async () => {
+			const user1Vals = mockUser();
+			const user2Vals = mockUser({
+				id: 2,
+				username: 'bob',
+				email: 'bob@example.com',
+				first_name: 'Bob',
+				last_name: 'Bar'
+			});
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [user1Vals]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [user2Vals]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [user1Vals]
+			}));
+			
+			expect(await component1.getInitialOwner())
+				.toEqual(new User(user1Vals));
+			expect(await component2.getInitialOwner())
+				.toEqual(new User(user2Vals));
+			expect(await component3.getInitialOwner())
+				.toEqual(new User(user1Vals));
+		});
+	
 		it('Can get ID of Component Initial QA Contact', () => {
 			expect(component1.getInitialQaContactId()).toEqual(2);
 			expect(component2.getInitialQaContactId()).toEqual(1);
 			expect(component3.getInitialQaContactId()).toEqual(2);
+		});
+		
+		it('Can get Component Initial QA Contact', async () => {
+			const user1Vals = mockUser();
+			const user2Vals = mockUser({
+				id: 2,
+				username: 'bob',
+				email: 'bob@example.com',
+				first_name: 'Bob',
+				last_name: 'Bar'
+			});
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [user2Vals]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [user1Vals]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [user2Vals]
+			}));
+			
+			expect(await component1.getInitialQaContact())
+				.toEqual(new User(user2Vals));
+			expect(await component2.getInitialQaContact())
+				.toEqual(new User(user1Vals));
+			expect(await component3.getInitialQaContact())
+				.toEqual(new User(user2Vals));
 		});
 	
 		it('Can get ID of Component Product', () => {
@@ -107,7 +165,6 @@ describe('Component', () => {
 		});
 	
 		it('Can get IDs of TestCases linked to Component', async () => {
-		
 			// Mock distinct entries
 			mockAxios.post.mockResolvedValue(
 				mockRpcResponse({ result: [ 
@@ -115,13 +172,9 @@ describe('Component', () => {
 					{ ...component1Vals, cases: 2 },
 					{ ...component1Vals, cases: 5 }
 				] }));
-		
 			const compTCs = await component1.getLinkedTestCaseIds();
-		
 			expect(compTCs).toEqual([1, 2, 5]);
 		});
-	
-		
 	});
 	
 	describe('Server Lookups', () => {
