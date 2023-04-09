@@ -6,6 +6,7 @@ import {
 	mockPriority,
 	mockProduct,
 	mockTag,
+	mockTagServerEntry,
 	mockUser,
 	mockVersion
 } from './mockValues/management/mockManagementValues';
@@ -37,6 +38,7 @@ export {
 	mockPriority,
 	mockProduct,
 	mockTag,
+	mockTagServerEntry,
 	mockUser,
 	mockVersion,
 	// Test Cases
