@@ -6,8 +6,9 @@ import Product from './product';
 export default class Component extends KiwiNamedItem {
 	
 	// Constructor for all classes
-	constructor(serializedValues: ComponentValues) {
+	constructor(serializedValues: ComponentValues|ComponentServerValues) {
 		super(serializedValues);
+		delete this.serialized.cases;
 	}
 	
 	public getProductId(): number {
@@ -32,7 +33,7 @@ export default class Component extends KiwiNamedItem {
 	}
 	
 	// TODO - implement User class
-	// public async getInitialOwner(): User {
+	// public async getInitialQaContact(): User {
 	// 	return await User.getById(this.getInitialQaContactId());
 	// }
 	

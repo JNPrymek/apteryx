@@ -24,15 +24,27 @@ export function mockClassification(
 }
 
 
-import { ComponentServerValues }
+import { ComponentValues, ComponentServerValues }
 	from '../../../src/management/component.type';
-import componentDefaults from './component.json';
+import componentServerDefaults from './component.json';
+
+const componentDefaults: ComponentValues = { ...componentServerDefaults };
 
 export function mockComponent(
+	overrideValues?: Partial<ComponentValues>
+): ComponentValues {
+	return {
+		...componentDefaults,
+		...overrideValues
+	};
+}
+
+export function mockComponentServerEntry(
 	overrideValues?: Partial<ComponentServerValues>
 ): ComponentServerValues {
 	return {
-		...componentDefaults,
+		...componentServerDefaults,
+		cases: null,
 		...overrideValues
 	};
 }
