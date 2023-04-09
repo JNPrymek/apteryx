@@ -1,11 +1,16 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
 import KiwiConnector from '../core/kiwiConnector';
+import { TagServerValues, TagValues } from './tag.type';
 
 export default class Tag extends KiwiBaseItem {
 	
-	// Constructor for all classes
-	constructor(serializedValues: Record<string, unknown>) {
+	constructor(serializedValues: TagValues | TagServerValues) {
 		super(serializedValues);
+		// Remove properties for tag associations
+		delete this.serialized.case;
+		delete this.serialized.plan;
+		delete this.serialized.run;
+		delete this.serialized.bugs;
 	}
 	
 	// Names are not unique, so cannot inherit from KiwiNamedItem
@@ -32,19 +37,19 @@ export default class Tag extends KiwiBaseItem {
 	
 	
 	// Get serialized entries as returned by Kiwi
-	// (1x entry per link to a case, plan, run, or bug)
+	// (1x entry per association with a case, plan, run, or bug)
 	private static async serverFilterDistinct(
 		filterObject: Record<string, unknown>
-	): Promise<Array<Record<string, unknown>>> {
+	): Promise<Array<TagServerValues>> {
 		return await KiwiConnector.sendRPCMethod(
 			`${this.name}.filter`,
 			[ filterObject ]
-		) as Array<Record<string, unknown>>;
+		) as Array<TagServerValues>;
 	}
 	
 	private static async serverFilterCaseTags(
 		filterObject: Record<string, unknown>
-	): Promise<Array<Record<string, unknown>>> {
+	): Promise<Array<TagServerValues>> {
 		return await this.serverFilterDistinct(
 			{ ...filterObject, 'case__isnull': false }
 		);
@@ -52,7 +57,7 @@ export default class Tag extends KiwiBaseItem {
 	
 	private static async serverFilterPlanTags(
 		filterObject: Record<string, unknown>
-	): Promise<Array<Record<string, unknown>>> {
+	): Promise<Array<TagServerValues>> {
 		return await this.serverFilterDistinct(
 			{ ...filterObject, 'plan__isnull': false }
 		);
@@ -60,7 +65,7 @@ export default class Tag extends KiwiBaseItem {
 	
 	private static async serverFilterRunTags(
 		filterObject: Record<string, unknown>
-	): Promise<Array<Record<string, unknown>>> {
+	): Promise<Array<TagServerValues>> {
 		return await this.serverFilterDistinct(
 			{ ...filterObject, 'run__isnull': false }
 		);
@@ -68,7 +73,7 @@ export default class Tag extends KiwiBaseItem {
 	
 	private static async serverFilterBugTags(
 		filterObject: Record<string, unknown>
-	): Promise<Array<Record<string, unknown>>> {
+	): Promise<Array<TagServerValues>> {
 		return await this.serverFilterDistinct(
 			{ ...filterObject, 'bugs__isnull': false }
 		);
@@ -84,11 +89,12 @@ export default class Tag extends KiwiBaseItem {
 		const tagIds: Array<number> = [];
 		
 		for (const distinctItem of distinctResults) {
-			const id = distinctItem['id'] as number;
+			const id = distinctItem.id as number;
 			if (!tagIds.includes(id)) {
-				const tagProps = { 
-					id: distinctItem['id'] as number, 
-					name: distinctItem['name'] as string };
+				const tagProps: TagValues = { 
+					id: distinctItem.id, 
+					name: distinctItem.name 
+				};
 				const tag = new Tag(tagProps);
 				tagIds.push(id);
 				tagList.push(tag);
@@ -100,11 +106,12 @@ export default class Tag extends KiwiBaseItem {
 	
 	public async getTaggedTestCaseIds(): Promise<Array<number>> {
 		const distinctTags = 
-		await Tag.serverFilterCaseTags({ id: this.getId() });
+			await Tag.serverFilterCaseTags({ id: this.getId() });
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
-			idList.push(tag['case'] as number);
+			// Server filter method should not return null values
+			idList.push(tag.case as number);
 		}
 		return idList;
 	}
@@ -115,7 +122,8 @@ export default class Tag extends KiwiBaseItem {
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
-			idList.push(tag['run'] as number);
+			// Server filter method should not return null values
+			idList.push(tag.run as number);
 		}
 		return idList;
 	}
@@ -126,7 +134,8 @@ export default class Tag extends KiwiBaseItem {
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
-			idList.push(tag['plan'] as number);
+			// Server filter method should not return null values
+			idList.push(tag.plan as number);
 		}
 		return idList;
 	}
@@ -137,7 +146,8 @@ export default class Tag extends KiwiBaseItem {
 		const idList: Array<number> = [];
 		
 		for (const tag of distinctTags) {
-			idList.push(tag['bugs'] as number);
+			// Server filter method should not return null values
+			idList.push(tag.bugs as number);
 		}
 		return idList;
 	}
