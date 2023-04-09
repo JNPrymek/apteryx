@@ -14,8 +14,13 @@ export default class KiwiConnector {
 	private static serverUrl: string;
 	
 	public static init(serverDetails: IServerDetails): void {
-		/* eslint-disable-next-line max-len */
-		this.serverUrl = `http${serverDetails.useSSL ? 's' : ''}://${serverDetails.hostName}${serverDetails.port ? serverDetails.port : ''}`;
+		const protocol = `http${serverDetails.useSSL ? 's' : ''}://`;
+		let host = serverDetails.hostName;
+		if (host.endsWith('/')) {
+			host = host.slice(0, -1);
+		}
+		const port = serverDetails.port ? `:${serverDetails.port}` : '';
+		this.serverUrl = `${protocol}${host}${port}`;
 		RequestHandler.clearCookieJar();
 	}
 	

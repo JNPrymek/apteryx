@@ -15,9 +15,35 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Kiwi Connector', () => {
 	
-	it('Init runs without error', () => {
-		expect(KiwiConnector.init({ hostName: serverDomain })).toBeUndefined();
+	describe('Initialization', () => {
+		it('Initializes with only hostname specified', () => {
+			expect(KiwiConnector.init({ hostName: 'example.com/' }))
+				.toBeUndefined();
+			expect(KiwiConnector['serverUrl']).not.toContain('.com/');
+		});
+		
+		it('Initialization removes trailing slash from hostname', () => {
+			expect(KiwiConnector.init({ hostName: serverDomain }))
+				.toBeUndefined();
+		});
+		
+		it('Initializes when using ssl', () => {
+			expect(KiwiConnector.init(
+				{ hostName: serverDomain, useSSL: true }
+			))
+				.toBeUndefined();
+			expect(KiwiConnector['serverUrl']).toContain('https://');
+		});
+		
+		it('Initializes when using custom port', () => {
+			expect(KiwiConnector.init({ hostName: serverDomain, port: 3080 }
+			))
+				.toBeUndefined();
+			expect(KiwiConnector['serverUrl']).toContain(':3080');
+		});
+		
 	});
+	
 	
 	// Send a Generic RPC method
 	it('Can send a generic RPC method call', async () => {
