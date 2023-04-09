@@ -4,5 +4,6 @@
 	"product": 1,
 	"initial_owner": 1,
 	"initial_qa_contact": 2,
-	"description": "Homepage of the Example.com website"
+	"description": "Homepage of the Example.com website",
+	"cases": null
 }
