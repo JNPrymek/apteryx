@@ -21,7 +21,7 @@ export default class Priority extends KiwiBaseItem {
 		}
 	}
 	
-	public getIsActive(): boolean {
+	public isActive(): boolean {
 		return this.serialized.is_active as boolean;
 	}
 	
