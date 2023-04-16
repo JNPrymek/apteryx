@@ -1,7 +1,7 @@
 {
 	"id": 1,
-	"name": "TestPlan h",
-	"text": "Example Test Plan\nauxiliary\na",
+	"name": "Example Test Plan",
+	"text": "An example test plan used for unit tests.\nThis is the description.",
 	"create_date": "2022-12-02T20:11:13.015",
 	"is_active": true,
 	"extra_link": null,
@@ -9,8 +9,8 @@
 	"product_version__value": "unspecified",
 	"product": 1,
 	"product__name": "Example.com Website",
-	"author": 3,
-	"author__username": "debug",
+	"author": 1,
+	"author__username": "alice",
 	"type": 1,
 	"type__name": "Unit",
 	"parent": null
