@@ -34,11 +34,9 @@ describe('HTTP Request Handler', () => {
 		{ key: 'test-b-key', value: 'test-b-value', domain: serverDomain },
 		{ key: 'test-c-key', value: 'test-c-value', domain: serverDomain }
 	];
-	// console.log((new Cookie(cookieVals[2])).cookieString());
 	
 	// Remove all cookies from Cookie Jar before each test
 	beforeEach( async () => {
-		// console.log(expect.getState().currentTestName);
 		RequestHandler.cookieJar.removeAllCookies();
 	});
 	
@@ -135,7 +133,6 @@ describe('HTTP Request Handler', () => {
 			const cookiesInJar = await RequestHandler
 				.cookieJar
 				.getCookies(requestPath);
-			console.log(cookiesInJar[0]);
 			expect(cookiesInJar)
 				.toEqual(
 					expect.arrayContaining([

@@ -1,110 +1,98 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import User from './user';
-import { UserValues } from './user.type';
+import { mockUser } from '../../test/mockKiwiValues';
 
 // Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('User', () => {
-	const rawValues: {
-		alice: UserValues;
-		bob: UserValues;
-	} = {
-		alice: {
-			id: 1,
-			username: 'alice',
-			email: 'alice@example.com',
-			first_name: 'Alice',
-			last_name: 'Foo',
-			is_active: true,
-			is_staff: true,
-			is_superuser: true,
-		},
-		bob: {
-			id: 2,
-			username: 'bob',
-			email: 'bob@example.com',
-			first_name: 'Bob',
-			last_name: 'Bar',
-			is_active: true,
-			is_staff: false,
-			is_superuser: false,
-		},
-	};
+	
+	const user1Vals = mockUser();
+	const user2Vals = mockUser({
+		id: 2,
+		username: 'bob',
+		email: 'bob@example.com',
+		first_name: 'Bob',
+		last_name: 'Bar',
+		is_active: true,
+		is_staff: false,
+		is_superuser: false,
+	});
+	
 	it('Can instantiate a User object', () => {
-		expect(new User(rawValues.alice)).toBeInstanceOf(User);
-		expect(new User(rawValues.alice)).toHaveProperty(
+		expect(new User(user1Vals)).toBeInstanceOf(User);
+		expect(new User(user1Vals)).toHaveProperty(
 			'serialized',
-			rawValues.alice
+			user1Vals
 		);
-		expect(new User(rawValues.bob))
-			.toHaveProperty('serialized', rawValues.bob);
+		expect(new User(user2Vals))
+			.toHaveProperty('serialized', user2Vals);
 	});
 
 	describe('Access local properties', () => {
-		const alice = new User(rawValues.alice);
-		const bob = new User(rawValues.bob);
+		const user1 = new User(user1Vals);
+		const user2 = new User(user2Vals);
 
 		it('Can get User username', () => {
-			expect(alice.getUsername()).toEqual('alice');
-			expect(bob.getUsername()).toEqual('bob');
+			expect(user1.getUsername()).toEqual('alice');
+			expect(user2.getUsername()).toEqual('bob');
 		});
 
 		it('Can get User name', () => {
-			expect(alice.getName()).toEqual('alice');
-			expect(bob.getName()).toEqual('bob');
+			expect(user1.getName()).toEqual('alice');
+			expect(user2.getName()).toEqual('bob');
 		});
 
 		it('Can get User first name', () => {
-			expect(alice.getFirstName()).toEqual('Alice');
-			expect(bob.getFirstName()).toEqual('Bob');
+			expect(user1.getFirstName()).toEqual('Alice');
+			expect(user2.getFirstName()).toEqual('Bob');
 		});
 
 		it('Can get User last name', () => {
-			expect(alice.getLastName()).toEqual('Foo');
-			expect(bob.getLastName()).toEqual('Bar');
+			expect(user1.getLastName()).toEqual('Foo');
+			expect(user2.getLastName()).toEqual('Bar');
 		});
 
 		it('Can get User email address', () => {
-			expect(alice.getEmail()).toEqual('alice@example.com');
-			expect(bob.getEmail()).toEqual('bob@example.com');
+			expect(user1.getEmail()).toEqual('alice@example.com');
+			expect(user2.getEmail()).toEqual('bob@example.com');
 		});
 
 		it('Can get User active flag', () => {
-			expect(alice.isActive()).toEqual(true);
-			expect(bob.isActive()).toEqual(true);
+			expect(user1.isActive()).toEqual(true);
+			expect(user2.isActive()).toEqual(true);
 		});
 
 		it('Can get User staff flag', () => {
-			expect(alice.isStaff()).toEqual(true);
-			expect(bob.isStaff()).toEqual(false);
+			expect(user1.isStaff()).toEqual(true);
+			expect(user2.isStaff()).toEqual(false);
 		});
 
 		it('Can get User superuser flag', () => {
-			expect(alice.isSuperUser()).toEqual(true);
-			expect(bob.isSuperUser()).toEqual(false);
+			expect(user1.isSuperUser()).toEqual(true);
+			expect(user2.isSuperUser()).toEqual(false);
 		});
 	});
 
 	describe('Server Functions', () => {
 		it('Can get a User via single ID', async () => {
 			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [rawValues.alice] })
+				mockRpcResponse({ result: [user1Vals] })
 			);
 
-			expect(await User.getById(1)).toEqual(new User(rawValues.alice));
+			expect(await User.getById(1)).toEqual(new User(user1Vals));
 		});
 
 		it('Can get Users via a list of IDs', async () => {
 			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [rawValues.alice, rawValues.bob] })
+				mockRpcResponse({ result: [user1Vals, user2Vals] })
 			);
 
 			const expectResults = [
-				new User(rawValues.alice),
-				new User(rawValues.bob)
+				new User(user1Vals),
+				new User(user2Vals)
 			];
 
 			expect(await User.getByIds([1, 2]))
@@ -113,32 +101,32 @@ describe('User', () => {
 
 		it('Can get a User by their username', async () => {
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [rawValues.alice] })
+				mockRpcResponse({ result: [user1Vals] })
 			);
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [rawValues.bob] })
+				mockRpcResponse({ result: [user2Vals] })
 			);
 
 			expect(await User.getByUsername('alice'))
-				.toEqual(new User(rawValues.alice));
+				.toEqual(new User(user1Vals));
 
 			expect(await User.getByUsername('bob'))
-				.toEqual(new User(rawValues.bob));
+				.toEqual(new User(user2Vals));
 		});
 
 		it('Can get a User by their name', async () => {
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [rawValues.alice] })
+				mockRpcResponse({ result: [user1Vals] })
 			);
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [rawValues.bob] })
+				mockRpcResponse({ result: [user2Vals] })
 			);
 
 			expect(await User.getByName('alice'))
-				.toEqual(new User(rawValues.alice));
+				.toEqual(new User(user1Vals));
 
 			expect(await User.getByName('bob'))
-				.toEqual(new User(rawValues.bob));
+				.toEqual(new User(user2Vals));
 		});
 
 		it('Throws error when getting User with invalid username', async () => {

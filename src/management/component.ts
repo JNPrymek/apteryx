@@ -2,12 +2,14 @@ import KiwiConnector from '../core/kiwiConnector';
 import KiwiNamedItem from '../core/kiwiNamedItem';
 import { ComponentServerValues, ComponentValues } from './component.type';
 import Product from './product';
+import User from './user';
 
 export default class Component extends KiwiNamedItem {
 	
 	// Constructor for all classes
-	constructor(serializedValues: ComponentValues) {
+	constructor(serializedValues: ComponentValues|ComponentServerValues) {
 		super(serializedValues);
+		delete this.serialized.cases;
 	}
 	
 	public getProductId(): number {
@@ -22,19 +24,17 @@ export default class Component extends KiwiNamedItem {
 		return this.serialized['initial_owner'] as number;
 	}
 	
-	// TODO - implement User class
-	// public async getInitialOwner(): User {
-	// 	return await User.getById(this.getInitialOwnerId());
-	// }
+	public async getInitialOwner(): Promise<User> {
+		return await User.getById(this.getInitialOwnerId());
+	}
 	
 	public getInitialQaContactId(): number {
 		return this.serialized['initial_qa_contact'] as number;
 	}
 	
-	// TODO - implement User class
-	// public async getInitialOwner(): User {
-	// 	return await User.getById(this.getInitialQaContactId());
-	// }
+	public async getInitialQaContact(): Promise<User> {
+		return await User.getById(this.getInitialQaContactId());
+	}
 	
 	public getDescription(): string {
 		return this.serialized.description as string;

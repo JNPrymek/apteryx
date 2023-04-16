@@ -2,9 +2,11 @@ import {
 	mockBuild,
 	mockClassification,
 	mockComponent,
+	mockComponentServerEntry,
 	mockPriority,
 	mockProduct,
 	mockTag,
+	mockTagServerEntry,
 	mockUser,
 	mockVersion
 } from './mockValues/management/mockManagementValues';
@@ -32,9 +34,11 @@ export {
 	mockBuild,
 	mockClassification,
 	mockComponent,
+	mockComponentServerEntry,
 	mockPriority,
 	mockProduct,
 	mockTag,
+	mockTagServerEntry,
 	mockUser,
 	mockVersion,
 	// Test Cases
