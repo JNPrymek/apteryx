@@ -1,5 +1,6 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
+import { mockPlanType } from '../../test/mockKiwiValues';
 import PlanType from './planType';
 
 // Init Mock Axios
@@ -8,21 +9,18 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('PlanType', () => {
 	
-	const type1Vals = {
-		id: 1,
-		name: 'Unit',
-		description: ''
-	};
-
-	const type2Vals = {
+	const type1Vals = mockPlanType();
+	const type2Vals = mockPlanType({
 		id: 2,
 		name: 'Regression',
 		description: 'Test Description'
-	};
+	});
 
 	it('Can instantiate a new PlanType', () => {
 		const type1 = new PlanType(type1Vals);
 		expect(type1['serialized']).toEqual(type1Vals);
+		const type2 = new PlanType(type2Vals);
+		expect(type2['serialized']).toEqual(type2Vals);
 	});
 
 	describe('Can access local properties', () => {
@@ -40,7 +38,8 @@ describe('PlanType', () => {
 		});
 
 		it('Can get PlanType Description', () => {
-			expect(type1.getDescription()).toEqual('');
+			expect(type1.getDescription())
+				.toEqual('Tests for a small portion of code');
 			expect(type2.getDescription()).toEqual('Test Description');
 		});
 	});
