@@ -1,5 +1,6 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
+import { mockCategory, mockProduct } from '../../test/mockKiwiValues';
 import Product from '../management/product';
 
 import Category from './category';
@@ -10,59 +11,48 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Category', () => {
 
-	const cat1Vals = {
-		id: 4,
-		name: 'Regression',
-		product: 1,
-		'product_name': 'Example.com Website',
-	};
-
-	const cat2Vals = {
+	const cat1Vals = mockCategory();
+	const cat2Vals = mockCategory({
 		id: 2,
 		name: 'Sanity',
 		product: 1,
-		'product_name': 'Example.com Website',
-	};
+		description: 'High-level tests',
+	});
 
 	it('Can instantiate a Category', () => {
 		const cat1 = new Category(cat1Vals);
 		expect(cat1['serialized']).toEqual(cat1Vals);
+		const cat2 = new Category(cat2Vals);
+		expect(cat2['serialized']).toEqual(cat2Vals);
 	});
 
 	describe('Can access local properties', () => {
 		
-		const cat1 = new Category(cat1Vals);
-		const cat2 = new Category(cat2Vals);
+		const category1 = new Category(cat1Vals);
+		const category2 = new Category(cat2Vals);
 
 		it('Can get Category ID', () => {
-			expect(cat1.getId()).toEqual(4);
-			expect(cat2.getId()).toEqual(2);
+			expect(category1.getId()).toEqual(1);
+			expect(category2.getId()).toEqual(2);
 		});
 
 		it('Can get Category Product', async () => {
-			const serverProd1 = { 
-				id: 1, 
-				name: 'Example.com Website', 
-				classification: 2, 
-				description: 'Example Product 1' 
-			};
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [serverProd1] })
-				);
-			const categoryProduct = await cat1.getProduct();
-			expect(categoryProduct).toEqual(new Product(serverProd1));
+			const product1Vals = mockProduct();
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: [product1Vals] 
+			}));
+			const categoryProduct = await category1.getProduct();
+			expect(categoryProduct).toEqual(new Product(product1Vals));
 		});
 
 		it('Can get Category Product ID', () => {
-			expect(cat1.getProductId()).toEqual(1);
-			expect(cat2.getProductId()).toEqual(1);
+			expect(category1.getProductId()).toEqual(1);
+			expect(category2.getProductId()).toEqual(1);
 		});
 
 		it('Can get Category Product Name', () => {
-			expect(cat1.getProductName()).toEqual('Example.com Website');
-			expect(cat2.getProductName()).toEqual('Example.com Website');
+			expect(category1.getDescription()).toEqual('The default category');
+			expect(category2.getDescription()).toEqual('High-level tests');
 		});
 	});
 
@@ -71,11 +61,9 @@ describe('Category', () => {
 		const cat1 = new Category(cat1Vals);
 
 		it('Can get Category by a single ID (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [cat1Vals] })
-				);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [cat1Vals] 
+			}));
 			const result = await Category.getById(1);
 			expect(result).toEqual(cat1);
 		});
@@ -88,11 +76,9 @@ describe('Category', () => {
 		});
 
 		it('Can get Category by Name (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [cat1Vals] })
-				);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [cat1Vals] 
+			}));
 			const cat = await Category.getByName('Regression');
 			expect(cat).toEqual(cat1);
 		});

@@ -8,6 +8,7 @@ describe('Utility Functions', () => {
 			console.log = jest.fn();
 			const myObj = { id: 123, name: 'Bob', b: 'valB' };
 			
+			/* eslint-disable-next-line max-len */
 			const prettyPrintResults = '{\n\t"id": 123,\n\t"name": "Bob",\n\t"b": "valB"\n}';
 			
 			prettyPrintJson(myObj);

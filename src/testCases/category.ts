@@ -11,8 +11,8 @@ export default class Category extends KiwiNamedItem {
 		return this.serialized.product as number;
 	}
 
-	public getProductName(): string {
-		return this.serialized['product_name'] as string;
+	public getDescription(): string {
+		return this.serialized.description as string;
 	}
 	
 	public async getProduct(): Promise<Product> {

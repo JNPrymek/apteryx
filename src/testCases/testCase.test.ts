@@ -5,6 +5,13 @@ import TestCase from './testCase';
 import Priority from '../management/priority';
 import Category from './category';
 import TestCaseStatus from './testCaseStatus';
+import { 
+	mockPriority, 
+	mockTestCase, 
+	mockTestCaseStatus, 
+	mockUser
+} from '../../test/mockKiwiValues';
+import User from '../management/user';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -12,49 +19,22 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('TestCase', () => {
 	
-	const case1Vals = {
-		id: 1,
-		create_date: '2021-01-02T03:15:00.000',  // 3:15am Jan 3rd 2021 (UTC)
-		is_automated: false,
-		script: 'Sample script or an empty string',
-		arguments: 'Sample args or an empty string',
+	const case1Vals = mockTestCase();
+	const case2Vals = mockTestCase({
+		id: 2,
+		summary: 'Another test case',
 		extra_link: 'Sample text or an empty string',
-		summary: 'Sample Test Case Title',
-		requirement: null,
-		notes: 'Notes or empty string',
-		text: 'Sample Test Case Details',
-		case_status: 1,
-		case_status__name: 'PROPOSED',
-		category: 4,
-		category__name: 'Regression',
-		priority: 1,
-		priority__value: 'P1',
-		setup_duration: 2700.0,
-		testing_duration: 60.0,
-		expected_duration: 2760.0,
-		author: 1,
-		author__username: 'jsmith',
+		script: '',
 		default_tester: null,
 		default_tester__username: null,
-		reviewer: null,
-		reviewer__username: null
-	};
-	
-	const case2Vals = { 
-		...case1Vals,
-		id: 2,
-		default_tester: 2,
-		default_tester__username: 'bob',
 		reviewer: 3,
-		reviewer__username: 'anne',
+		reviewer__username: 'charles',
 		is_automated: true,
 		setup_duration: 0.0,
 		testing_duration: 325.0,
 		expected_duration: 325.0
-	};
+	});
 		
-	const tc1 = new TestCase(case1Vals);
-	const tc2 = new TestCase(case2Vals);
 	
 	it('Can instantiate a TestCase', () => {
 		const tc1 = new TestCase(case1Vals);
@@ -63,13 +43,16 @@ describe('TestCase', () => {
 	
 	describe('Can access local properties of TestCase', () => {
 		
+		const tc1 = new TestCase(case1Vals);
+		const tc2 = new TestCase(case2Vals);
+	
 		it('Can get TC ID', () => {
 			expect(tc1.getId()).toEqual(1);
 			expect(tc2.getId()).toEqual(2);
 		});
 		
 		it('Can get TC Create Date', () => {
-			const date = new Date('2021-01-02T03:15:00.000Z');
+			const date = new Date('2022-12-02T20:13:27.697Z');
 			expect(tc1.getCreateDate()).toEqual(date);
 		});
 		
@@ -85,6 +68,7 @@ describe('TestCase', () => {
 		
 		it('Can get TC Script', () => {
 			expect(tc1.getScript()).toEqual('Sample script or an empty string');
+			expect(tc2.getScript()).toEqual('');
 		});
 		
 		it('Can get TC Arguments', () => {
@@ -97,55 +81,58 @@ describe('TestCase', () => {
 		});
 		
 		it('Can get TC Reference Link', () => {
-			expect(tc1.getExtraLink())
+			expect(tc1.getReferenceLink()).toBeNull();
+			expect(tc2.getExtraLink())
 				.toEqual('Sample text or an empty string');
 		});
 		
 		it('Can get TC Reference Link', () => {
-			expect(tc1.getReferenceLink())
+			expect(tc1.getReferenceLink()).toBeNull();
+			expect(tc2.getReferenceLink())
 				.toEqual('Sample text or an empty string');
 		});
 		
 		it('Can get TC Summary', () => {
-			expect(tc1.getSummary()).toEqual('Sample Test Case Title');
+			expect(tc1.getSummary()).toEqual('Example Test Case Title');
+			expect(tc2.getSummary()).toEqual('Another test case');
 		});
 		
 		it('Can get TC Title', () => {
-			expect(tc1.getTitle()).toEqual('Sample Test Case Title');
+			expect(tc1.getTitle()).toEqual('Example Test Case Title');
+			expect(tc2.getTitle()).toEqual('Another test case');
 		});
 		
 		it('Can get TC Text', () => {
-			expect(tc1.getText()).toEqual('Sample Test Case Details');
+			expect(tc1.getText())
+				.toEqual('An example test case for unit testing');
 		});
 		
 		it('Can get TC Notes', () => {
-			expect(tc1.getNotes()).toEqual('Notes or empty string');
+			expect(tc1.getNotes()).toEqual('Custom notes go here');
 		});
 
 		it('Can get TC Status', async () => {
-			const tcStatusVals = {
-				id: 1,
-				name: 'PROPOSED',
-				description: 'Unreviewed, new test cases',
-				'is_confirmed': false
-			};
-			const proposedStatus = new TestCaseStatus(tcStatusVals);
+			const tcStatus2Vals = mockTestCaseStatus({
+				id: 2,
+				name: 'CONFIRMED',
+				is_confirmed: true,
+				description: 'Tests that are ready to go'
+			});
+			const confirmedStatus = new TestCaseStatus(tcStatus2Vals);
 
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [tcStatusVals] })
-				);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [tcStatus2Vals]
+			}));
 			const tc1Status = await tc1.getCaseStatus();
-			expect(tc1Status).toEqual(proposedStatus);
+			expect(tc1Status).toEqual(confirmedStatus);
 		});
 		
 		it('Can get TC Status ID', () => {
-			expect(tc1.getCaseStatusId()).toEqual(1);
+			expect(tc1.getCaseStatusId()).toEqual(2);
 		});
 		
 		it('Can get TC Status Name', () => {
-			expect(tc1.getCaseStatusName()).toEqual('PROPOSED');
+			expect(tc1.getCaseStatusName()).toEqual('CONFIRMED');
 		});
 		
 		it('Can get TC Category ID', () => {
@@ -157,31 +144,25 @@ describe('TestCase', () => {
 		});
 
 		it('Can get TC Category', async () => {
-			const regressionCategoryVals = {
+			const regressionCategoryVals = mockTestCaseStatus({
 				id: 4,
-				name: 'Regression',
-				product: 1,
-				'product_name': 'Example.com Website'
-			};
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [regressionCategoryVals] })
-				);
+				name: 'Regression'
+			});
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [regressionCategoryVals]
+			}));
 			const regressionCategory = await tc1.getCategory();
 			expect(regressionCategory)
 				.toEqual(new Category(regressionCategoryVals));
 		});
 		
 		it('Can get TC Priority', async () => {
-			const priorityOneVals = { id: 1, value: 'P1', is_active: true };
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [priorityOneVals] })
-				);
+			const priority1Vals = mockPriority();
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [priority1Vals]
+			}));
 			const tcPriority = await tc1.getPriority();
-			expect(tcPriority).toEqual(new Priority(priorityOneVals));
+			expect(tcPriority).toEqual(new Priority(priority1Vals));
 		});
 		
 		it('Can get TC Priority ID', () => {
@@ -198,42 +179,70 @@ describe('TestCase', () => {
 		});
 		
 		it('Can get TC Author Username', () => {
-			expect(tc1.getAuthorName()).toEqual('jsmith');
-			expect(tc2.getAuthorName()).toEqual('jsmith');
+			expect(tc1.getAuthorName()).toEqual('alice');
+			expect(tc2.getAuthorName()).toEqual('alice');
+		});
+		
+		it('Can get TC Author', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockUser() ]
+			}));
+			expect(await tc1.getAuthor()).toEqual(new User(mockUser()));
 		});
 		
 		it('Can get TC Reviewer ID', () => {
-			expect(tc1.getReviewerId()).toBeNull();
+			expect(tc1.getReviewerId()).toEqual(2);
 			expect(tc2.getReviewerId()).toEqual(3);
 		});
 		
 		it('Can get TC Reviewer Username', () => {
-			expect(tc1.getReviewerName()).toBeNull();
-			expect(tc2.getReviewerName()).toEqual('anne');
+			expect(tc1.getReviewerName()).toEqual('bob');
+			expect(tc2.getReviewerName()).toEqual('charles');
+		});
+		
+		it('Can get TC Reviewer', async () => {
+			const userVals = mockUser({
+				id: 2,
+				username: 'bob',
+				email: 'bob@example.com',
+				first_name: 'Bob',
+				last_name: 'Bar'
+			});
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ userVals ]
+			}));
+			expect(await tc1.getReviewer()).toEqual(new User(userVals));
 		});
 		
 		it('Can get TC Default Tester ID', () => {
-			expect(tc1.getDefaultTesterId()).toBeNull();
-			expect(tc2.getDefaultTesterId()).toEqual(2);
+			expect(tc1.getDefaultTesterId()).toEqual(1);
+			expect(tc2.getDefaultTesterId()).toBeNull();
 		});
 		
 		it('Can get TC Default Tester Username', () => {
-			expect(tc1.getDefaultTesterName()).toBeNull();
-			expect(tc2.getDefaultTesterName()).toEqual('bob');
+			expect(tc1.getDefaultTesterName()).toEqual('alice');
+			expect(tc2.getDefaultTesterName()).toBeNull();
+		});
+		
+		it('Can get TC Default Tester', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockUser() ]
+			}));
+			expect(await tc1.getDefaultTester()).toEqual(new User(mockUser()));
 		});
 
 		it('Can get TC Setup Duration', () => {
-			expect(tc1.getSetupDuration()).toEqual(2700.0);
+			expect(tc1.getSetupDuration()).toEqual(60.0);
 			expect(tc2.getSetupDuration()).toEqual(0.0);
 		});
 
 		it('Can get TC Testing Duration', () => {
-			expect(tc1.getTestingDuration()).toEqual(60.0);
+			expect(tc1.getTestingDuration()).toEqual(30.0);
 			expect(tc2.getTestingDuration()).toEqual(325.0);
 		});
 
 		it('Can get TC Total Expected Duration', () => {
-			expect(tc1.getTotalDuration()).toEqual(2760.0);
+			expect(tc1.getTotalDuration()).toEqual(90.0);
 			expect(tc2.getTotalDuration()).toEqual(325.0);
 		});
 		
@@ -242,13 +251,11 @@ describe('TestCase', () => {
 	describe('Basic Server Functions', () => {
 		
 		it('Can get TC by a single ID (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [case1Vals] })
-				);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: [case1Vals] 
+			}));
 			const testCaseOne = await TestCase.getById(1);
-			expect(testCaseOne).toEqual(tc1);
+			expect(testCaseOne).toEqual(new TestCase(case1Vals));
 		});
 		
 		it('Can get TC by a single ID (no match)', async () => {

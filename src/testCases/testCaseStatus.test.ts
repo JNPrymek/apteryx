@@ -1,5 +1,6 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
+import { mockTestCaseStatus } from '../../test/mockKiwiValues';
 
 import TestCaseStatus from './testCaseStatus';
 
@@ -9,18 +10,13 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Case Status', () => {
 
-	const stat1Vals = {
-		id: 1,
-		name: 'PROPOSED',
-		description: 'Test case is pending approval',
-		'is_confirmed': false
-	};
-	const stat2Vals = {
+	const stat1Vals = mockTestCaseStatus();
+	const stat2Vals = mockTestCaseStatus({
 		id: 2,
 		name: 'CONFIRMED',
 		description: 'Test case is fully approved and usable',
 		'is_confirmed': true
-	};
+	});
 
 	it('Can instantiate a TestCaseStatus', () => {
 		const stat1 = new TestCaseStatus(stat1Vals);
@@ -66,26 +62,26 @@ describe('Test Case Status', () => {
 		const stat1 = new TestCaseStatus(stat1Vals);
 
 		it('Can get TestCaseStatus by a single ID (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: [stat1Vals] 
+			}));
 			const result = await TestCaseStatus.getById(1);
 			expect(result).toEqual(stat1);
 		});	
 		
 		it('Can get TestCaseStatus by single ID (no match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: [] 
+			}));
 			expect(TestCaseStatus.getById(1))
 				.rejects
 				.toThrowError('Could not find any TestCaseStatus with ID 1');
 		});
 
 		it('Can get TestCaseStatus by Name (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: [stat1Vals] 
+			}));
 			const result = await TestCaseStatus.getByName('PROPOSED');
 			expect(result).toEqual(stat1);
 		});
