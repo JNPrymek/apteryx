@@ -8,8 +8,10 @@ import TestCaseStatus from './testCaseStatus';
 import { 
 	mockPriority, 
 	mockTestCase, 
-	mockTestCaseStatus 
+	mockTestCaseStatus, 
+	mockUser
 } from '../../test/mockKiwiValues';
+import User from '../management/user';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -181,6 +183,13 @@ describe('TestCase', () => {
 			expect(tc2.getAuthorName()).toEqual('alice');
 		});
 		
+		it('Can get TC Author', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockUser() ]
+			}));
+			expect(await tc1.getAuthor()).toEqual(new User(mockUser()));
+		});
+		
 		it('Can get TC Reviewer ID', () => {
 			expect(tc1.getReviewerId()).toEqual(2);
 			expect(tc2.getReviewerId()).toEqual(3);
@@ -191,6 +200,20 @@ describe('TestCase', () => {
 			expect(tc2.getReviewerName()).toEqual('charles');
 		});
 		
+		it('Can get TC Reviewer', async () => {
+			const userVals = mockUser({
+				id: 2,
+				username: 'bob',
+				email: 'bob@example.com',
+				first_name: 'Bob',
+				last_name: 'Bar'
+			});
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ userVals ]
+			}));
+			expect(await tc1.getReviewer()).toEqual(new User(userVals));
+		});
+		
 		it('Can get TC Default Tester ID', () => {
 			expect(tc1.getDefaultTesterId()).toEqual(1);
 			expect(tc2.getDefaultTesterId()).toBeNull();
@@ -199,6 +222,13 @@ describe('TestCase', () => {
 		it('Can get TC Default Tester Username', () => {
 			expect(tc1.getDefaultTesterName()).toEqual('alice');
 			expect(tc2.getDefaultTesterName()).toBeNull();
+		});
+		
+		it('Can get TC Default Tester', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockUser() ]
+			}));
+			expect(await tc1.getDefaultTester()).toEqual(new User(mockUser()));
 		});
 
 		it('Can get TC Setup Duration', () => {

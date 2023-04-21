@@ -4,6 +4,7 @@ import TimeUtils from '../utils/timeUtils';
 import Priority from '../management/priority';
 import Category from './category';
 import TestCaseStatus from './testCaseStatus';
+import User from '../management/user';
 
 export default class TestCase extends KiwiBaseItem {
 	
@@ -115,9 +116,9 @@ export default class TestCase extends KiwiBaseItem {
 		return this.serialized['author__username'] as string;
 	}
 	
-	// public async getAuthor(): Promise<User> {
-	// 	return await User.getById(this.getAuthorId());
-	// }
+	public async getAuthor(): Promise<User> {
+		return await User.getById(this.getAuthorId());
+	}
 	
 	public getReviewerId(): number {
 		return this.serialized['reviewer'] as number;
@@ -127,9 +128,9 @@ export default class TestCase extends KiwiBaseItem {
 		return this.serialized['reviewer__username'] as string;
 	}
 	
-	// public async getReviewer(): Promise<User> {
-	// 	return await User.getById(this.getReviewerId());
-	// }
+	public async getReviewer(): Promise<User> {
+		return await User.getById(this.getReviewerId());
+	}
 	
 	public getDefaultTesterId(): number {
 		return this.serialized['default_tester'] as number;
@@ -139,9 +140,9 @@ export default class TestCase extends KiwiBaseItem {
 		return this.serialized['default_tester__username'] as string;
 	}
 	
-	// public async getDefaultTester(): Promise<User> {
-	// 	return await User.getById(this.getDefaultTesterId());
-	// }
+	public async getDefaultTester(): Promise<User> {
+		return await User.getById(this.getDefaultTesterId());
+	}
 	
 	
 	// Inherited methods
