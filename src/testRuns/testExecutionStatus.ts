@@ -23,11 +23,11 @@ export default class TestExecutionStatus extends KiwiNamedItem {
 		return this.getColor();
 	}
 
-	public isGood(): boolean {
+	public isPositive(): boolean {
 		return this.getWeight() > 0;
 	}
 
-	public isBad(): boolean {
+	public isNegative(): boolean {
 		return this.getWeight() < 0;
 	}
 
