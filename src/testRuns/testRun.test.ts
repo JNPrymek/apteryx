@@ -171,9 +171,9 @@ describe('Test Run', () => {
 		});
 
 		it('Can get TestRun Manager Username', () => {
-			expect(tr1.getManagerUsername()).toEqual('Alice');
-			expect(tr2.getManagerUsername()).toEqual('Alice');
-			expect(tr3.getManagerUsername()).toEqual('Charlie');
+			expect(tr1.getManagerUsername()).toEqual('alice');
+			expect(tr2.getManagerUsername()).toEqual('alice');
+			expect(tr3.getManagerUsername()).toEqual('charlie');
 		});
 
 		it('Can get TestPlan Manager', async () => {
@@ -192,9 +192,9 @@ describe('Test Run', () => {
 		});
 
 		it('Can get TestRun Default Tester Username', () => {
-			expect(tr1.getDefaultTesterUsername()).toEqual('Bob');
+			expect(tr1.getDefaultTesterUsername()).toEqual('bob');
 			expect(tr2.getDefaultTesterUsername()).toBeNull();
-			expect(tr3.getDefaultTesterUsername()).toEqual('Charlie');
+			expect(tr3.getDefaultTesterUsername()).toEqual('charlie');
 		});
 
 		it('Can get TestPlan Default Tester', async () => {
