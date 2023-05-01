@@ -1,120 +1,80 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestExecution from './testExecution';
-
-import type { TestExecutionValues } from './testExecution.type';
-import type { TestRunValues } from './testRun.type';
-import type { TestCaseValues } from '../testCases/testCase.type';
-import type { BuildValues } from '../management/build.type';
 import TestCase from '../testCases/testCase';
 import TestRun from './testRun';
 import Build from '../management/build';
 import TestExecutionStatus from './testExecutionStatus';
-import { TestExecutionStatusValues } from './testExecutionStatus.type';
-import { UserValues } from '../management/user.type';
 import User from '../management/user';
+import { 
+	mockBuild, 
+	mockTestCase, 
+	mockTestExecution,
+	mockTestExecutionStatus, 
+	mockTestRun,
+	mockUser 
+} from '../../test/mockKiwiValues';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Execution', () => {
-	// Raw values
-	const ex1Vals: TestExecutionValues = {
-		id: 1,
-		assignee: 1,
-		assignee__username: 'Alice',
-		tested_by: 2,
-		tested_by__username: 'Bob',
-		case_text_version: 4,
-		start_date: null,
-		stop_date: '2023-01-08T16:41:28.001',
-		sortkey: 10,
-		run: 1,
-		case: 1,
-		case__summary: 'The first test case',
-		build: 1,
-		build__name: 'unspecified',
-		status: 5,
-		status__name: 'FAILED'
-	};
-
-	const ex2Vals: TestExecutionValues = {
+	
+	const execution1Vals = mockTestExecution();
+	const execution2Vals = mockTestExecution({
 		id: 2,
-		assignee: 1,
-		assignee__username: 'Alice',
 		tested_by: 1,
-		tested_by__username: 'Alice',
+		tested_by__username: 'alice',
 		case_text_version: 3,
 		start_date: '2023-01-08T16:40:43.078',
 		stop_date: '2023-01-08T16:41:28.001',
 		sortkey: 20,
-		run: 1,
 		case: 2,
 		case__summary: 'The second test case',
-		build: 1,
-		build__name: 'unspecified',
 		status: 4,
-		status__name: 'PASSED'
-	};
-
-	const ex3Vals: TestExecutionValues = {
+		status__name: 'PASSED',
+	});
+	const execution3Vals = mockTestExecution({
 		id: 3,
 		assignee: null,
 		assignee__username: null,
 		tested_by: null,
 		tested_by__username: null,
 		case_text_version: 6,
-		start_date: null,
-		stop_date: null,
 		sortkey: 50,
 		run: 4,
 		case: 2,
 		case__summary: 'The second test case',
 		build: 2,
-		build__name: 'specified',
-		status: 1,
-		status__name: 'IDLE'
-	};
-
-	const userVals: {
-		alice: UserValues;
-		bob: UserValues;
-	} = {
-		alice: {
-			id: 1,
-			email: 'alice@example.com',
-			username: 'alice',
-			first_name: 'Alice',
-			last_name: 'Foo',
-			is_active: true,
-			is_staff: true,
-			is_superuser: true
-		},
-		bob: {
-			id: 2,
-			email: 'bob@example.com',
-			username: 'bob',
-			first_name: 'Bob',
-			last_name: 'Bar',
-			is_active: true,
-			is_staff: false,
-			is_superuser: false
-		}
-	};
+		build__name: 'Build2',
+		status: 5,
+		status__name: 'FAILED'
+	});
+	
+	const user1Vals = mockUser();
+	const user2Vals = mockUser({
+		id: 2,
+		email: 'bob@example.com',
+		username: 'bob',
+		first_name: 'Bob',
+		last_name: 'Bar',
+		is_staff: false,
+		is_superuser: false
+	});
 
 	it('Can instantiate a TestExecution', () => {
-		const te1 = new TestExecution(ex1Vals);
-		const te2 = new TestExecution(ex2Vals);
-		expect(te1['serialized']).toEqual(ex1Vals);
-		expect(te2['serialized']).toEqual(ex2Vals);
+		const te1 = new TestExecution(execution1Vals);
+		const te2 = new TestExecution(execution2Vals);
+		expect(te1['serialized']).toEqual(execution1Vals);
+		expect(te2['serialized']).toEqual(execution2Vals);
 	});
 
 	describe ('Access local properties', () => {
 
-		const te1 = new TestExecution(ex1Vals);
-		const te2 = new TestExecution(ex2Vals);
-		const te3 = new TestExecution(ex3Vals);
+		const te1 = new TestExecution(execution1Vals);
+		const te2 = new TestExecution(execution2Vals);
+		const te3 = new TestExecution(execution3Vals);
 
 		it('Can get TestExecution ID', () => {
 			expect(te1.getId()).toEqual(1);
@@ -129,19 +89,19 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get TestExecution Assignee Username', () => {
-			expect(te1.getAssigneeUsername()).toEqual('Alice');
-			expect(te2.getAssigneeUsername()).toEqual('Alice');
+			expect(te1.getAssigneeUsername()).toEqual('alice');
+			expect(te2.getAssigneeUsername()).toEqual('alice');
 			expect(te3.getAssigneeUsername()).toBeNull();
 		});
 
 		it('Can get TestExecution Assignee', async () => {
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [userVals.alice] })
+				mockRpcResponse({ result: [user1Vals] })
 			);
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [userVals.alice] })
+				mockRpcResponse({ result: [user1Vals] })
 			);
-			const alice = new User(userVals.alice);
+			const alice = new User(user1Vals);
 
 			expect(await te1.getAssignee()).toEqual(alice);
 			expect(await te2.getAssignee()).toEqual(alice);
@@ -155,21 +115,21 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get TestExecution Last Tester Username', () => {
-			expect(te1.getLastTesterName()).toEqual('Bob');
-			expect(te2.getLastTesterName()).toEqual('Alice');
+			expect(te1.getLastTesterName()).toEqual('bob');
+			expect(te2.getLastTesterName()).toEqual('alice');
 			expect(te3.getLastTesterName()).toBeNull();
 		});
 
 		it('Can get TestExecution Last Tester', async () => {
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [userVals.bob] })
+				mockRpcResponse({ result: [user2Vals] })
 			);
 			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [userVals.alice] })
+				mockRpcResponse({ result: [user1Vals] })
 			);
 
-			const alice = new User(userVals.alice);
-			const bob = new User(userVals.bob);
+			const alice = new User(user1Vals);
+			const bob = new User(user2Vals);
 
 			expect(await te1.getLastTester()).toEqual(bob);
 			expect(await te2.getLastTester()).toEqual(alice);
@@ -190,8 +150,7 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get TestExecution Stop Date', () => {
-			expect(te1.getStopDate())
-				.toEqual(new Date('2023-01-08T16:41:28.001Z'));
+			expect(te1.getStopDate()).toBeNull();
 			expect(te2.getStopDate())
 				.toEqual(new Date('2023-01-08T16:41:28.001Z'));
 			expect(te3.getStopDate()).toBeNull();
@@ -210,47 +169,14 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get TestExecution TestRun', async () => {
-			const run1Vals: TestRunValues = {
-				id: 1,
-				plan__product_version: 1,
-				plan__product_version__value: 'unspecified',
-				start_date: null,
-				stop_date: null,
-				planned_start: '2023-01-04T00:00:00',
-				planned_stop: '2023-01-04T00:00:00',
-				summary: 'Test Run One',
-				notes: 'The first of many test runs',
-				plan: 1,
-				plan__product: 1,
-				plan__name: 'The first test plan',
-				build: 1,
-				build__name: 'unspecified',
-				manager: 1,
-				manager__username: 'bob',
-				default_tester: 1,
-				default_tester__username: 'bob'
-			};
-
-			const run4Vals: TestRunValues = {
-				id: 1,
-				plan__product_version: 1,
-				plan__product_version__value: 'unspecified',
-				start_date: null,
-				stop_date: null,
-				planned_start: '2023-01-04T00:00:00',
-				planned_stop: '2023-01-04T00:00:00',
+			const run1Vals = mockTestRun();
+			const run4Vals = mockTestRun({
+				id: 4,
 				summary: 'Test Run Four',
 				notes: 'May the fourth be with you',
-				plan: 1,
-				plan__product: 1,
-				plan__name: 'The first test plan',
 				build: 2,
-				build__name: 'specified',
-				manager: 1,
-				manager__username: 'bob',
-				default_tester: 2,
-				default_tester__username: 'alice'
-			};
+				build__name: 'Build2'
+			});
 
 			mockAxios.post.mockResolvedValueOnce(
 				mockRpcResponse({ result: [run1Vals] })
@@ -277,46 +203,20 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get TestExecution TestCase Summary', () => {
-			expect(te1.getTestCaseSummary()).toEqual('The first test case');
+			expect(te1.getTestCaseSummary()).toEqual('Example Test Case');
 			expect(te2.getTestCaseSummary()).toEqual('The second test case');
 			expect(te3.getTestCaseSummary()).toEqual('The second test case');
 		});
 
 		it('Can get TestExecution TestCase', async () => {
-			const tcRawVal: TestCaseValues = {
-				id: 1,
-				is_automated: false,
-				create_date: '',
-				arguments: '',
-				extra_link: null,
-				script: '',
-				summary: 'The first test case',
-				requirement: null,
-				notes: 'some notes',
-				text: 'The first test case',
-				case_status: 2,
-				case_status__name: 'CONFIRMED',
-				category: 1,
-				category__name: '--default--',
-				priority: 1,
-				priority__value: 'P1',
-				author: 2,
-				author__username: 'bob',
-				default_tester: 2,
-				default_tester__username: 'bob',
-				reviewer: null,
-				reviewer__username: null,
-				setup_duration: 60,
-				testing_duration: 120,
-				expected_duration: 180
-			};
+			const tc1Vals = mockTestCase();
 
 			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [tcRawVal] })
+				mockRpcResponse({ result: [tc1Vals] })
 			);
 				
 			const testExecCase = await te1.getTestCase();
-			expect(testExecCase).toEqual(new TestCase(tcRawVal));
+			expect(testExecCase).toEqual(new TestCase(tc1Vals));
 		});
 
 		it('Can get TestExecution Build ID', () => {
@@ -328,124 +228,111 @@ describe('Test Execution', () => {
 		it('Can get TestExecution Build Name', () => {
 			expect(te1.getBuildName()).toEqual('unspecified');
 			expect(te2.getBuildName()).toEqual('unspecified');
-			expect(te3.getBuildName()).toEqual('specified');
+			expect(te3.getBuildName()).toEqual('Build2');
 		});
 
 		it('Can get TestExecution Build', async () => {
-			const buildValues: BuildValues = {
-				id: 1,
-				name: 'unspecified',
-				version: 1,
-				version__value: 'unspecified',
-				is_active: true,
-			};
+			const build1Vals = mockBuild();
 			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [buildValues] })
+				mockRpcResponse({ result: [build1Vals] })
 			);
 
 			expect(await te1.getBuild())
-				.toEqual(new Build(buildValues));
+				.toEqual(new Build(build1Vals));
 		});
 
 		it('Can get TestExecution Status ID', () => {
-			expect(te1.getStatusId()).toEqual(5);
+			expect(te1.getStatusId()).toEqual(1);
 			expect(te2.getStatusId()).toEqual(4);
-			expect(te3.getStatusId()).toEqual(1);
+			expect(te3.getStatusId()).toEqual(5);
 		});
 
 		it('Can get TestExecution Status Name', () => {
-			expect(te1.getStatusName()).toEqual('FAILED');
+			expect(te1.getStatusName()).toEqual('IDLE');
 			expect(te2.getStatusName()).toEqual('PASSED');
-			expect(te3.getStatusName()).toEqual('IDLE');
+			expect(te3.getStatusName()).toEqual('FAILED');
 		});
 
 		it('Can get TestExecution Status', async () => {
 			
-			const statusTypes: {
-				idle: TestExecutionStatusValues;
-				passed: TestExecutionStatusValues;
-				failed: TestExecutionStatusValues;
-			} = {
-				idle: {
-					id: 1,
-					name: 'IDLE',
-					weight: 0,
-					icon: 'fa circle',
-					color: '#72767b'
-				},
-				passed: {
-					id: 4,
-					name: 'PASSED',
-					weight: 10,
-					icon: 'fa circle',
-					color: '#72767b'
-				},
-				failed: {
-					id: 5,
-					name: 'FAILED',
-					weight: -10,
-					icon: 'fa circle',
-					color: '#72767b'
-				}
-			}; 
+			const idleValues = mockTestExecutionStatus();
+			const passedValues = mockTestExecutionStatus({
+				id: 4,
+				name: 'PASSED',
+				weight: 10,
+				icon: 'fa circle',
+				color: '#72767b'
+			});
+			const failedValues = mockTestExecutionStatus({
+				id: 5,
+				name: 'FAILED',
+				weight: -10,
+				icon: 'fa circle',
+				color: '#72767b'
+			});
+			
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [statusTypes.idle] })
+				mockRpcResponse({ result: [idleValues] })
 			);
 			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [statusTypes.passed] })
+				mockRpcResponse({ result: [passedValues] })
 			);
 			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [statusTypes.failed] })
+				mockRpcResponse({ result: [failedValues] })
 			);
 
 			expect(await te1.getStatus())
-				.toEqual(new TestExecutionStatus(statusTypes.idle));
+				.toEqual(new TestExecutionStatus(idleValues));
 			expect(await te2.getStatus())
-				.toEqual(new TestExecutionStatus(statusTypes.passed));
+				.toEqual(new TestExecutionStatus(passedValues));
 			expect(await te3.getStatus())
-				.toEqual(new TestExecutionStatus(statusTypes.failed));
+				.toEqual(new TestExecutionStatus(failedValues));
 		});
 
 	});
 
 	describe('Fetch values from server', () => {
 		it('Can get a single TestExecution by ID', async () => {
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [ex1Vals] })
-			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [ex2Vals] })
-			);
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [ex3Vals] })
-			);
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse(
+				{ result: [execution1Vals] }
+			));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse(
+				{ result: [execution2Vals] }
+			));
+			mockAxios.post.mockResolvedValue(mockRpcResponse(
+				{ result: [execution3Vals] }
+			));
 
 			expect(await TestExecution.getById(1))
-				.toEqual(new TestExecution(ex1Vals));
+				.toEqual(new TestExecution(execution1Vals));
 			expect(await TestExecution.getById(2))
-				.toEqual(new TestExecution(ex2Vals));
+				.toEqual(new TestExecution(execution2Vals));
 			expect(await TestExecution.getById(3))
-				.toEqual(new TestExecution(ex3Vals));
+				.toEqual(new TestExecution(execution3Vals));
 		});
 
 		it('Can get multiple TestExecutions by ID', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [ex1Vals, ex2Vals, ex3Vals] })
-			);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: [
+					execution1Vals, 
+					execution2Vals, 
+					execution3Vals
+				] 
+			}));
 			expect(await TestExecution.getByIds([1, 2, 3]))
 				.toEqual(expect.arrayContaining([
-					new TestExecution(ex1Vals),
-					new TestExecution(ex2Vals),
-					new TestExecution(ex3Vals)
+					new TestExecution(execution1Vals),
+					new TestExecution(execution2Vals),
+					new TestExecution(execution3Vals)
 				]));
 		});
 
 		/* eslint-disable max-len */
 		it('Throws an error when fetching a TestExecution by ID that does not exist', 
 			async () => {
-				mockAxios.post.mockResolvedValue(
-					mockRpcResponse({ result: [] })
-				);
+				mockAxios.post.mockResolvedValue(mockRpcResponse(
+					{ result: [] }
+				));
 				expect(TestExecution.getById(5000))
 					.rejects
 					.toThrowError('Could not find any TestExecution with ID 5000');
@@ -454,11 +341,11 @@ describe('Test Execution', () => {
 
 		it('Can get TestExecution by filtering arbitrary data', 
 			async () => {
-				mockAxios.post.mockResolvedValue(
-					mockRpcResponse({ result: [ex1Vals] })
-				);
+				mockAxios.post.mockResolvedValue(mockRpcResponse(
+					{ result: [execution1Vals] }
+				));
 				expect(await TestExecution.serverFilter({ run: 1, case: 1 }))
-					.toEqual([new TestExecution(ex1Vals)]);
+					.toEqual([new TestExecution(execution1Vals)]);
 			});
 	});
 });

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
+import { mockTestExecutionStatus } from '../../test/mockKiwiValues';
 import TestExecutionStatus from './testExecutionStatus';
 
 // Init Mock Axios
@@ -9,33 +10,29 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 describe('Test Execution Status', () => {
 	
 	// Data values
-	const stat1Vals = {
-		id: 1,
-		name: 'IDLE',
-		weight: 0,
-		icon: 'fa fa-question-circle-o',
-		color: '#72767b'
-	};
-
-	const stat2Vals = {
+	const stat1Vals = mockTestExecutionStatus();
+	const stat2Vals = mockTestExecutionStatus({
 		id: 4,
 		name: 'PASSED',
 		weight: 20,
-		icon: 'fa fa-check-circle-o',
-		color: '#92d400'
-	};
-
-	const stat3Vals = {
+		color: '#92d400',
+		icon: 'fa fa-check-circle-o'
+	});
+	const stat3Vals = mockTestExecutionStatus({
 		id: 5,
 		name: 'FAILED',
 		weight: -30,
-		icon: 'fa fa-times-circle-o',
-		color: '#cc0000'
-	};
+		color: '#cc0000',
+		icon: 'fa fa-times-circle-o'
+	});
 
 	it('Can instantiate a TestExecutionStatus', () => {
-		const tes = new TestExecutionStatus(stat1Vals);
-		expect(tes['serialized']).toEqual(stat1Vals);
+		const tes1 = new TestExecutionStatus(stat1Vals);
+		expect(tes1['serialized']).toEqual(stat1Vals);
+		const tes2 = new TestExecutionStatus(stat2Vals);
+		expect(tes2['serialized']).toEqual(stat2Vals);
+		const tes3 = new TestExecutionStatus(stat3Vals);
+		expect(tes3['serialized']).toEqual(stat3Vals);
 	});
 
 	const tes1 = new TestExecutionStatus(stat1Vals);
@@ -81,9 +78,9 @@ describe('Test Execution Status', () => {
 		});
 
 		it('Can check if TestExecutionStatus has "good" meaning', () => {
-			expect(tes1.isGood()).toEqual(false);
-			expect(tes2.isGood()).toEqual(true);
-			expect(tes3.isGood()).toEqual(false);
+			expect(tes1.isPositive()).toEqual(false);
+			expect(tes2.isPositive()).toEqual(true);
+			expect(tes3.isPositive()).toEqual(false);
 		});
 
 		it('Can check if TestExecutionStatus has "neutral" meaning', () => {
@@ -93,27 +90,27 @@ describe('Test Execution Status', () => {
 		});
 
 		it('Can check if TestExecutionStatus has "bad" meaning', () => {
-			expect(tes1.isBad()).toEqual(false);
-			expect(tes2.isBad()).toEqual(false);
-			expect(tes3.isBad()).toEqual(true);
+			expect(tes1.isNegative()).toEqual(false);
+			expect(tes2.isNegative()).toEqual(false);
+			expect(tes3.isNegative()).toEqual(true);
 		});
 	});
 
 	describe('Basic Server Functions', () => {
 		// get by id - 0 & 1 matches
 		it('Can get TestExecutionStatus by single ID (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse(
+				{ result: [stat1Vals] }
+			));
 			const result = await TestExecutionStatus.getById(1);
 			expect(result).toEqual(tes1);
 		});
 
 		it('Can get TestExecutionStatus by single ID (no matches)', 
 			async () => {
-				mockAxios
-					.post
-					.mockResolvedValue(mockRpcResponse({ result: [] }));
+				mockAxios.post.mockResolvedValue(mockRpcResponse(
+					{ result: [] }
+				));
 				expect(TestExecutionStatus.getById(1))
 					.rejects
 					.toThrowError(
@@ -123,11 +120,9 @@ describe('Test Execution Status', () => {
 
 		it('Can get multiple TestExecutionStatus from array of IDs', 
 			async () => {
-				mockAxios
-					.post
-					.mockResolvedValue(
-						mockRpcResponse({ result: [stat1Vals, stat2Vals] })
-					);
+				mockAxios.post.mockResolvedValue(mockRpcResponse(
+					{ result: [stat1Vals, stat2Vals] }
+				));
 				const results = await TestExecutionStatus.getByIds([1, 4]);
 				expect(results).toEqual(expect.arrayContaining([tes1, tes2]));
 				expect(results).toEqual(expect.not.arrayContaining([tes3]));
@@ -135,9 +130,9 @@ describe('Test Execution Status', () => {
 
 		// get by name - 0 & 1 matches
 		it('Can get TestExecutionStatus by name (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [stat1Vals] }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse(
+				{ result: [stat1Vals] }
+			));
 			const result = await TestExecutionStatus.getByName('IDLE');
 			expect(result).toEqual(tes1);
 		});
