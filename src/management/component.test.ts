@@ -10,12 +10,18 @@ import {
 	mockUser
 } from '../../test/mockKiwiValues';
 import User from './user';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Component', () => {
+	
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 	
 	const component1Vals = mockComponent();
 	const component2Vals = mockComponent({
@@ -323,5 +329,41 @@ describe('Component', () => {
 				expect(comp['serialized']).toEqual(component1Vals);
 			
 			});
+
+		it('Can reload values from server', async () => {
+			const origServerVal = mockComponentServerEntry();
+			const origLocalVal = mockComponent();
+			const updatedVal = mockComponent({
+				name: 'New and improved',
+				description: 'Updated for unit testing'
+			});
+			const updatedServerVal = [
+				mockComponentServerEntry(updatedVal),
+				mockComponentServerEntry({
+					...updatedVal,
+					cases: 1
+				}),
+				mockComponentServerEntry({
+					...updatedVal,
+					cases: 2
+				}),
+				mockComponentServerEntry({
+					...updatedVal,
+					cases: 3
+				}),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ origServerVal ]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updatedServerVal
+			}));
+
+			const comp1 = await Component.getById(1);
+			expect(comp1['serialized']).toEqual(origLocalVal);
+			await comp1.syncServerValues();
+			verifyRpcCall(mockAxios, 1, 'Component.filter', [{ id: 1 }]);
+		});
 	});
 });

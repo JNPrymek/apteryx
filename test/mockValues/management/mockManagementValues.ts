@@ -26,10 +26,7 @@ export function mockClassification(
 
 import { ComponentValues, ComponentServerValues }
 	from '../../../src/management/component.type';
-import componentServerDefaults from './component.json';
-
-// Local values - Remove 'cases' property from server value
-const componentDefaults: ComponentValues = { ...componentServerDefaults };
+import componentDefaults from './component.json';
 
 export function mockComponent(
 	overrideValues?: Partial<ComponentValues>
@@ -44,7 +41,8 @@ export function mockComponentServerEntry(
 	overrideValues?: Partial<ComponentServerValues>
 ): ComponentServerValues {
 	return {
-		...componentServerDefaults,
+		...componentDefaults,
+		cases: null, // Server entry also contains reference to linked test case
 		...overrideValues
 	};
 }

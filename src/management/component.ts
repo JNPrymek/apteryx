@@ -176,6 +176,13 @@ export default class Component extends KiwiNamedItem {
 	): Promise<Component> {
 		return await super.getById(id) as Component;
 	}
+
+	// Reload values from server - unique component
+	public async syncServerValues(): Promise<void> {
+		const distinctList = await Component
+			.serverFilterDistinct({ id: this.getId() });
+		this.serialized = distinctList[0] as ComponentValues;
+	}
 	
 	// ------------------------------------------------------------------------
 }
