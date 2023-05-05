@@ -10,6 +10,13 @@ export default class KiwiBaseItem {
 	public getId(): number {
 		return this.serialized.id as number;
 	}
+
+	public async syncServerValues(): Promise<void> {
+		const newServerResults = await KiwiConnector
+			.sendRPCMethod(`${this.constructor.name}.filter`, 
+				[{ 'id': this.getId() }]) as Array<Record<string, unknown>>;
+		this.serialized = newServerResults[0];
+	}
 	
 	public static async serverFilter(
 		filterObj: Record<string, unknown>
