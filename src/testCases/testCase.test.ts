@@ -12,12 +12,18 @@ import {
 	mockUser
 } from '../../test/mockKiwiValues';
 import User from '../management/user';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('TestCase', () => {
+	
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 	
 	const case1Vals = mockTestCase();
 	const case2Vals = mockTestCase({
@@ -263,6 +269,34 @@ describe('TestCase', () => {
 			expect(TestCase.getById(1))
 				.rejects
 				.toThrowError('Could not find any TestCase with ID 1');
+		});
+	});
+
+	describe('Updating TestCase values', () => {
+		it('Can sync local and server values', async () => {
+			const origVal = mockTestCase();
+			const updatedVal = mockTestCase({
+				summary: 'New summary',
+				text: 'New description',
+				setup_duration: 200,
+				testing_duration: 20,
+				expected_duration: 220
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [origVal]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [updatedVal]
+			}));
+
+			const tc1 = await TestCase.getById(1);
+			verifyRpcCall(mockAxios, 0, 'TestCase.filter', [{ id__in: [1] }]);
+			expect(tc1['serialized']).toEqual(origVal);
+
+			await tc1.syncServerValues();
+			verifyRpcCall(mockAxios, 1, 'TestCase.filter', [{ id: 1 }]);
+			expect(tc1['serialized']).toEqual(updatedVal);
 		});
 	});
 });
