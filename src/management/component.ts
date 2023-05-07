@@ -7,7 +7,7 @@ import User from './user';
 export default class Component extends KiwiNamedItem {
 	
 	// Constructor for all classes
-	constructor(serializedValues: ComponentValues|ComponentServerValues) {
+	constructor(serializedValues: ComponentValues | ComponentServerValues) {
 		super(serializedValues);
 		delete this.serialized.cases;
 	}
@@ -181,7 +181,16 @@ export default class Component extends KiwiNamedItem {
 	public async syncServerValues(): Promise<void> {
 		const distinctList = await Component
 			.serverFilterDistinct({ id: this.getId() });
-		this.serialized = distinctList[0] as ComponentValues;
+		const serverVal = distinctList[0];
+		const localVal: ComponentValues = {
+			id: serverVal.id,
+			name: serverVal.name,
+			description: serverVal.description,
+			product: serverVal.product,
+			initial_owner: serverVal.initial_owner,
+			initial_qa_contact: serverVal.initial_qa_contact
+		};
+		this.serialized = localVal;
 	}
 	
 	// ------------------------------------------------------------------------

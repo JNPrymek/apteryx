@@ -364,6 +364,7 @@ describe('Component', () => {
 			expect(comp1['serialized']).toEqual(origLocalVal);
 			await comp1.syncServerValues();
 			verifyRpcCall(mockAxios, 1, 'Component.filter', [{ id: 1 }]);
+			expect(comp1['serialized']).toEqual(updatedVal);
 		});
 	});
 });
