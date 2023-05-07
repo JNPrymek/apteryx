@@ -3,6 +3,7 @@ import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
 import Tag from './tag';
 import { mockTag, mockTagServerEntry } from '../../test/mockKiwiValues';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Mock Axios
 jest.mock('axios');
@@ -10,6 +11,11 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Tag', () => {
 	
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
 	const tag1Vals = mockTag();
 	const tag2Vals = mockTag({
 		id: 2,
@@ -333,6 +339,43 @@ describe('Tag', () => {
 			
 			expect(caseIds).toHaveLength(0);
 			expect(caseIds).toEqual([]);
+		});
+	});
+
+	describe('Updating Tag objects', () => {
+		it('Can resync local values with server values', async () => {
+			const origLocalVal = mockTag();
+			const origServerVal = mockTagServerEntry(origLocalVal);
+			const updatedLocalVal = mockTag({ name: 'New name' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ origServerVal ]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTagServerEntry(updatedLocalVal),
+					mockTagServerEntry({
+						...updatedLocalVal,
+						case: 1
+					}),
+					mockTagServerEntry({
+						...updatedLocalVal,
+						case: 2
+					}),
+					mockTagServerEntry({
+						...updatedLocalVal,
+						run: 1
+					})
+				]
+			}));
+			
+			const tag1 = await Tag.getById(1);
+			verifyRpcCall(mockAxios, 0, 'Tag.filter', [{ id__in: [1] }]);
+			expect(tag1['serialized']).toEqual(origLocalVal);
+
+			await tag1.syncServerValues();
+			verifyRpcCall(mockAxios, 1, 'Tag.filter', [{ id: 1 }]);
+			expect(tag1['serialized']).toEqual(updatedLocalVal);
 		});
 	});
 });

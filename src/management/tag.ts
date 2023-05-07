@@ -175,6 +175,18 @@ export default class Tag extends KiwiBaseItem {
 	): Promise<Tag> {
 		return await super.getById(id) as Tag;
 	}
+
+	// Reload values from server - unique tag
+	public async syncServerValues(): Promise<void> {
+		const distinctList = await Tag
+			.serverFilterDistinct({ id: this.getId() });
+		const serverVal = distinctList[0];
+		const localVal: TagValues = {
+			id: serverVal.id,
+			name: serverVal.name
+		};
+		this.serialized = localVal;
+	}
 	
 	// ------------------------------------------------------------------------
 }

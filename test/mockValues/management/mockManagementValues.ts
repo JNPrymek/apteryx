@@ -76,14 +76,13 @@ export function mockProduct(
 import { TagValues, TagServerValues } 
 	from '../../../src/management/tag.type';
 import tagServerDefaults from './tag.json';
-
-const tagDefaults: TagValues = { ... tagServerDefaults };
+import tagLocalDefaults from './tag_local.json';
 
 export function mockTag(
 	overrideValues?: Partial<TagValues>
 ): TagValues {
 	return {
-		...tagDefaults,
+		...tagLocalDefaults,
 		...overrideValues
 	};
 }
