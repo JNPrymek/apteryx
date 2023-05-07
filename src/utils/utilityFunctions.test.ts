@@ -17,7 +17,7 @@ describe('Utility Functions', () => {
 	
 	describe('Time Utils', () => {
 		
-		it('Can interpret Kiwi Server date strings', () => {
+		it('Can convert Kiwi Server date strings to Dates', () => {
 			// First millisecond of year 2021
 			const begin2021String = '2021-01-01T00:00:00.000';
 			const begin2021Val = 1609459200000;
@@ -29,6 +29,16 @@ describe('Utility Functions', () => {
 			const realisticVal = 1635046679158;
 			const realisticDate = TimeUtils.serverStringToDate(realisticString);
 			expect(realisticDate.valueOf()).toEqual(realisticVal);
+		});
+
+		it('Can convert Date to Kiwi Server date string', () => {
+			const begin2021Val = new Date(1609459200000);
+			const realisticVal = new Date(1635046679158);
+
+			expect(TimeUtils.dateToServerString(begin2021Val))
+				.toEqual('2021-01-01T00:00:00.000');
+			expect(TimeUtils.dateToServerString(realisticVal))
+				.toEqual('2021-10-24T03:37:59.158');
 		});
 	});
 });
