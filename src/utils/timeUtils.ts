@@ -27,4 +27,21 @@ export default class TimeUtils {
 			.padStart(3, '0');
 		return `${year}-${month}-${day}T${hours}:${min}:${sec}.${milli}`;
 	}
+
+	/**
+	 * Converts number of seconds into a string representation
+	 * @param totalSeconds Number of seconds
+	 * @returns Duration represented in `h:mm:ss` format string
+	 */
+	public static secondsToTimeString(
+		totalSeconds: number | undefined | null
+	): string {
+		if (!totalSeconds) return '0:00:00';
+		const hours = Math.floor(totalSeconds / 3600);
+		const remainder = totalSeconds % 3600;
+		const min = Math.floor(remainder / 60);
+		const sec = remainder % 60;
+		/* eslint-disable-next-line max-len */
+		return `${hours}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+	}
 }

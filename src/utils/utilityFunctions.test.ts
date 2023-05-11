@@ -40,5 +40,12 @@ describe('Utility Functions', () => {
 			expect(TimeUtils.dateToServerString(realisticVal))
 				.toEqual('2021-10-24T03:37:59.158');
 		});
+
+		it('Can convert number of seconds into an h:mm:ss time string', () => {
+			expect(TimeUtils.secondsToTimeString(1)).toEqual('0:00:01');
+			expect(TimeUtils.secondsToTimeString(60)).toEqual('0:01:00');
+			expect(TimeUtils.secondsToTimeString(3600)).toEqual('1:00:00');
+			expect(TimeUtils.secondsToTimeString(36072)).toEqual('10:01:12');
+		});
 	});
 });
