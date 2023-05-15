@@ -375,6 +375,10 @@ describe('TestCase', () => {
 			expect(tc1.isManual()).toEqual(true);
 
 			await tc1.setAutomation(true);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ is_automated: true }
+			]);
 
 			expect(tc1.isAutomated()).toEqual(true);
 			expect(tc1.isManual()).toEqual(false);
@@ -398,6 +402,10 @@ describe('TestCase', () => {
 			expect(tc1.isManual()).toEqual(true);
 
 			await tc1.setIsAutomated();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ is_automated: true }
+			]);
 
 			expect(tc1.isAutomated()).toEqual(true);
 			expect(tc1.isManual()).toEqual(false);
@@ -421,6 +429,10 @@ describe('TestCase', () => {
 			expect(tc1.isManual()).toEqual(false);
 
 			await tc1.setIsManual();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ is_automated: false }
+			]);
 
 			expect(tc1.isAutomated()).toEqual(false);
 			expect(tc1.isManual()).toEqual(true);
@@ -445,6 +457,10 @@ describe('TestCase', () => {
 			expect(tc1.getScript()).toEqual('original script');
 
 			await tc1.setScript('new script');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ script: 'new script' }
+			]);
 
 			expect(tc1.getScript()).toEqual('new script');
 		});
@@ -468,6 +484,10 @@ describe('TestCase', () => {
 			expect(tc1.getScript()).toEqual('original script');
 
 			await tc1.setScript();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ script: '' }
+			]);
 
 			expect(tc1.getScript()).toEqual('');
 		});
