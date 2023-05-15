@@ -46,6 +46,7 @@ describe('Utility Functions', () => {
 			expect(TimeUtils.secondsToTimeString(60)).toEqual('0:01:00');
 			expect(TimeUtils.secondsToTimeString(3600)).toEqual('1:00:00');
 			expect(TimeUtils.secondsToTimeString(36072)).toEqual('10:01:12');
+			expect(TimeUtils.secondsToTimeString(null)).toEqual('0:00:00');
 		});
 	});
 });
