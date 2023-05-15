@@ -43,6 +43,11 @@ export default class TestCase extends KiwiBaseItem {
 	public getScript(): string {
 		return this.serialized['script'] as string;
 	}
+
+	public async setScript(script?: string): Promise<void> {
+		const newScriptVal = script ?? '';
+		await this.serverUpdate({ script: newScriptVal });
+	}
 	
 	public getArguments(): string {
 		return this.serialized['arguments'] as string;

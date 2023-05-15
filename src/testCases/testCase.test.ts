@@ -425,5 +425,51 @@ describe('TestCase', () => {
 			expect(tc1.isAutomated()).toEqual(false);
 			expect(tc1.isManual()).toEqual(true);
 		});
+
+		it('Can set a new script value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				script: 'original script' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				script: 'new script'
+			});
+			const updateVal = mockTestCase({ script: 'new script' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getScript()).toEqual('original script');
+
+			await tc1.setScript('new script');
+
+			expect(tc1.getScript()).toEqual('new script');
+		});
+
+		it('Can erase existing script value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				script: 'original script' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				script: ''
+			});
+			const updateVal = mockTestCase({ script: '' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getScript()).toEqual('original script');
+
+			await tc1.setScript();
+
+			expect(tc1.getScript()).toEqual('');
+		});
 	});
 });
