@@ -5,11 +5,13 @@ import Priority from '../management/priority';
 import Category from './category';
 import TestCaseStatus from './testCaseStatus';
 import User from '../management/user';
+import { TestCaseValues, TestCaseWriteValues } from './testCase.type';
+import KiwiConnector from '../core/kiwiConnector';
 
 export default class TestCase extends KiwiBaseItem {
 	
 	// Constructor for all classes
-	constructor(serializedValues: Record<string, unknown>) {
+	constructor(serializedValues: TestCaseValues) {
 		super(serializedValues);
 	}
 	
@@ -144,6 +146,15 @@ export default class TestCase extends KiwiBaseItem {
 		return await User.getById(this.getDefaultTesterId());
 	}
 	
+	public async serverUpdate(
+		updateValues: Partial<TestCaseWriteValues>
+	): Promise<void> {
+		await KiwiConnector.sendRPCMethod('TestCase.update', [
+			this.getId(),
+			updateValues
+		]);
+		await this.syncServerValues();
+	}
 	
 	// Inherited methods
 	// ------------------------------------------------------------------------
