@@ -13,11 +13,10 @@ import {
 } from '../../test/mockKiwiValues';
 import User from '../management/user';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import {
-	TestCaseUpdateResponseValues,
-	TestCaseWriteValues,
-} from './testCase.type';
-import { mockTestCaseUpdateResponse } from '../../test/mockValues/testCases/mockTestCaseValues';
+import { TestCaseWriteValues } from './testCase.type';
+import { 
+	mockTestCaseUpdateResponse 
+} from '../../test/mockValues/testCases/mockTestCaseValues';
 
 // Init Mock Axios
 jest.mock('axios');

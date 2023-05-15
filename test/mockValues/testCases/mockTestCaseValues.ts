@@ -1,4 +1,7 @@
-import { TestCaseUpdateResponseValues, TestCaseValues } from '../../../src/testCases/testCase.type';
+import { 
+	TestCaseUpdateResponseValues, 
+	TestCaseValues 
+} from '../../../src/testCases/testCase.type';
 import testCaseDefaults from './testCase.json';
 export function mockTestCase(
 	overrideValues?: Partial<TestCaseValues>
@@ -34,7 +37,7 @@ export function mockTestCaseStatus(
 import { CategoryValues } 
 	from '../../../src/testCases/category.type';
 import categoryDefaults from './category.json';
-import TimeUtils from '../../../src/utils/timeUtils';
+
 export function mockCategory(
 	overrideValues?: Partial<CategoryValues>
 ): CategoryValues {
