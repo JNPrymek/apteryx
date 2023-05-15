@@ -349,13 +349,81 @@ describe('TestCase', () => {
 			);
 			expect(tc1['serialized']).toEqual(origVal);
 			await tc1.serverUpdate(changeVals);
-			console.log(JSON.stringify(mockAxios.post.mock.calls), null, 2);
 			verifyRpcCall(mockAxios, 0, 'TestCase.update', [1, changeVals]);
 			verifyRpcCall(mockAxios, 1, 'TestCase.filter', [{ id: 1 }]);
 			expect(tc1.getAuthorId()).toEqual(2);
 			expect(tc1.getAuthorName()).toEqual('bob');
 			expect(tc1.getNotes()).toEqual('This test has been updated');
 			expect(tc1.getText()).toEqual('New and improved test case');
+		});
+
+		it('Can update automation flag with .setAutomation()', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const updateResponse = mockTestCaseUpdateResponse({
+				is_automated: true
+			});
+			const updateVal = mockTestCase({ is_automated: true });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.isAutomated()).toEqual(false);
+			expect(tc1.isManual()).toEqual(true);
+
+			await tc1.setAutomation(true);
+
+			expect(tc1.isAutomated()).toEqual(true);
+			expect(tc1.isManual()).toEqual(false);
+		});
+
+		it('Can enable automation flag with .setIsAutomated()', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const updateResponse = mockTestCaseUpdateResponse({
+				is_automated: true
+			});
+			const updateVal = mockTestCase({ is_automated: true });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.isAutomated()).toEqual(false);
+			expect(tc1.isManual()).toEqual(true);
+
+			await tc1.setIsAutomated();
+
+			expect(tc1.isAutomated()).toEqual(true);
+			expect(tc1.isManual()).toEqual(false);
+		});
+
+		it('Can disable automation flag with .setIsManual()', async () => {
+			const tc1 = new TestCase(mockTestCase({ is_automated: true }));
+			const updateResponse = mockTestCaseUpdateResponse({
+				is_automated: false
+			});
+			const updateVal = mockTestCase({ is_automated: false });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.isAutomated()).toEqual(true);
+			expect(tc1.isManual()).toEqual(false);
+
+			await tc1.setIsManual();
+
+			expect(tc1.isAutomated()).toEqual(false);
+			expect(tc1.isManual()).toEqual(true);
 		});
 	});
 });

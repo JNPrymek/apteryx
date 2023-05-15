@@ -23,8 +23,21 @@ export default class TestCase extends KiwiBaseItem {
 	public isAutomated(): boolean {
 		return this.serialized['is_automated'] as boolean;
 	}
+
 	public isManual(): boolean {
 		return !this.isAutomated();
+	}
+
+	public async setAutomation(isAutomated: boolean) : Promise<void> {
+		await this.serverUpdate({ is_automated: isAutomated });
+	}
+
+	public async setIsAutomated(): Promise<void> {
+		await this.setAutomation(true);
+	}
+
+	public async setIsManual(): Promise<void> {
+		await this.setAutomation(false);
 	}
 	
 	public getScript(): string {
