@@ -52,6 +52,11 @@ export default class TestCase extends KiwiBaseItem {
 	public getArguments(): string {
 		return this.serialized['arguments'] as string;
 	}
+
+	public async setArguments(args?: string): Promise<void> {
+		const newArgs = args ?? '';
+		await this.serverUpdate({ arguments: newArgs });
+	}
 	
 	public getRequirements(): string {
 		return this.serialized['requirement'] as string;

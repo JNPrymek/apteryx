@@ -491,5 +491,59 @@ describe('TestCase', () => {
 
 			expect(tc1.getScript()).toEqual('');
 		});
+
+		it('Can set a new arguments value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				arguments: 'original args' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				arguments: 'new args'
+			});
+			const updateVal = mockTestCase({ arguments: 'new args' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getArguments()).toEqual('original args');
+
+			await tc1.setArguments('new args');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ arguments: 'new args' }
+			]);
+
+			expect(tc1.getArguments()).toEqual('new args');
+		});
+
+		it('Can erase existing arguments value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				arguments: 'original args' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				arguments: ''
+			});
+			const updateVal = mockTestCase({ arguments: '' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getArguments()).toEqual('original args');
+
+			await tc1.setArguments();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ arguments: '' }
+			]);
+
+			expect(tc1.getArguments()).toEqual('');
+		});
 	});
 });
