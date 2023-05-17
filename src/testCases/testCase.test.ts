@@ -545,5 +545,59 @@ describe('TestCase', () => {
 
 			expect(tc1.getArguments()).toEqual('');
 		});
+
+		it('Can set a new requirements value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				requirement: 'original reqs' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				requirement: 'new reqs'
+			});
+			const updateVal = mockTestCase({ requirement: 'new reqs' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getRequirements()).toEqual('original reqs');
+
+			await tc1.setRequirements('new reqs');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ requirement: 'new reqs' }
+			]);
+
+			expect(tc1.getRequirements()).toEqual('new reqs');
+		});
+
+		it('Can erase existing requirements value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				requirement: 'original reqs' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				requirement: ''
+			});
+			const updateVal = mockTestCase({ requirement: '' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getRequirements()).toEqual('original reqs');
+
+			await tc1.setRequirements();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ requirement: '' }
+			]);
+
+			expect(tc1.getRequirements()).toEqual('');
+		});
 	});
 });

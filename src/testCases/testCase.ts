@@ -61,6 +61,11 @@ export default class TestCase extends KiwiBaseItem {
 	public getRequirements(): string {
 		return this.serialized['requirement'] as string;
 	}
+
+	public async setRequirements(requirements?: string): Promise<void> {
+		const newReqs = requirements ?? '';
+		await this.serverUpdate({ requirement: newReqs });
+	}
 	
 	public getExtraLink(): string {
 		return this.serialized['extra_link'] as string;
