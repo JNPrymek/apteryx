@@ -79,6 +79,10 @@ export default class TestCase extends KiwiBaseItem {
 	public getReferenceLink(): string {
 		return this.getExtraLink();
 	}
+
+	public async setReferenceLink(referenceLink?: string): Promise<void> {
+		await this.setExtraLink(referenceLink);
+	}
 	
 	public getSummary(): string {
 		return this.serialized['summary'] as string;
