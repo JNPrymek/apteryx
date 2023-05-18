@@ -599,5 +599,59 @@ describe('TestCase', () => {
 
 			expect(tc1.getRequirements()).toEqual('');
 		});
+
+		it('Can set a new extra link value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				extra_link: 'original link' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				extra_link: 'new link'
+			});
+			const updateVal = mockTestCase({ extra_link: 'new link' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getExtraLink()).toEqual('original link');
+
+			await tc1.setExtraLink('new link');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ extra_link: 'new link' }
+			]);
+
+			expect(tc1.getExtraLink()).toEqual('new link');
+		});
+
+		it('Can erase existing extra link value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				extra_link: 'original link' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				extra_link: ''
+			});
+			const updateVal = mockTestCase({ extra_link: '' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getExtraLink()).toEqual('original link');
+
+			await tc1.setExtraLink();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ extra_link: '' }
+			]);
+
+			expect(tc1.getExtraLink()).toEqual('');
+		});
 	});
 });
