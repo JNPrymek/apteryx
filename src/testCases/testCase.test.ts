@@ -707,5 +707,59 @@ describe('TestCase', () => {
 
 			expect(tc1.getReferenceLink()).toEqual('');
 		});
+
+		it('Can set a new summary value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				summary: 'original test case name' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				summary: 'new name'
+			});
+			const updateVal = mockTestCase({ summary: 'new name' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getSummary()).toEqual('original test case name');
+
+			await tc1.setSummary('new name');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ summary: 'new name' }
+			]);
+
+			expect(tc1.getSummary()).toEqual('new name');
+		});
+
+		it('Can set a new title value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				summary: 'original test case name' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				summary: 'new name'
+			});
+			const updateVal = mockTestCase({ summary: 'new name' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getTitle()).toEqual('original test case name');
+
+			await tc1.setTitle('new name');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ summary: 'new name' }
+			]);
+
+			expect(tc1.getTitle()).toEqual('new name');
+		});
 	});
 });
