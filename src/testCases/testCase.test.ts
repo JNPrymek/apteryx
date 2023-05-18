@@ -87,8 +87,8 @@ describe('TestCase', () => {
 			expect(tc1.getRequirements()).toBeNull();
 		});
 
-		it('Can get TC Reference Link', () => {
-			expect(tc1.getReferenceLink()).toBeNull();
+		it('Can get TC Extra Link', () => {
+			expect(tc1.getExtraLink()).toBeNull();
 			expect(tc2.getExtraLink())
 				.toEqual('Sample text or an empty string');
 		});
