@@ -847,5 +847,59 @@ describe('TestCase', () => {
 
 			expect(tc1.getText()).toEqual('');
 		});
+
+		it('Can set a new notes value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				notes: 'original test case notes' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				notes: 'new notes'
+			});
+			const updateVal = mockTestCase({ notes: 'new notes' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getNotes()).toEqual('original test case notes');
+
+			await tc1.setNotes('new notes');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ notes: 'new notes' }
+			]);
+
+			expect(tc1.getNotes()).toEqual('new notes');
+		});
+
+		it('Can delete notes value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				notes: 'original test case notes' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				notes: ''
+			});
+			const updateVal = mockTestCase({ notes: '' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getNotes()).toEqual('original test case notes');
+
+			await tc1.setNotes();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ notes: '' }
+			]);
+
+			expect(tc1.getNotes()).toEqual('');
+		});
 	});
 });
