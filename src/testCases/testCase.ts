@@ -103,6 +103,19 @@ export default class TestCase extends KiwiBaseItem {
 	public getText(): string {
 		return this.serialized['text'] as string;
 	}
+
+	public async setText(text?: string): Promise<void> {
+		const newText = text ?? '';
+		await this.serverUpdate({ text: newText });
+	}
+
+	public getDescription(): string {
+		return this.getText();
+	}
+
+	public async setDescription(text?: string): Promise<void> {
+		await this.setText(text);
+	}
 	
 	public getNotes(): string {
 		return this.serialized['notes'] as string;

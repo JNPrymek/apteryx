@@ -114,6 +114,11 @@ describe('TestCase', () => {
 				.toEqual('An example test case for unit testing');
 		});
 
+		it('Can get TC Description', () => {
+			expect(tc1.getDescription())
+				.toEqual('An example test case for unit testing');
+		});
+
 		it('Can get TC Notes', () => {
 			expect(tc1.getNotes()).toEqual('Custom notes go here');
 		});
@@ -760,6 +765,87 @@ describe('TestCase', () => {
 			]);
 
 			expect(tc1.getTitle()).toEqual('new name');
+		});
+
+		it('Can set a new text value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				text: 'original test case text' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				text: 'new text'
+			});
+			const updateVal = mockTestCase({ text: 'new text' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getText()).toEqual('original test case text');
+
+			await tc1.setText('new text');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ text: 'new text' }
+			]);
+
+			expect(tc1.getText()).toEqual('new text');
+		});
+
+		it('Can set a new description value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				text: 'original test case text' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				text: 'new text'
+			});
+			const updateVal = mockTestCase({ text: 'new text' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getDescription()).toEqual('original test case text');
+
+			await tc1.setDescription('new text');
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ text: 'new text' }
+			]);
+
+			expect(tc1.getDescription()).toEqual('new text');
+		});
+
+		it('Can delete text value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				text: 'original test case text' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				text: ''
+			});
+			const updateVal = mockTestCase({ text: '' });
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getText()).toEqual('original test case text');
+
+			await tc1.setText();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ text: '' }
+			]);
+
+			expect(tc1.getText()).toEqual('');
 		});
 	});
 });
