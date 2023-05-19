@@ -901,5 +901,157 @@ describe('TestCase', () => {
 
 			expect(tc1.getNotes()).toEqual('');
 		});
+
+		it('Can set a new setup duration value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				setup_duration: 124,
+				testing_duration: 8,
+				expected_duration: 132
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				setup_duration: '0:07:03',
+				testing_duration: '0:00:08'
+			});
+			const updateVal = mockTestCase({ 
+				setup_duration: 423,
+				testing_duration: 8,
+				expected_duration: 431
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getSetupDuration()).toEqual(124);
+			expect(tc1.getTestingDuration()).toEqual(8);
+			expect(tc1.getTotalDuration()).toEqual(132);
+
+			await tc1.setSetupDuration(423);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ setup_duration: 423 }
+			]);
+
+			expect(tc1.getSetupDuration()).toEqual(423);
+			expect(tc1.getTestingDuration()).toEqual(8);
+			expect(tc1.getTotalDuration()).toEqual(431);
+		});
+
+		it('Can delete setup duration value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				setup_duration: 124,
+				testing_duration: 8,
+				expected_duration: 132
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				setup_duration: '0:00:00',
+				testing_duration: '0:00:08'
+			});
+			const updateVal = mockTestCase({ 
+				setup_duration: 0,
+				testing_duration: 8,
+				expected_duration: 8
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getSetupDuration()).toEqual(124);
+			expect(tc1.getTestingDuration()).toEqual(8);
+			expect(tc1.getTotalDuration()).toEqual(132);
+
+			await tc1.setSetupDuration();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ setup_duration: 0 }
+			]);
+
+			expect(tc1.getSetupDuration()).toEqual(0);
+			expect(tc1.getTestingDuration()).toEqual(8);
+			expect(tc1.getTotalDuration()).toEqual(8);
+		});
+
+		it('Can set a new testing duration value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				setup_duration: 124,
+				testing_duration: 8,
+				expected_duration: 132
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				setup_duration: '0:07:03',
+				testing_duration: '1:00:08'
+			});
+			const updateVal = mockTestCase({ 
+				setup_duration: 124,
+				testing_duration: 3608,
+				expected_duration: 3732
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getSetupDuration()).toEqual(124);
+			expect(tc1.getTestingDuration()).toEqual(8);
+			expect(tc1.getTotalDuration()).toEqual(132);
+
+			await tc1.setSetupDuration(3608);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ setup_duration: 3608 }
+			]);
+
+			expect(tc1.getSetupDuration()).toEqual(124);
+			expect(tc1.getTestingDuration()).toEqual(3608);
+			expect(tc1.getTotalDuration()).toEqual(3732);
+		});
+
+		it('Can delete testing duration value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				setup_duration: 124,
+				testing_duration: 8,
+				expected_duration: 132
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				setup_duration: '0:07:03',
+				testing_duration: '0:00:00'
+			});
+			const updateVal = mockTestCase({ 
+				setup_duration: 124,
+				testing_duration: 0,
+				expected_duration: 124
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getSetupDuration()).toEqual(124);
+			expect(tc1.getTestingDuration()).toEqual(8);
+			expect(tc1.getTotalDuration()).toEqual(132);
+
+			await tc1.setSetupDuration();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ setup_duration: 0 }
+			]);
+
+			expect(tc1.getSetupDuration()).toEqual(124);
+			expect(tc1.getTestingDuration()).toEqual(0);
+			expect(tc1.getTotalDuration()).toEqual(124);
+		});
 	});
 });

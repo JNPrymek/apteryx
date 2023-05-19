@@ -166,8 +166,18 @@ export default class TestCase extends KiwiBaseItem {
 		return this.serialized['setup_duration'] as number;
 	}
 
+	public async setSetupDuration(time?: number): Promise<void> {
+		const newTime = time ?? 0;
+		await this.serverUpdate({ setup_duration: newTime });
+	}
+
 	public getTestingDuration(): number {
 		return this.serialized['testing_duration'] as number;
+	}
+
+	public async setTestingDuration(time?: number): Promise<void> {
+		const newTime = time ?? 0;
+		await this.serverUpdate({ testing_duration: newTime });
 	}
 
 	public getTotalDuration(): number {
