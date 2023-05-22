@@ -162,6 +162,20 @@ export default class TestCase extends KiwiBaseItem {
 		return await Priority.getById(this.getPriorityId());
 	}
 
+	public async setPriority(
+		priority: number | string | Priority
+	): Promise<void> {
+		let priorityId = (typeof priority === 'number') ? priority : 0;
+		if (priority instanceof Priority) {
+			priorityId = priority.getId();
+		}
+		if (typeof priority === 'string') {
+			const priorityObj = await Priority.getByValue(priority);
+			priorityId = priorityObj.getId();
+		}
+		await this.serverUpdate({ priority: priorityId });
+	}
+
 	public getSetupDuration(): number {
 		return this.serialized['setup_duration'] as number;
 	}

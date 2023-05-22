@@ -1005,10 +1005,10 @@ describe('TestCase', () => {
 			expect(tc1.getTestingDuration()).toEqual(8);
 			expect(tc1.getTotalDuration()).toEqual(132);
 
-			await tc1.setSetupDuration(3608);
+			await tc1.setTestingDuration(3608);
 			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
 				1,
-				{ setup_duration: 3608 }
+				{ testing_duration: 3608 }
 			]);
 
 			expect(tc1.getSetupDuration()).toEqual(124);
@@ -1043,15 +1043,131 @@ describe('TestCase', () => {
 			expect(tc1.getTestingDuration()).toEqual(8);
 			expect(tc1.getTotalDuration()).toEqual(132);
 
-			await tc1.setSetupDuration();
+			await tc1.setTestingDuration();
 			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
 				1,
-				{ setup_duration: 0 }
+				{ testing_duration: 0 }
 			]);
 
 			expect(tc1.getSetupDuration()).toEqual(124);
 			expect(tc1.getTestingDuration()).toEqual(0);
 			expect(tc1.getTotalDuration()).toEqual(124);
+		});
+
+		it('Can set a new priority from id', async () => {
+			const tc1 = new TestCase(mockTestCase({
+				priority: 1,
+				priority__value: 'P1'
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				priority: 2,
+				priority__value: 'P2'
+			});
+			const updateVal = mockTestCase({
+				priority: 2,
+				priority__value: 'P2'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getPriorityId()).toEqual(1);
+			expect(tc1.getPriorityValue()).toEqual('P1');
+
+			await tc1.setPriority(2);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ priority: 2 }
+			]);
+
+			expect(tc1.getPriorityId()).toEqual(2);
+			expect(tc1.getPriorityValue()).toEqual('P2');
+		});
+
+		it('Can set a new priority from Priority', async () => {
+			const tc1 = new TestCase(mockTestCase({
+				priority: 1,
+				priority__value: 'P1'
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				priority: 2,
+				priority__value: 'P2'
+			});
+			const updateVal = mockTestCase({
+				priority: 2,
+				priority__value: 'P2'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getPriorityId()).toEqual(1);
+			expect(tc1.getPriorityValue()).toEqual('P1');
+
+			const p2 = new Priority(mockPriority({
+				id: 2,
+				value: 'P2'
+			}));
+			await tc1.setPriority(p2);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ priority: 2 }
+			]);
+
+			expect(tc1.getPriorityId()).toEqual(2);
+			expect(tc1.getPriorityValue()).toEqual('P2');
+		});
+
+		it('Can set a new priority from Priority', async () => {
+			const tc1 = new TestCase(mockTestCase({
+				priority: 1,
+				priority__value: 'P1'
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				priority: 2,
+				priority__value: 'P2'
+			});
+			const updateVal = mockTestCase({
+				priority: 2,
+				priority__value: 'P2'
+			});
+			const p2Vals = mockPriority({
+				id: 2,
+				value: 'P2'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ p2Vals ]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getPriorityId()).toEqual(1);
+			expect(tc1.getPriorityValue()).toEqual('P1');
+
+			await tc1.setPriority('P2');
+			verifyRpcCall(mockAxios, 0, 'Priority.filter', [
+				{ value: 'P2' }
+			]);
+			verifyRpcCall(mockAxios, 1, 'TestCase.update', [
+				1,
+				{ priority: 2 }
+			]);
+
+			expect(tc1.getPriorityId()).toEqual(2);
+			expect(tc1.getPriorityValue()).toEqual('P2');
 		});
 	});
 });
