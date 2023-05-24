@@ -1287,5 +1287,192 @@ describe('TestCase', () => {
 			expect(tc1.getAuthorId()).toEqual(2);
 			expect(tc1.getAuthorName()).toEqual('bob');
 		});
+
+		it('Can set a new Reviewer by ID', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				reviewer: 1,
+				reviewer__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				reviewer: 2,
+				reviewer__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				reviewer: 2,
+				reviewer__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getReviewerId()).toEqual(1);
+			expect(tc1.getReviewerName()).toEqual('alice');
+
+			await tc1.setReviewer(2);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ reviewer: 2 }
+			]);
+
+			expect(tc1.getReviewerId()).toEqual(2);
+			expect(tc1.getReviewerName()).toEqual('bob');
+		});
+
+		it('Can set a new Reviewer by User', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				reviewer: 1,
+				reviewer__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				reviewer: 2,
+				reviewer__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				reviewer: 2,
+				reviewer__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getReviewerId()).toEqual(1);
+			expect(tc1.getReviewerName()).toEqual('alice');
+
+			const bob = new User(mockUser({ id: 2, username: 'bob' }));
+			await tc1.setReviewer(bob);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ reviewer: 2 }
+			]);
+
+			expect(tc1.getReviewerId()).toEqual(2);
+			expect(tc1.getReviewerName()).toEqual('bob');
+		});
+
+		it('Can set a new Reviewer by username', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				reviewer: 1,
+				reviewer__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				reviewer: 2,
+				reviewer__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				reviewer: 2,
+				reviewer__username: 'bob'
+			});
+
+			const user2Vals = mockUser({
+				id: 2,
+				username: 'bob',
+				email: 'bob@example.com',
+				first_name: 'Bob',
+				last_name: 'Bar'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ user2Vals ]
+			}));
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getReviewerId()).toEqual(1);
+			expect(tc1.getReviewerName()).toEqual('alice');
+
+			await tc1.setReviewer('bob');
+			verifyRpcCall(mockAxios, 0, 'User.filter', [
+				{ username: 'bob' }
+			]);
+			verifyRpcCall(mockAxios, 1, 'TestCase.update', [
+				1,
+				{ reviewer: 2 }
+			]);
+
+			expect(tc1.getReviewerId()).toEqual(2);
+			expect(tc1.getReviewerName()).toEqual('bob');
+		});
+
+		it('Can remove Reviewer by omitting new Reviewer value', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				reviewer: 1,
+				reviewer__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				reviewer: null,
+				reviewer__username: null
+			});
+			const updateVal = mockTestCase({ 
+				reviewer: null,
+				reviewer__username: null
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getReviewerId()).toEqual(1);
+			expect(tc1.getReviewerName()).toEqual('alice');
+
+			await tc1.setReviewer();
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ reviewer: null }
+			]);
+
+			expect(tc1.getReviewerId()).toBeNull();
+			expect(tc1.getReviewerName()).toBeNull();
+		});
+
+		it('Can remove Reviewer by using null as new Reviewer value', 
+			async () => {
+				const tc1 = new TestCase(mockTestCase({ 
+					reviewer: 1,
+					reviewer__username: 'alice' 
+				}));
+				const updateResponse = mockTestCaseUpdateResponse({
+					reviewer: null,
+					reviewer__username: null
+				});
+				const updateVal = mockTestCase({ 
+					reviewer: null,
+					reviewer__username: null
+				});
+
+				mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+					result: updateResponse
+				}));
+				mockAxios.post.mockResolvedValue(mockRpcResponse({
+					result: [ updateVal ]
+				}));
+
+				expect(tc1.getReviewerId()).toEqual(1);
+				expect(tc1.getReviewerName()).toEqual('alice');
+
+				await tc1.setReviewer(null);
+				verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+					1,
+					{ reviewer: null }
+				]);
+
+				expect(tc1.getReviewerId()).toBeNull();
+				expect(tc1.getReviewerName()).toBeNull();
+			});
 	});
 });

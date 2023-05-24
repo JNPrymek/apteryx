@@ -227,6 +227,17 @@ export default class TestCase extends KiwiBaseItem {
 	public async getReviewer(): Promise<User> {
 		return await User.getById(this.getReviewerId());
 	}
+
+	public async setReviewer(
+		reviewer?: number | string | User | null
+	): Promise<void> {
+		if (reviewer) {
+			const reviewerId = await User.resolveUserId(reviewer);
+			await this.serverUpdate({ reviewer: reviewerId });
+		} else {
+			await this.serverUpdate({ reviewer: null });
+		}
+	};
 	
 	public getDefaultTesterId(): number {
 		return this.serialized['default_tester'] as number;
