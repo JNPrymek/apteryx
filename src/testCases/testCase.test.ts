@@ -1474,5 +1474,193 @@ describe('TestCase', () => {
 				expect(tc1.getReviewerId()).toBeNull();
 				expect(tc1.getReviewerName()).toBeNull();
 			});
+
+		it('Can set a new DefaultTester by ID', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				default_tester: 1,
+				default_tester__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+	
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+	
+			expect(tc1.getDefaultTesterId()).toEqual(1);
+			expect(tc1.getDefaultTesterName()).toEqual('alice');
+	
+			await tc1.setDefaultTester(2);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ default_tester: 2 }
+			]);
+	
+			expect(tc1.getDefaultTesterId()).toEqual(2);
+			expect(tc1.getDefaultTesterName()).toEqual('bob');
+		});
+	
+		it('Can set a new DefaultTester by User', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				default_tester: 1,
+				default_tester__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+	
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+	
+			expect(tc1.getDefaultTesterId()).toEqual(1);
+			expect(tc1.getDefaultTesterName()).toEqual('alice');
+	
+			const bob = new User(mockUser({ id: 2, username: 'bob' }));
+			await tc1.setDefaultTester(bob);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ default_tester: 2 }
+			]);
+	
+			expect(tc1.getDefaultTesterId()).toEqual(2);
+			expect(tc1.getDefaultTesterName()).toEqual('bob');
+		});
+	
+		it('Can set a new DefaultTester by username', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				default_tester: 1,
+				default_tester__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+	
+			const user2Vals = mockUser({
+				id: 2,
+				username: 'bob',
+				email: 'bob@example.com',
+				first_name: 'Bob',
+				last_name: 'Bar'
+			});
+	
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ user2Vals ]
+			}));
+	
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+	
+			expect(tc1.getDefaultTesterId()).toEqual(1);
+			expect(tc1.getDefaultTesterName()).toEqual('alice');
+	
+			await tc1.setDefaultTester('bob');
+			verifyRpcCall(mockAxios, 0, 'User.filter', [
+				{ username: 'bob' }
+			]);
+			verifyRpcCall(mockAxios, 1, 'TestCase.update', [
+				1,
+				{ default_tester: 2 }
+			]);
+	
+			expect(tc1.getDefaultTesterId()).toEqual(2);
+			expect(tc1.getDefaultTesterName()).toEqual('bob');
+		});
+	
+		it('Can remove DefaultTester by omitting new DefaultTester value', 
+			async () => {
+				const tc1 = new TestCase(mockTestCase({ 
+					default_tester: 1,
+					default_tester__username: 'alice' 
+				}));
+				const updateResponse = mockTestCaseUpdateResponse({
+					default_tester: null,
+					default_tester__username: null
+				});
+				const updateVal = mockTestCase({ 
+					default_tester: null,
+					default_tester__username: null
+				});
+	
+				mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+					result: updateResponse
+				}));
+				mockAxios.post.mockResolvedValue(mockRpcResponse({
+					result: [ updateVal ]
+				}));
+	
+				expect(tc1.getDefaultTesterId()).toEqual(1);
+				expect(tc1.getDefaultTesterName()).toEqual('alice');
+	
+				await tc1.setDefaultTester();
+				verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+					1,
+					{ default_tester: null }
+				]);
+	
+				expect(tc1.getDefaultTesterId()).toBeNull();
+				expect(tc1.getDefaultTesterName()).toBeNull();
+			});
+	
+		it('Can remove DefaultTester by using null as new DefaultTester value', 
+			async () => {
+				const tc1 = new TestCase(mockTestCase({ 
+					default_tester: 1,
+					default_tester__username: 'alice' 
+				}));
+				const updateResponse = mockTestCaseUpdateResponse({
+					default_tester: null,
+					default_tester__username: null
+				});
+				const updateVal = mockTestCase({ 
+					default_tester: null,
+					default_tester__username: null
+				});
+	
+				mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+					result: updateResponse
+				}));
+				mockAxios.post.mockResolvedValue(mockRpcResponse({
+					result: [ updateVal ]
+				}));
+	
+				expect(tc1.getDefaultTesterId()).toEqual(1);
+				expect(tc1.getDefaultTesterName()).toEqual('alice');
+	
+				await tc1.setDefaultTester(null);
+				verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+					1,
+					{ default_tester: null }
+				]);
+	
+				expect(tc1.getDefaultTesterId()).toBeNull();
+				expect(tc1.getDefaultTesterName()).toBeNull();
+			});
 	});
 });

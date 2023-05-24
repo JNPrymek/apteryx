@@ -250,6 +250,17 @@ export default class TestCase extends KiwiBaseItem {
 	public async getDefaultTester(): Promise<User> {
 		return await User.getById(this.getDefaultTesterId());
 	}
+
+	public async setDefaultTester(
+		tester?: number | string | User | null
+	): Promise<void> {
+		if (tester) {
+			const testerId = await User.resolveUserId(tester);
+			await this.serverUpdate({ default_tester: testerId });
+		} else {
+			await this.serverUpdate({ default_tester: null });
+		}
+	};
 	
 	public async serverUpdate(
 		updateValues: Partial<TestCaseWriteValues>
