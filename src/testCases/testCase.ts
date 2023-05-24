@@ -210,6 +210,11 @@ export default class TestCase extends KiwiBaseItem {
 	public async getAuthor(): Promise<User> {
 		return await User.getById(this.getAuthorId());
 	}
+
+	public async setAuthor(author: number | string | User): Promise<void> {
+		const authorId = await User.resolveUserId(author);
+		await this.serverUpdate({ author: authorId });
+	};
 	
 	public getReviewerId(): number {
 		return this.serialized['reviewer'] as number;

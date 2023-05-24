@@ -1126,7 +1126,7 @@ describe('TestCase', () => {
 			expect(tc1.getPriorityValue()).toEqual('P2');
 		});
 
-		it('Can set a new priority from Priority', async () => {
+		it('Can set a new priority from Priority Name', async () => {
 			const tc1 = new TestCase(mockTestCase({
 				priority: 1,
 				priority__value: 'P1'
@@ -1168,6 +1168,124 @@ describe('TestCase', () => {
 
 			expect(tc1.getPriorityId()).toEqual(2);
 			expect(tc1.getPriorityValue()).toEqual('P2');
+		});
+
+		it('Can set a new Author by ID', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				author: 1,
+				author__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				author: 2,
+				author__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				author: 2,
+				author__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getAuthorId()).toEqual(1);
+			expect(tc1.getAuthorName()).toEqual('alice');
+
+			await tc1.setAuthor(2);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ author: 2 }
+			]);
+
+			expect(tc1.getAuthorId()).toEqual(2);
+			expect(tc1.getAuthorName()).toEqual('bob');
+		});
+
+		it('Can set a new Author by User', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				author: 1,
+				author__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				author: 2,
+				author__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				author: 2,
+				author__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getAuthorId()).toEqual(1);
+			expect(tc1.getAuthorName()).toEqual('alice');
+
+			const bob = new User(mockUser({ id: 2, username: 'bob' }));
+			await tc1.setAuthor(bob);
+			verifyRpcCall(mockAxios, 0, 'TestCase.update', [
+				1,
+				{ author: 2 }
+			]);
+
+			expect(tc1.getAuthorId()).toEqual(2);
+			expect(tc1.getAuthorName()).toEqual('bob');
+		});
+
+		it('Can set a new Author by username', async () => {
+			const tc1 = new TestCase(mockTestCase({ 
+				author: 1,
+				author__username: 'alice' 
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				author: 2,
+				author__username: 'bob'
+			});
+			const updateVal = mockTestCase({ 
+				author: 2,
+				author__username: 'bob'
+			});
+
+			const user2Vals = mockUser({
+				id: 2,
+				username: 'bob',
+				email: 'bob@example.com',
+				first_name: 'Bob',
+				last_name: 'Bar'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ user2Vals ]
+			}));
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getAuthorId()).toEqual(1);
+			expect(tc1.getAuthorName()).toEqual('alice');
+
+			await tc1.setAuthor('bob');
+			verifyRpcCall(mockAxios, 0, 'User.filter', [
+				{ username: 'bob' }
+			]);
+			verifyRpcCall(mockAxios, 1, 'TestCase.update', [
+				1,
+				{ author: 2 }
+			]);
+
+			expect(tc1.getAuthorId()).toEqual(2);
+			expect(tc1.getAuthorName()).toEqual('bob');
 		});
 	});
 });
