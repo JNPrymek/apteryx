@@ -19,6 +19,23 @@ export default class Category extends KiwiNamedItem {
 		return await Product.getById(this.getProductId());
 	}
 
+	public static async resolveCategoryId(
+		identifier: number | string | Category
+	): Promise<number> {
+		let result = 0;
+		if (typeof identifier === 'number') {
+			result = identifier;
+		}
+		if (identifier instanceof Category) {
+			result = identifier.getId();
+		}
+		if (typeof identifier === 'string') {
+			const user = await Category.getByName(identifier);
+			result = user.getId();
+		}
+		return result;
+	}
+
 	// Inherited methods
 	// ------------------------------------------------------------------------
 	
