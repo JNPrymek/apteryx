@@ -1662,5 +1662,41 @@ describe('TestCase', () => {
 				expect(tc1.getDefaultTesterId()).toBeNull();
 				expect(tc1.getDefaultTesterName()).toBeNull();
 			});
+
+		it('Can set a new value for Category', async () => {
+			const tc1 = new TestCase(mockTestCase({
+				category: 1,
+				category__name: '--default--'
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				category: 4,
+				category__name: 'Regression'
+			});
+			const updateVal = mockTestCase({
+				category: 4,
+				category__name: 'Regression'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: updateResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getCategoryId()).toEqual(1);
+			expect(tc1.getCategoryName()).toEqual('--default--');
+
+			await tc1.setCategory(4);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.update',
+				[1, { category: 4 }]
+			);
+
+			expect(tc1.getCategoryId()).toEqual(4);
+			expect(tc1.getCategoryName()).toEqual('Regression');
+		});
 	});
 });

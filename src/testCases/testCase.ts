@@ -149,6 +149,13 @@ export default class TestCase extends KiwiBaseItem {
 	public async getCategory(): Promise<Category> {
 		return await Category.getById(this.getCategoryId());
 	}
+
+	public async setCategory(
+		category: number | string | Category
+	): Promise<void> {
+		const categoryId = await Category.resolveCategoryId(category);
+		await this.serverUpdate({ category: categoryId });
+	}
 	
 	public getPriorityId(): number {
 		return this.serialized['priority'] as number;
