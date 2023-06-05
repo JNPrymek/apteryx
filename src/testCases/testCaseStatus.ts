@@ -25,6 +25,15 @@ export default class TestCaseStatus extends KiwiNamedItem {
 		return this.serialized['description'] as string;
 	}
 
+	public static async resolveStatusId(
+		status: number | string | TestCaseStatus
+	): Promise<number> {
+		if (typeof status === 'number') return status;
+		if (status instanceof TestCaseStatus) return status.getId();
+		const caseStatus = await TestCaseStatus.getByName(status);
+		return caseStatus.getId();
+	}
+
 	// Inherited methods
 	// ------------------------------------------------------------------------
 	

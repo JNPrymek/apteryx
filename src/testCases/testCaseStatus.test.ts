@@ -3,12 +3,17 @@ import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import { mockTestCaseStatus } from '../../test/mockKiwiValues';
 
 import TestCaseStatus from './testCaseStatus';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Case Status', () => {
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
 	const stat1Vals = mockTestCaseStatus();
 	const stat2Vals = mockTestCaseStatus({
@@ -94,6 +99,60 @@ describe('Test Case Status', () => {
 				.toThrowError(
 					`TestCaseStatus with name "${name}" could not be found.`
 				);
+		});
+
+		it('Can resolve TestCaseStatus ID by id', () => {
+			expect(TestCaseStatus.resolveStatusId(1)).resolves.toEqual(1);
+			expect(TestCaseStatus.resolveStatusId(82)).resolves.toEqual(82);
+			expect(TestCaseStatus.resolveStatusId(5)).resolves.toEqual(5);
+			expect(TestCaseStatus.resolveStatusId(314)).resolves.toEqual(314);
+		});
+
+		it('Can resolve TestCaseStatus ID from TestCaseStatus object', () => {
+			const tcs1 = new TestCaseStatus(mockTestCaseStatus({ id: 1 }));
+			const tcs2 = new TestCaseStatus(mockTestCaseStatus({ id: 57 }));
+			const tcs3 = new TestCaseStatus(mockTestCaseStatus({ id: 34 }));
+			const tcs4 = new TestCaseStatus(mockTestCaseStatus({ id: 963 }));
+
+			expect(TestCaseStatus.resolveStatusId(tcs1)).resolves.toEqual(1);
+			expect(TestCaseStatus.resolveStatusId(tcs2)).resolves.toEqual(57);
+			expect(TestCaseStatus.resolveStatusId(tcs3)).resolves.toEqual(34);
+			expect(TestCaseStatus.resolveStatusId(tcs4)).resolves.toEqual(963);
+		});
+
+		it('Can resolve TestCaseStatus ID from Name', async () => {
+			const stat1Vals = mockTestCaseStatus({
+				name: 'First Status'
+			});
+			const stat2Vals = mockTestCaseStatus({
+				id: 2,
+				name: 'Second Status'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [stat1Vals]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [stat2Vals]
+			}));
+
+			expect(await TestCaseStatus.resolveStatusId('First Status'))
+				.toEqual(1);
+			expect(await TestCaseStatus.resolveStatusId('Second Status'))
+				.toEqual(2);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCaseStatus.filter',
+				[{ name: 'First Status' }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCaseStatus.filter',
+				[{ name: 'Second Status' }]
+			);
 		});
 	});
 	
