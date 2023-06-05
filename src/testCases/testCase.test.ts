@@ -1698,5 +1698,52 @@ describe('TestCase', () => {
 			expect(tc1.getCategoryId()).toEqual(4);
 			expect(tc1.getCategoryName()).toEqual('Regression');
 		});
+
+		it('Can set a new value for Case Status', async () => {
+			const caseStatus2 = new TestCaseStatus(mockTestCaseStatus({
+				id: 2,
+				name: 'CONFIRMED',
+				is_confirmed: true,
+				description: 'Ready to test'
+			}));
+			const tc1 = new TestCase(mockTestCase({
+				case_status: 1,
+				case_status__name: 'PROPOSED',
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				case_status: 2,
+				case_status__name: 'CONFIRMED',
+			});
+
+			const updateVal = mockTestCase({
+				case_status: 2,
+				case_status__name: 'CONFIRMED',
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateResponse ]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tc1.getCaseStatusId()).toEqual(1);
+			expect(tc1.getCaseStatusName()).toEqual('PROPOSED');
+
+			await tc1.setCaseStatus(caseStatus2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.update',
+				[
+					1,
+					{ case_status: 2 }
+				]
+			);
+
+			expect(tc1.getCaseStatusId()).toEqual(2);
+			expect(tc1.getCaseStatusName()).toEqual('CONFIRMED');
+
+		});
 	});
 });
