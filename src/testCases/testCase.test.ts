@@ -6,6 +6,7 @@ import Priority from '../management/priority';
 import Category from './category';
 import TestCaseStatus from './testCaseStatus';
 import {
+	mockComponent,
 	mockPriority,
 	mockTestCase,
 	mockTestCaseStatus,
@@ -17,6 +18,7 @@ import { TestCaseWriteValues } from './testCase.type';
 import { 
 	mockTestCaseUpdateResponse 
 } from '../../test/mockValues/testCases/mockTestCaseValues';
+import Component from '../management/component';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -1744,6 +1746,111 @@ describe('TestCase', () => {
 			expect(tc1.getCaseStatusId()).toEqual(2);
 			expect(tc1.getCaseStatusName()).toEqual('CONFIRMED');
 
+		});
+
+		it('Can add a Component by ID', async () => {
+			const componentVals = mockComponent();
+			const tc1 = new TestCase(mockTestCase());
+			// Resolve component from ID
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({ 
+				result: [ componentVals ]
+			}));
+			// Add component to TC
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ componentVals ]
+			}));
+
+			await tc1.addComponent(componentVals.id);
+			
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Component.filter',
+				[{ id__in: [1] }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCase.add_component',
+				[1, componentVals.name]
+			);
+		});
+
+		it('Can add a Component by Name', async () => {
+			const componentVals = mockComponent();
+			const tc1 = new TestCase(mockTestCase());
+			// Add component to TC
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ componentVals ]
+			}));
+
+			await tc1.addComponent(componentVals.name);
+			
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.add_component',
+				[1, componentVals.name]
+			);
+		});
+
+		it('Can add a Component using Component object', async () => {
+			const componentVals = mockComponent();
+			const tc1 = new TestCase(mockTestCase());
+			// Add component to TC
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ componentVals ]
+			}));
+
+			await tc1.addComponent(new Component(componentVals));
+			
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.add_component',
+				[1, componentVals.name]
+			);
+		});
+
+		it('Can remove a Component by ID', async () => {
+			const componentVals = mockComponent({
+				id: 54
+			});
+			const tc1 = new TestCase(mockTestCase());
+			// Add component to TC
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await tc1.removeComponent(componentVals.id);
+			
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.remove_component',
+				[1, componentVals.id]
+			);
+		});
+
+		it('Can remove a Component by Component object', async () => {
+			const componentVals = mockComponent({
+				id: 54
+			});
+			const tc1 = new TestCase(mockTestCase());
+			// Add component to TC
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			const component = new Component(componentVals);
+			await tc1.removeComponent(component);
+			
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.remove_component',
+				[1, componentVals.id]
+			);
 		});
 	});
 });

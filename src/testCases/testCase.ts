@@ -7,6 +7,7 @@ import TestCaseStatus from './testCaseStatus';
 import User from '../management/user';
 import { TestCaseValues, TestCaseWriteValues } from './testCase.type';
 import KiwiConnector from '../core/kiwiConnector';
+import Component from '../management/component';
 
 export default class TestCase extends KiwiBaseItem {
 	
@@ -275,6 +276,33 @@ export default class TestCase extends KiwiBaseItem {
 			await this.serverUpdate({ default_tester: null });
 		}
 	};
+
+	public async addComponent(
+		component: number | string | Component
+	): Promise<void> {
+		let componentName = (typeof component === 'string') ? component : '';
+		if (component instanceof Component) {
+			componentName = component.getName();
+		}
+		if (typeof component === 'number') {
+			const comp = await Component.getById(component);
+			componentName = comp.getName();
+		}
+
+		await KiwiConnector.sendRPCMethod('TestCase.add_component', [
+			this.getId(),
+			componentName
+		]);
+	}
+
+	public async removeComponent(component: number | Component): Promise<void> {
+		const componentId = 
+			(component instanceof Component) ? component.getId() : component;
+		await KiwiConnector.sendRPCMethod('TestCase.remove_component', [
+			this.getId(),
+			componentId
+		]);
+	}
 	
 	public async serverUpdate(
 		updateValues: Partial<TestCaseWriteValues>

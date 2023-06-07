@@ -1,5 +1,6 @@
 
 export type RpcResult = 
+	null |
 	string | 
 	number | 
 	Record<string, unknown> | 
