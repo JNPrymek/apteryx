@@ -8,6 +8,7 @@ import TestCaseStatus from './testCaseStatus';
 import {
 	mockComponent,
 	mockPriority,
+	mockTag,
 	mockTestCase,
 	mockTestCaseStatus,
 	mockUser,
@@ -19,6 +20,7 @@ import {
 	mockTestCaseUpdateResponse 
 } from '../../test/mockValues/testCases/mockTestCaseValues';
 import Component from '../management/component';
+import Tag from '../management/tag';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -1850,6 +1852,132 @@ describe('TestCase', () => {
 				0,
 				'TestCase.remove_component',
 				[1, componentVals.id]
+			);
+		});
+
+		it('Can add tag by Name', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const tag1 = new Tag(mockTag());
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await tc1.addTag(tag1.getName());
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.add_tag',
+				[1, 'ExampleTag']
+			);
+		});
+
+		it('Can remove tag by Name', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const tag1 = new Tag(mockTag());
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await tc1.removeTag(tag1.getName());
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.remove_tag',
+				[1, 'ExampleTag']
+			);
+		});
+
+		it('Can add tag by Tag object', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const tag1 = new Tag(mockTag());
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await tc1.addTag(tag1);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.add_tag',
+				[1, 'ExampleTag']
+			);
+		});
+
+		it('Can remove tag by Tag object', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const tag1 = new Tag(mockTag());
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await tc1.removeTag(tag1);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.remove_tag',
+				[1, 'ExampleTag']
+			);
+		});
+
+		it('Can add tag by ID', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const tag1 = new Tag(mockTag());
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [mockTag()]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await tc1.addTag(tag1.getId());
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Tag.filter',
+				[{ id__in: [1] }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCase.add_tag',
+				[1, 'ExampleTag']
+			);
+		});
+
+		it('Can add tag by ID', async () => {
+			const tc1 = new TestCase(mockTestCase());
+			const tag1 = new Tag(mockTag());
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [mockTag()]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await tc1.removeTag(tag1.getId());
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Tag.filter',
+				[{ id__in: [1] }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCase.remove_tag',
+				[1, 'ExampleTag']
 			);
 		});
 	});

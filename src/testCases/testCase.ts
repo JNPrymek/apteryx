@@ -8,6 +8,7 @@ import User from '../management/user';
 import { TestCaseValues, TestCaseWriteValues } from './testCase.type';
 import KiwiConnector from '../core/kiwiConnector';
 import Component from '../management/component';
+import Tag from '../management/tag';
 
 export default class TestCase extends KiwiBaseItem {
 	
@@ -301,6 +302,36 @@ export default class TestCase extends KiwiBaseItem {
 		await KiwiConnector.sendRPCMethod('TestCase.remove_component', [
 			this.getId(),
 			componentId
+		]);
+	}
+
+	public async addTag(tag: number | string | Tag): Promise<void> {
+		let tagName = (typeof tag === 'string') ? tag : '';
+		if (tag instanceof Tag) {
+			tagName = tag.getName();
+		}
+		if (typeof tag === 'number') {
+			const tagObj = await Tag.getById(tag);
+			tagName = tagObj.getName();
+		}
+		await KiwiConnector.sendRPCMethod('TestCase.add_tag', [
+			this.getId(),
+			tagName
+		]);
+	}
+
+	public async removeTag(tag: number | string | Tag): Promise<void> {
+		let tagName = (typeof tag === 'string') ? tag : '';
+		if (tag instanceof Tag) {
+			tagName = tag.getName();
+		}
+		if (typeof tag === 'number') {
+			const tagObj = await Tag.getById(tag);
+			tagName = tagObj.getName();
+		}
+		await KiwiConnector.sendRPCMethod('TestCase.remove_tag', [
+			this.getId(),
+			tagName
 		]);
 	}
 	
