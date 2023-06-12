@@ -15,7 +15,7 @@ import {
 } from '../../test/mockKiwiValues';
 import User from '../management/user';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import { TestCaseWriteValues } from './testCase.type';
+import { TestCaseCreateValues, TestCaseWriteValues } from './testCase.type';
 import { 
 	mockTestCaseUpdateResponse 
 } from '../../test/mockValues/testCases/mockTestCaseValues';
@@ -1979,6 +1979,137 @@ describe('TestCase', () => {
 				'TestCase.remove_tag',
 				[1, 'ExampleTag']
 			);
+		});
+	});
+
+	describe('Creating TestCase', () => {
+		it('Can create new TestCase with minimum values', async () => {
+			const createVals: TestCaseCreateValues = {
+				summary: 'TestCase from unit tests',
+				product: 1,
+				category: 1,
+				priority: 1,
+				case_status: 1
+			};
+			const newTCVals = mockTestCase({
+				summary: 'TestCase from unit tests'
+			});
+
+			// Create response - non-calculated TC fields
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: {
+					id: newTCVals.id,
+					is_automated: newTCVals.is_automated,
+					script: newTCVals.script,
+					arguments: newTCVals.arguments,
+					extra_link: newTCVals.extra_link,
+					summary: newTCVals.summary,
+					requirement: newTCVals.requirement,
+					notes: newTCVals.notes,
+					text: newTCVals.text,
+					setup_duration: newTCVals.setup_duration,
+					testing_duration: newTCVals.testing_duration,
+					case_status: newTCVals.case_status,
+					category: newTCVals.category,
+					priority: newTCVals.priority,
+					author: newTCVals.author,
+					default_tester: newTCVals.default_tester,
+					reviewer: newTCVals.reviewer,
+					create_date: newTCVals.create_date
+				}
+			}));
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [newTCVals]
+			}));
+
+			const result = await TestCase.create(createVals);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.create',
+				[createVals]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCase.filter',
+				[ { id__in: [1] }]
+			);
+			expect(result).toEqual(new TestCase(newTCVals));
+		});
+
+		it('Can create new TestCase with additional values', async () => {
+			const createVals: TestCaseCreateValues = {
+				summary: 'TestCase from unit tests',
+				product: 1,
+				category: 1,
+				priority: 1,
+				case_status: 1,
+				notes: 'Custom notes',
+				default_tester: 2,
+				setup_duration: 30,
+				testing_duration: 90
+			};
+			const newTCVals = mockTestCase({
+				summary: 'TestCase from unit tests',
+				notes: 'Custom notes',
+				default_tester: 2,
+				default_tester__username: 'bob',
+				setup_duration: 30,
+				testing_duration: 90,
+				expected_duration: 120
+			});
+
+			// Create response - non-calculated TC fields
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: {
+					id: newTCVals.id,
+					is_automated: newTCVals.is_automated,
+					script: newTCVals.script,
+					arguments: newTCVals.arguments,
+					extra_link: newTCVals.extra_link,
+					summary: newTCVals.summary,
+					requirement: newTCVals.requirement,
+					notes: newTCVals.notes,
+					text: newTCVals.text,
+					setup_duration: newTCVals.setup_duration,
+					testing_duration: newTCVals.testing_duration,
+					case_status: newTCVals.case_status,
+					category: newTCVals.category,
+					priority: newTCVals.priority,
+					author: newTCVals.author,
+					default_tester: newTCVals.default_tester,
+					reviewer: newTCVals.reviewer,
+					create_date: newTCVals.create_date
+				}
+			}));
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [newTCVals]
+			}));
+
+			const result = await TestCase.create(createVals);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.create',
+				[createVals]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCase.filter',
+				[ { id__in: [1] }]
+			);
+			expect(result).toEqual(new TestCase(newTCVals));
+			expect(result.getSummary()).toEqual('TestCase from unit tests');
+			expect(result.getTestingDuration()).toEqual(90);
+			expect(result.getSetupDuration()).toEqual(30);
+			expect(result.getTotalDuration()).toEqual(120);
+			expect(result.getDefaultTesterId()).toEqual(2);
+			expect(result.getDefaultTesterName()).toEqual('bob');
+			expect(result.getNotes()).toEqual('Custom notes');
 		});
 	});
 });

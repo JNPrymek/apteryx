@@ -5,7 +5,12 @@ import Priority from '../management/priority';
 import Category from './category';
 import TestCaseStatus from './testCaseStatus';
 import User from '../management/user';
-import { TestCaseValues, TestCaseWriteValues } from './testCase.type';
+import { 
+	TestCaseCreateResponseValues,
+	TestCaseCreateValues,
+	TestCaseValues,
+	TestCaseWriteValues
+} from './testCase.type';
 import KiwiConnector from '../core/kiwiConnector';
 import Component from '../management/component';
 import Tag from '../management/tag';
@@ -335,6 +340,17 @@ export default class TestCase extends KiwiBaseItem {
 		]);
 	}
 	
+	public static async create(
+		testCaseValues: TestCaseCreateValues
+	): Promise<TestCase> {
+		const respose = await KiwiConnector.sendRPCMethod(
+			'TestCase.create', 
+			[ testCaseValues ]
+		);
+		const id = (respose as TestCaseCreateResponseValues).id;
+		return await TestCase.getById(id);
+	}
+
 	public async serverUpdate(
 		updateValues: Partial<TestCaseWriteValues>
 	): Promise<void> {

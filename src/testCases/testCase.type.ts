@@ -85,3 +85,17 @@ export type TestCaseUpdateResponseValues = {
 	default_tester__username: string | null;
 	reviewer__username: string | null;
 };
+
+export type TestCaseCreateValues = 
+	Partial<Omit<TestCaseValues, keyof TestCaseComputedFields>> & {
+		product: number;
+		category: number;
+		priority: number;
+		case_status: number;
+		summary: string;
+	}
+
+export type TestCaseCreateResponseValues = 
+	Omit<TestCaseValues, keyof TestCaseComputedFields> & {
+		id: number;
+	}
