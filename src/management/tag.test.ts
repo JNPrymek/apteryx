@@ -340,6 +340,78 @@ describe('Tag', () => {
 			expect(caseIds).toHaveLength(0);
 			expect(caseIds).toEqual([]);
 		});
+
+		it('Can get Tags for given TestCase ID', async () => {
+			const tcId = 35;
+			
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTagServerEntry({ ...tag1Vals, case: tcId }),
+					mockTagServerEntry({ ...tag2Vals, case: tcId }),
+					mockTagServerEntry({ ...tag3Vals, case: tcId }),
+				]
+			}));
+
+			const tagList = await Tag.getTagsForTestCase(tcId);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Tag.filter',
+				[{ case: tcId }]
+			);
+
+			expect(tagList).toContainEqual(new Tag(tag1Vals));
+			expect(tagList).toContainEqual(new Tag(tag2Vals));
+			expect(tagList).toContainEqual(new Tag(tag3Vals));
+		});
+
+		it('Can get Tags for given TestPlan ID', async () => {
+			const planId = 35;
+			
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTagServerEntry({ ...tag1Vals, plan: planId }),
+					mockTagServerEntry({ ...tag2Vals, plan: planId }),
+					mockTagServerEntry({ ...tag3Vals, plan: planId }),
+				]
+			}));
+
+			const tagList = await Tag.getTagsForTestPlan(planId);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Tag.filter',
+				[{ plan: planId }]
+			);
+
+			expect(tagList).toContainEqual(new Tag(tag1Vals));
+			expect(tagList).toContainEqual(new Tag(tag2Vals));
+			expect(tagList).toContainEqual(new Tag(tag3Vals));
+		});
+
+		it('Can get Tags for given TestRun ID', async () => {
+			const runId = 35;
+			
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTagServerEntry({ ...tag1Vals, run: runId }),
+					mockTagServerEntry({ ...tag2Vals, run: runId }),
+					mockTagServerEntry({ ...tag3Vals, run: runId }),
+				]
+			}));
+
+			const tagList = await Tag.getTagsForTestRun(runId);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Tag.filter',
+				[{ run: runId }]
+			);
+
+			expect(tagList).toContainEqual(new Tag(tag1Vals));
+			expect(tagList).toContainEqual(new Tag(tag2Vals));
+			expect(tagList).toContainEqual(new Tag(tag3Vals));
+		});
 	});
 
 	describe('Updating Tag objects', () => {
