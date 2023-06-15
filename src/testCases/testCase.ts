@@ -310,6 +310,10 @@ export default class TestCase extends KiwiBaseItem {
 		]);
 	}
 
+	public async getComponents(): Promise<Array<Component>> {
+		return Component.getComponentsForTestCase(this.getId());
+	}
+
 	public async addTag(tag: number | string | Tag): Promise<void> {
 		let tagName = (typeof tag === 'string') ? tag : '';
 		if (tag instanceof Tag) {

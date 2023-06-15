@@ -7,6 +7,7 @@ import Category from './category';
 import TestCaseStatus from './testCaseStatus';
 import {
 	mockComponent,
+	mockComponentServerEntry,
 	mockPriority,
 	mockTag,
 	mockTagServerEntry,
@@ -319,6 +320,45 @@ describe('TestCase', () => {
 			expect(tags).toContainEqual(new Tag({ id: 2, name: 'Tag2' }));
 			expect(tags).toContainEqual(new Tag({ id: 3, name: 'Tag3' }));
 			expect(tags).toContainEqual(new Tag({ id: 4, name: 'Tag4' }));
+		});
+
+		it('Can get Components linked to TestCase', async () => {
+			const tcId = 8;
+			const tc8 = new TestCase(mockTestCase({ id: 8 }));
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockComponentServerEntry({ name: 'Comp1', cases: tcId }),
+					mockComponentServerEntry(
+						{ id: 8, name: 'Comp8', cases: tcId }
+					),
+					mockComponentServerEntry(
+						{ id: 14, name: 'Comp14', cases: tcId }
+					),
+				]
+			}));
+
+			const compoents = await tc8.getComponents();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Component.filter',
+				[ { cases: tcId }]
+			);
+
+			expect(compoents)
+				.toContainEqual(new Component(
+					mockComponent({ id: 1, name: 'Comp1' })
+				));
+			expect(compoents)
+				.toContainEqual(new Component(
+					mockComponent({ id: 8, name: 'Comp8' })
+				));
+			expect(compoents)
+				.toContainEqual(new Component(
+					mockComponent({ id: 14, name: 'Comp14' })
+				));
 		});
 	});
 
