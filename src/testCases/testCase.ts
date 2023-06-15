@@ -339,6 +339,10 @@ export default class TestCase extends KiwiBaseItem {
 			tagName
 		]);
 	}
+
+	public async getTags(): Promise<Array<Tag>> {
+		return await Tag.getTagsForTestCase(this.getId());
+	}
 	
 	public static async create(
 		testCaseValues: TestCaseCreateValues

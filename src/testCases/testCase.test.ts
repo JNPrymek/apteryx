@@ -9,6 +9,7 @@ import {
 	mockComponent,
 	mockPriority,
 	mockTag,
+	mockTagServerEntry,
 	mockTestCase,
 	mockTestCaseStatus,
 	mockUser,
@@ -291,6 +292,33 @@ describe('TestCase', () => {
 			expect(TestCase.getById(1)).rejects.toThrowError(
 				'Could not find any TestCase with ID 1'
 			);
+		});
+	});
+
+	describe('Relational data', () => {
+		it('Can get Tags linked to a TestCase', async () => {
+			const tc1 = new TestCase(mockTestCase());
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTagServerEntry({ id: 2, name: 'Tag2', case: 1 }),
+					mockTagServerEntry({ id: 3, name: 'Tag3', case: 1 }),
+					mockTagServerEntry({ id: 4, name: 'Tag4', case: 1 }),
+				]
+			}));
+
+			const tags = await tc1.getTags();
+			
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Tag.filter',
+				[ { case: 1 }]
+			);
+
+			expect(tags).toContainEqual(new Tag({ id: 2, name: 'Tag2' }));
+			expect(tags).toContainEqual(new Tag({ id: 3, name: 'Tag3' }));
+			expect(tags).toContainEqual(new Tag({ id: 4, name: 'Tag4' }));
 		});
 	});
 
