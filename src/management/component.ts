@@ -50,6 +50,12 @@ export default class Component extends KiwiNamedItem {
 		}
 		return testCaseIds;
 	}
+
+	public static async getComponentsForTestCase(
+		id: number
+	): Promise<Array<Component>> {
+		return this.getUniqueComponents({ cases: id });
+	}
 	
 	// Inherited methods
 	// ------------------------------------------------------------------------

@@ -329,6 +329,42 @@ describe('Component', () => {
 				expect(comp['serialized']).toEqual(component1Vals);
 			
 			});
+		
+		it('Can get Component list for given TestCase ID', async () => {
+			const tcId = 3;
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockComponentServerEntry({ name: 'Comp1', cases: tcId }),
+					mockComponentServerEntry(
+						{ id: 8, name: 'Comp8', cases: tcId }
+					),
+					mockComponentServerEntry(
+						{ id: 14, name: 'Comp14', cases: tcId }
+					),
+				]
+			}));
+
+			const compoents = await Component.getComponentsForTestCase(tcId);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Component.filter',
+				[ { cases: tcId }]
+			);
+
+			expect(compoents)
+				.toContainEqual(new Component(
+					mockComponent({ id: 1, name: 'Comp1' })
+				));
+			expect(compoents)
+				.toContainEqual(new Component(
+					mockComponent({ id: 8, name: 'Comp8' })
+				));
+			expect(compoents)
+				.toContainEqual(new Component(
+					mockComponent({ id: 14, name: 'Comp14' })
+				));
+		});
 
 		it('Can reload values from server', async () => {
 			const origServerVal = mockComponentServerEntry();
