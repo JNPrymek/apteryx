@@ -297,7 +297,7 @@ describe('TestCase', () => {
 	});
 
 	describe('Relational data', () => {
-		it('Can get Tags linked to a TestCase', async () => {
+		it('Can get Tags linked to a TestCase - 1+ result', async () => {
 			const tc1 = new TestCase(mockTestCase());
 
 			mockAxios.post.mockResolvedValue(mockRpcResponse({
@@ -322,7 +322,26 @@ describe('TestCase', () => {
 			expect(tags).toContainEqual(new Tag({ id: 4, name: 'Tag4' }));
 		});
 
-		it('Can get Components linked to TestCase', async () => {
+		it('Can get Tags linked to a TestCase - 0 results', async () => {
+			const tc1 = new TestCase(mockTestCase());
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: []
+			}));
+
+			const tags = await tc1.getTags();
+			
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Tag.filter',
+				[ { case: 1 }]
+			);
+
+			expect(tags.length).toEqual(0);
+		});
+
+		it('Can get Components linked to TestCase - 1+ result', async () => {
 			const tcId = 8;
 			const tc8 = new TestCase(mockTestCase({ id: 8 }));
 
@@ -359,6 +378,26 @@ describe('TestCase', () => {
 				.toContainEqual(new Component(
 					mockComponent({ id: 14, name: 'Comp14' })
 				));
+		});
+
+		it('Can get Components linked to TestCase - 0 results', async () => {
+			const tcId = 8;
+			const tc8 = new TestCase(mockTestCase({ id: 8 }));
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: []
+			}));
+
+			const compoents = await tc8.getComponents();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Component.filter',
+				[ { cases: tcId }]
+			);
+
+			expect(compoents.length).toEqual(0);
 		});
 
 		it('Can get TestCases from Component', async () => {
