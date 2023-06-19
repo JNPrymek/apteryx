@@ -360,6 +360,133 @@ describe('TestCase', () => {
 					mockComponent({ id: 14, name: 'Comp14' })
 				));
 		});
+
+		it('Can get TestCases from Component', async () => {
+			const comp = new Component(mockComponent());
+			const compVals = [
+				mockComponentServerEntry({ cases: 1 }),
+				mockComponentServerEntry({ cases: 2 }),
+				mockComponentServerEntry({ cases: 3 })
+			];
+			const tcVals = [
+				mockTestCase({ id: 1, summary: 'TC1' }),
+				mockTestCase({ id: 2, summary: 'TC2' }),
+				mockTestCase({ id: 3, summary: 'TC3' }),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: compVals
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: tcVals
+			}));
+
+			const tcList = await TestCase.getTestCasesWithComponent(comp);
+			expect(tcList).toContainEqual(new TestCase(tcVals[0]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[1]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[2]));
+		});
+
+		it('Can get TestCases from Component ID', async () => {
+			const compVals = [
+				mockComponentServerEntry({ cases: 1 }),
+				mockComponentServerEntry({ cases: 2 }),
+				mockComponentServerEntry({ cases: 3 })
+			];
+			const tcVals = [
+				mockTestCase({ id: 1, summary: 'TC1' }),
+				mockTestCase({ id: 2, summary: 'TC2' }),
+				mockTestCase({ id: 3, summary: 'TC3' }),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: compVals
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: tcVals
+			}));
+
+			const tcList = await TestCase.getTestCasesWithComponent(1);
+			expect(tcList).toContainEqual(new TestCase(tcVals[0]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[1]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[2]));
+		});
+
+		it('Can get TestCases from Tag', async () => {
+			const tag1 = new Tag(mockTag());
+			const tagVals = [
+				mockTagServerEntry({ case: 1 }),
+				mockTagServerEntry({ case: 2 }),
+				mockTagServerEntry({ case: 3 }),
+			];
+			const tcVals = [
+				mockTestCase({ id: 1, summary: 'TC1' }),
+				mockTestCase({ id: 2, summary: 'TC2' }),
+				mockTestCase({ id: 3, summary: 'TC3' }),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: tagVals
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: tcVals
+			}));
+
+			const tcList = await TestCase.getTestCasesWithTag(tag1);
+			expect(tcList).toContainEqual(new TestCase(tcVals[0]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[1]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[2]));
+		});
+
+		it('Can get TestCases from Tag ID', async () => {
+			const tagVals = [
+				mockTagServerEntry({ case: 1 }),
+				mockTagServerEntry({ case: 2 }),
+				mockTagServerEntry({ case: 3 }),
+			];
+			const tcVals = [
+				mockTestCase({ id: 1, summary: 'TC1' }),
+				mockTestCase({ id: 2, summary: 'TC2' }),
+				mockTestCase({ id: 3, summary: 'TC3' }),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: tagVals
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: tcVals
+			}));
+
+			const tcList = await TestCase.getTestCasesWithTag(1);
+			expect(tcList).toContainEqual(new TestCase(tcVals[0]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[1]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[2]));
+		});
+
+		it('Can get TestCases from Tag Name', async () => {
+			const tagVals = [
+				mockTagServerEntry({ name: 'TestTag', case: 1 }),
+				mockTagServerEntry({ name: 'TestTag', case: 2 }),
+				mockTagServerEntry({ name: 'TestTag', case: 3 }),
+			];
+			const tcVals = [
+				mockTestCase({ id: 1, summary: 'TC1' }),
+				mockTestCase({ id: 2, summary: 'TC2' }),
+				mockTestCase({ id: 3, summary: 'TC3' }),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: tagVals
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: tcVals
+			}));
+
+			const tcList = await TestCase.getTestCasesWithTag('TestTag');
+			expect(tcList).toContainEqual(new TestCase(tcVals[0]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[1]));
+			expect(tcList).toContainEqual(new TestCase(tcVals[2]));
+		});
 	});
 
 	describe('Updating TestCase values', () => {

@@ -314,6 +314,15 @@ export default class TestCase extends KiwiBaseItem {
 		return Component.getComponentsForTestCase(this.getId());
 	}
 
+	public static async getTestCasesWithComponent(
+		comp: number | Component
+	): Promise<Array<TestCase>> {
+		const compObj = (comp instanceof Component) ?
+			comp : (await Component.getById(comp));
+		const caseIds = await compObj.getLinkedTestCaseIds();
+		return TestCase.getByIds(caseIds);
+	}
+
 	public async addTag(tag: number | string | Tag): Promise<void> {
 		let tagName = (typeof tag === 'string') ? tag : '';
 		if (tag instanceof Tag) {
@@ -346,6 +355,21 @@ export default class TestCase extends KiwiBaseItem {
 
 	public async getTags(): Promise<Array<Tag>> {
 		return await Tag.getTagsForTestCase(this.getId());
+	}
+
+	public static async getTestCasesWithTag(
+		tag: number | string | Tag
+	): Promise<Array<TestCase>> {
+		let tagObj: Tag;
+		if (tag instanceof Tag) {
+			tagObj = tag;
+		} else if (typeof tag === 'number') {
+			tagObj = await Tag.getById(tag);
+		} else { // type is string
+			tagObj = await Tag.getByName(tag);
+		}
+		const caseIds = await tagObj.getTaggedTestCaseIds();
+		return TestCase.getByIds(caseIds);
 	}
 	
 	public static async create(
