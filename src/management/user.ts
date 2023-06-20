@@ -43,6 +43,23 @@ export default class User extends KiwiNamedItem {
 		}
 	}
 
+	public static async resolveUserId(
+		identifier: number | string | User
+	): Promise<number> {
+		let result = 0;
+		if (typeof identifier === 'number') {
+			result = identifier;
+		}
+		if (identifier instanceof User) {
+			result = identifier.getId();
+		}
+		if (typeof identifier === 'string') {
+			const user = await User.getByUsername(identifier);
+			result = user.getId();
+		}
+		return result;
+	}
+
 	// Inherited methods
 	// ------------------------------------------------------------------------
 

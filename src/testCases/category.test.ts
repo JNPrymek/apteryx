@@ -4,12 +4,17 @@ import { mockCategory, mockProduct } from '../../test/mockKiwiValues';
 import Product from '../management/product';
 
 import Category from './category';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Category', () => {
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
 	const cat1Vals = mockCategory();
 	const cat2Vals = mockCategory({
@@ -93,6 +98,34 @@ describe('Category', () => {
 				);
 		});
 
+	});
+
+	describe('Resolve Category IDs', () => {
+		it('Can resolve a Category ID from a number',  async () => {
+			expect(Category.resolveCategoryId(1)).resolves.toEqual(1);
+			expect(Category.resolveCategoryId(100)).resolves.toEqual(100);
+			expect(Category.resolveCategoryId(245)).resolves.toEqual(245);
+		});
+
+		it('Can resolve Category ID from a Category object', () => {
+			const cat1 = new Category(cat1Vals);
+			const cat2 = new Category(cat2Vals);
+			expect(Category.resolveCategoryId(cat1)).resolves.toEqual(1);
+			expect(Category.resolveCategoryId(cat2)).resolves.toEqual(2);
+		});
+
+		it('Can resolve Category ID from a name', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ cat2Vals ]
+			}));
+			expect(await Category.resolveCategoryId('Sanity')).toEqual(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Category.filter',
+				[{ name: 'Sanity' }]
+			);
+		});
 	});
 
 });

@@ -2,12 +2,18 @@ import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import User from './user';
 import { mockUser } from '../../test/mockKiwiValues';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('User', () => {
+
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 	
 	const user1Vals = mockUser();
 	const user2Vals = mockUser({
@@ -138,6 +144,43 @@ describe('User', () => {
 				.rejects.toThrowError(
 					'User with username "charlie" could not be found.'
 				);
+		});
+
+		it('Can resolve ID from number', async () => {
+			expect(User.resolveUserId(1)).resolves.toEqual(1);
+			expect(User.resolveUserId(3)).resolves.toEqual(3);
+			expect(User.resolveUserId(156)).resolves.toEqual(156);
+		});
+
+		it('Can resolve ID from User', async () => {
+			const alice = new User(user1Vals);
+			const bob = new User(user2Vals);
+			expect(User.resolveUserId(alice)).resolves.toEqual(1);
+			expect(User.resolveUserId(bob)).resolves.toEqual(2);
+		});
+
+		it('Can resolve ID from username', async () => {
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ user1Vals ]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ user2Vals ]
+			}));
+
+			expect(await User.resolveUserId('alice')).toEqual(1);
+			expect(await User.resolveUserId('bob')).toEqual(2);
+			verifyRpcCall(
+				mockAxios, 
+				0, 
+				'User.filter', 
+				[ { username: 'alice' }]
+			);
+			verifyRpcCall(
+				mockAxios, 
+				1, 
+				'User.filter', 
+				[ { username: 'bob' }]
+			);
 		});
 	});
 });

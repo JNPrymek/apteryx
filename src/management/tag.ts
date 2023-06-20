@@ -35,7 +35,6 @@ export default class Tag extends KiwiBaseItem {
 		}
 	}
 	
-	
 	// Get serialized entries as returned by Kiwi
 	// (1x entry per association with a case, plan, run, or bug)
 	private static async serverFilterDistinct(
@@ -151,6 +150,22 @@ export default class Tag extends KiwiBaseItem {
 		}
 		return idList;
 	}
+
+	public static async getTagsForTestCase(
+		caseId: number
+	): Promise<Array<Tag>> {
+		return this.getUniqueTags({ case: caseId });
+	}
+
+	public static async getTagsForTestPlan(
+		planId: number
+	): Promise<Array<Tag>> {
+		return this.getUniqueTags({ plan: planId });
+	}
+
+	public static async getTagsForTestRun(runId: number): Promise<Array<Tag>> {
+		return this.getUniqueTags({ run: runId });
+	}
 	
 	// Inherited methods
 	// ------------------------------------------------------------------------
@@ -174,6 +189,18 @@ export default class Tag extends KiwiBaseItem {
 		id: number
 	): Promise<Tag> {
 		return await super.getById(id) as Tag;
+	}
+
+	// Reload values from server - unique tag
+	public async syncServerValues(): Promise<void> {
+		const distinctList = await Tag
+			.serverFilterDistinct({ id: this.getId() });
+		const serverVal = distinctList[0];
+		const localVal: TagValues = {
+			id: serverVal.id,
+			name: serverVal.name
+		};
+		this.serialized = localVal;
 	}
 	
 	// ------------------------------------------------------------------------

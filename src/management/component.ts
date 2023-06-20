@@ -7,7 +7,7 @@ import User from './user';
 export default class Component extends KiwiNamedItem {
 	
 	// Constructor for all classes
-	constructor(serializedValues: ComponentValues|ComponentServerValues) {
+	constructor(serializedValues: ComponentValues | ComponentServerValues) {
 		super(serializedValues);
 		delete this.serialized.cases;
 	}
@@ -49,6 +49,12 @@ export default class Component extends KiwiNamedItem {
 			testCaseIds.push(comp.cases as number);
 		}
 		return testCaseIds;
+	}
+
+	public static async getComponentsForTestCase(
+		id: number
+	): Promise<Array<Component>> {
+		return this.getUniqueComponents({ cases: id });
 	}
 	
 	// Inherited methods
@@ -175,6 +181,22 @@ export default class Component extends KiwiNamedItem {
 		id: number
 	): Promise<Component> {
 		return await super.getById(id) as Component;
+	}
+
+	// Reload values from server - unique component
+	public async syncServerValues(): Promise<void> {
+		const distinctList = await Component
+			.serverFilterDistinct({ id: this.getId() });
+		const serverVal = distinctList[0];
+		const localVal: ComponentValues = {
+			id: serverVal.id,
+			name: serverVal.name,
+			description: serverVal.description,
+			product: serverVal.product,
+			initial_owner: serverVal.initial_owner,
+			initial_qa_contact: serverVal.initial_qa_contact
+		};
+		this.serialized = localVal;
 	}
 	
 	// ------------------------------------------------------------------------

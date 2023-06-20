@@ -26,10 +26,8 @@ export function mockClassification(
 
 import { ComponentValues, ComponentServerValues }
 	from '../../../src/management/component.type';
+import componentDefaults from './component_local.json';
 import componentServerDefaults from './component.json';
-
-// Local values - Remove 'cases' property from server value
-const componentDefaults: ComponentValues = { ...componentServerDefaults };
 
 export function mockComponent(
 	overrideValues?: Partial<ComponentValues>
@@ -78,14 +76,13 @@ export function mockProduct(
 import { TagValues, TagServerValues } 
 	from '../../../src/management/tag.type';
 import tagServerDefaults from './tag.json';
-
-const tagDefaults: TagValues = { ... tagServerDefaults };
+import tagLocalDefaults from './tag_local.json';
 
 export function mockTag(
 	overrideValues?: Partial<TagValues>
 ): TagValues {
 	return {
-		...tagDefaults,
+		...tagLocalDefaults,
 		...overrideValues
 	};
 }
