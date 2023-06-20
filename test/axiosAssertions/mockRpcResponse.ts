@@ -5,8 +5,8 @@ import { serverDomain } from '../testServerDetails';
 
 export default function mockRpcResponse(
 	data: { 
-		result?: RpcResult, 
-		error?: { code: number, message: string }
+		result?: RpcResult; 
+		error?: { code: number; message: string; };
 	},
 	setCookies?: Array<string>
 ): AxiosResponse<IRpcResponseBody> {
@@ -17,11 +17,11 @@ export default function mockRpcResponse(
 			if (setCookieHeaderString !== '' ) {
 				setCookieHeaderString += ', ';
 			}
+			/* eslint-disable-next-line max-len*/
 			setCookieHeaderString += `${cookieKeyVal}; domain=${serverDomain}; path=/`;
 		}
 	}
-	
-	//const setCookieHeader = setCookieHeaderString ? ({ 'set-cookie' : setCookieHeaderString }) : ({});
+
 	const resHeader: Record<string, string> = setCookieHeaderString ? 
 		{
 			'set-cookie' : setCookieHeaderString,
