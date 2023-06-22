@@ -26,6 +26,12 @@ export default class TestPlan extends KiwiNamedItem {
 			.serverStringToDate(this.serialized['create_date'] as string);
 	}
 
+	public async setCreateDate(createDate: string | Date): Promise<void> {
+		const dateString = (createDate instanceof Date) ? 
+			TimeUtils.dateToServerString(createDate) : createDate;
+		await this.serverUpdate({ create_date: dateString });
+	}
+
 	public isActive(): boolean {
 		return this.serialized['is_active'] as boolean;
 	}

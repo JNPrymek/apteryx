@@ -12,6 +12,7 @@ import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import { 
 	mockTestPlanUpdateResponse
 } from '../../test/mockValues/testPlans/mockTestPlanValues';
+import TimeUtils from '../utils/timeUtils';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -377,6 +378,84 @@ describe('Test Plan', () => {
 				[ 1, updateVal ]
 			);
 			expect(tp1.getText()).toEqual('');
+		});
+
+		it('Can update the TestPlan Creation Date using strings', async () => {
+			const origDate = '2022-12-08T23:42:11.042';
+			const newDate = '2023-03-07T23:42:11.042';
+
+			const tp1 = new TestPlan(mockTestPlan({
+				create_date: origDate
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				create_date: newDate
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					create_date: newDate
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						create_date: newDate
+					})
+				]
+			}));
+
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(origDate));
+
+			await tp1.setCreateDate(newDate);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(newDate));
+		});
+
+		it('Can update the TestPlan Creation Date using Dates', async () => {
+			const origDate = '2022-12-08T23:42:11.042';
+			const newDate = '2023-03-07T23:42:11.042';
+
+			const tp1 = new TestPlan(mockTestPlan({
+				create_date: origDate
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				create_date: newDate
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					create_date: newDate
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						create_date: newDate
+					})
+				]
+			}));
+
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(origDate));
+
+			await tp1.setCreateDate(TimeUtils.serverStringToDate(newDate));
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(newDate));
 		});
 	});
 
