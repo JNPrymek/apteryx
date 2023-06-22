@@ -17,6 +17,10 @@ export default class TestPlan extends KiwiNamedItem {
 		return this.serialized['text'] as string;
 	}
 
+	public async setText(text= ''): Promise<void> {
+		await this.serverUpdate({ text: text });
+	}
+
 	public getCreateDate(): Date {
 		return TimeUtils
 			.serverStringToDate(this.serialized['create_date'] as string);

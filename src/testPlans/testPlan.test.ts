@@ -310,6 +310,74 @@ describe('Test Plan', () => {
 			);
 			expect(tp1.getName()).toEqual('Updated Name');
 		});
+
+		it('Can remove the TestPlan Text', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				text: 'Original Text'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				text: 'Updated Text'
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					text: 'Updated Text'
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						text: 'Updated Text'
+					})
+				]
+			}));
+
+			expect(tp1.getText()).toEqual('Original Text');
+
+			await tp1.setText('Updated Text');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getText()).toEqual('Updated Text');
+		});
+
+		it('Can update the TestPlan Text', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				text: 'Original Text'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				text: ''
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					text: ''
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						text: ''
+					})
+				]
+			}));
+
+			expect(tp1.getText()).toEqual('Original Text');
+
+			await tp1.setText();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getText()).toEqual('');
+		});
 	});
 
 	describe('Basic Server Functions', () => {
