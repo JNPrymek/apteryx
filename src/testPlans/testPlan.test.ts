@@ -9,6 +9,7 @@ import PlanType from './planType';
 import TestPlan from './testPlan';
 import { TestPlanWriteValues } from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import { mockTestPlanUpdateResponse } from '../../test/mockValues/testPlans/mockTestPlanValues';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -214,7 +215,7 @@ describe('Test Plan', () => {
 			};
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
-				result: mockTestPlan({
+				result: mockTestPlanUpdateResponse({
 					text: 'new text value'
 				})
 			}));
@@ -226,11 +227,10 @@ describe('Test Plan', () => {
 				]
 			}));
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
-				result: mockTestPlan({
+				result: mockTestPlanUpdateResponse({
 					id: 2,
 					is_active: false,
-					type: 3,
-					type__name: 'Function'
+					type: 3
 				}),
 			}));
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
@@ -273,6 +273,40 @@ describe('Test Plan', () => {
 			expect(plan2.isActive()).toEqual(false);
 			expect(plan2.getTypeId()).toEqual(3);
 			expect(plan2.getTypeName()).toEqual('Function');
+		});
+
+		it('Can update the TestPlan Name', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				name: 'Original Name'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				name: 'Updated Name'
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					name: 'Updated Name'
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						name: 'Updated Name'
+					})
+				]
+			}));
+
+			expect(tp1.getName()).toEqual('Original Name');
+
+			await tp1.setName('Updated Name');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getName()).toEqual('Updated Name');
 		});
 	});
 

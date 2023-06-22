@@ -151,6 +151,10 @@ export default class TestPlan extends KiwiNamedItem {
 		await this.syncServerValues();
 	}
 
+	public async setName(newName: string): Promise<void> {
+		await this.serverUpdate({ name: newName });
+	}
+
 	// Inherited methods
 	// ------------------------------------------------------------------------
 	

@@ -26,3 +26,7 @@ export type TestPlanComputedFields = {
 
 export type TestPlanWriteValues = 
 	Omit<TestPlanValues, keyof TestPlanComputedFields>;
+
+export type TestPlanUpdateResponse = TestPlanWriteValues & {
+	id: number;
+};
