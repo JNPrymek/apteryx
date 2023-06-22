@@ -1,4 +1,7 @@
-import { TestPlanUpdateResponse, TestPlanValues } from '../../../src/testPlans/testPlan.type';
+import { 
+	TestPlanUpdateResponse,
+	TestPlanValues
+} from '../../../src/testPlans/testPlan.type';
 import testPlanDefaults from './testPlan.json';
 
 export function mockTestPlan(

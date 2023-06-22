@@ -9,7 +9,9 @@ import PlanType from './planType';
 import TestPlan from './testPlan';
 import { TestPlanWriteValues } from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import { mockTestPlanUpdateResponse } from '../../test/mockValues/testPlans/mockTestPlanValues';
+import { 
+	mockTestPlanUpdateResponse
+} from '../../test/mockValues/testPlans/mockTestPlanValues';
 
 // Init Mock Axios
 jest.mock('axios');
