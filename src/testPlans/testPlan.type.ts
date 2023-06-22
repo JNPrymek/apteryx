@@ -15,3 +15,14 @@ export type TestPlanValues = {
 	type__name: string;
 	parent: number | null;
 }
+
+export type TestPlanComputedFields = {
+	id: number;
+	product_version__value: string;
+	product__name: string;
+	author__username: string;
+	type__name: string;
+}
+
+export type TestPlanWriteValues = 
+	Omit<TestPlanValues, keyof TestPlanComputedFields>;

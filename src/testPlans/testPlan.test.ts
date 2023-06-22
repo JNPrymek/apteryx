@@ -7,12 +7,18 @@ import TestCase from '../testCases/testCase';
 import PlanType from './planType';
 
 import TestPlan from './testPlan';
+import { TestPlanWriteValues } from './testPlan.type';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Plan', () => {
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
 	const plan1Vals = mockTestPlan();
 	const plan2Vals = mockTestPlan({
@@ -194,6 +200,80 @@ describe('Test Plan', () => {
 			expect(tp1Parent).toBeNull();
 		});
 
+	});
+
+	describe('Updating TestPlan values', () => {
+		
+		it('Can call the update method with specified paramters', async () => {
+			const update1Vals: Partial<TestPlanWriteValues> = {
+				text: 'new text value'
+			};
+			const update2Vals: Partial<TestPlanWriteValues> = {
+				is_active: false,
+				type: 3
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlan({
+					text: 'new text value'
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						text: 'new text value'
+					})
+				]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlan({
+					id: 2,
+					is_active: false,
+					type: 3,
+					type__name: 'Function'
+				}),
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						id: 2,
+						is_active: false,
+						type: 3,
+						type__name: 'Function'
+					})
+				]
+			}));
+
+			const plan1 = new TestPlan(mockTestPlan());
+			const plan2 = new TestPlan(mockTestPlan({ id: 2 }));
+
+			/* eslint-disable-next-line max-len */
+			expect(plan1.getText()).toEqual('An example test plan used for unit tests.\nThis is the description.');
+			expect(plan2.isActive()).toEqual(true);
+			expect(plan2.getTypeId()).toEqual(1);
+			expect(plan2.getTypeName()).toEqual('Unit');
+
+			await plan1.serverUpdate(update1Vals);
+			await plan2.serverUpdate(update2Vals);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, update1Vals]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.update',
+				[2, update2Vals]
+			);
+
+			expect(plan1.getText()).toEqual('new text value');
+			expect(plan2.isActive()).toEqual(false);
+			expect(plan2.getTypeId()).toEqual(3);
+			expect(plan2.getTypeName()).toEqual('Function');
+		});
 	});
 
 	describe('Basic Server Functions', () => {
