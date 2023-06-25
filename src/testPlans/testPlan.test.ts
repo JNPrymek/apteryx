@@ -1,6 +1,6 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
-import { mockTestCase, mockTestPlan } from '../../test/mockKiwiValues';
+import { mockTestCase, mockTestPlan, mockVersion } from '../../test/mockKiwiValues';
 import Product from '../management/product';
 import Version from '../management/version';
 import TestCase from '../testCases/testCase';
@@ -604,6 +604,86 @@ describe('Test Plan', () => {
 				[ 1, updateVal ]
 			);
 			expect(tp1.getExtraLink()).toBeNull();
+		});
+		
+		it('Can update the TestPlan Product Version by ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product_version: 1,
+				product_version__value: 'unspecified'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product_version: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product_version: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product_version: 2,
+						product_version__value: 'v1.0.0'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductVersionId()).toEqual(1);
+			expect(tp1.getProductVersionValue()).toEqual('unspecified');
+			
+			await tp1.setProductVersion(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductVersionId()).toEqual(2);
+			expect(tp1.getProductVersionValue()).toEqual('v1.0.0');
+		});
+		
+		it('Can update the TestPlan Product Version by Version', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product_version: 1,
+				product_version__value: 'unspecified'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product_version: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product_version: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product_version: 2,
+						product_version__value: 'v1.0.0'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductVersionId()).toEqual(1);
+			expect(tp1.getProductVersionValue()).toEqual('unspecified');
+			
+			const v2 = new Version(mockVersion({
+				id: 2,
+				value: 'v1.0.0'
+			}));
+			await tp1.setProductVersion(v2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductVersionId()).toEqual(2);
+			expect(tp1.getProductVersionValue()).toEqual('v1.0.0');
 		});
 	});
 

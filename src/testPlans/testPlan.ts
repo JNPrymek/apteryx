@@ -72,6 +72,12 @@ export default class TestPlan extends KiwiNamedItem {
 	public async getProductVersion(): Promise<Version> {
 		return await Version.getById(this.getProductVersionId());
 	}
+	
+	public async setProductVersion(version: Version | number): Promise<void> {
+		const versionId = (version instanceof Version) 
+			? version.getId() : version;
+		await this.serverUpdate({ product_version: versionId });
+	}
 
 	public getProductId(): number {
 		return this.serialized['product'] as number;
