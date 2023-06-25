@@ -86,6 +86,12 @@ export default class TestPlan extends KiwiNamedItem {
 	public async getProduct(): Promise<Product> {
 		return await Product.getById(this.getProductId());
 	}
+	
+	public async setProduct(product: number | Product): Promise<void> {
+		const productId = (product instanceof Product)
+			? product.getId() : product;
+		await this.serverUpdate({ product: productId });
+	}
 
 	public getProductName(): string {
 		return this.serialized['product__name'] as string;

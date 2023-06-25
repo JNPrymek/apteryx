@@ -1,6 +1,11 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
-import { mockTestCase, mockTestPlan, mockVersion } from '../../test/mockKiwiValues';
+import { 
+	mockProduct,
+	mockTestCase,
+	mockTestPlan,
+	mockVersion
+} from '../../test/mockKiwiValues';
 import Product from '../management/product';
 import Version from '../management/version';
 import TestCase from '../testCases/testCase';
@@ -684,6 +689,86 @@ describe('Test Plan', () => {
 			
 			expect(tp1.getProductVersionId()).toEqual(2);
 			expect(tp1.getProductVersionValue()).toEqual('v1.0.0');
+		});
+		
+		it('Can update the TestPlan Product by ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product: 1,
+				product__name: 'Example Product'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product: 2,
+						product__name: 'Second Product'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductId()).toEqual(1);
+			expect(tp1.getProductName()).toEqual('Example Product');
+			
+			await tp1.setProduct(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductId()).toEqual(2);
+			expect(tp1.getProductName()).toEqual('Second Product');
+		});
+		
+		it('Can update the TestPlan Product by Product', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product: 1,
+				product__name: 'Example Product'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product: 2,
+						product__name: 'Second Product'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductId()).toEqual(1);
+			expect(tp1.getProductName()).toEqual('Example Product');
+			
+			const prod2 = new Product(mockProduct({
+				id: 2,
+				name: 'Second Product'
+			}));
+			await tp1.setProduct(prod2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductId()).toEqual(2);
+			expect(tp1.getProductName()).toEqual('Second Product');
 		});
 	});
 
