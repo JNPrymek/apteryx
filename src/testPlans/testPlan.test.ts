@@ -55,8 +55,6 @@ describe('Test Plan', () => {
 		parent: 3
 	});
 
-	
-
 	it('Can instantiate a TestPlan', () => {
 		const tp1 = new TestPlan(plan1Vals);
 		expect(tp1['serialized']).toEqual(plan1Vals);
@@ -288,15 +286,11 @@ describe('Test Plan', () => {
 			};
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
-				result: mockTestPlanUpdateResponse({
-					name: 'Updated Name'
-				})
+				result: mockTestPlanUpdateResponse(updateVal)
 			}));
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
 				result: [
-					mockTestPlan({
-						name: 'Updated Name'
-					})
+					mockTestPlan(updateVal)
 				]
 			}));
 
@@ -456,6 +450,96 @@ describe('Test Plan', () => {
 			);
 			expect(tp1.getCreateDate())
 				.toEqual(TimeUtils.serverStringToDate(newDate));
+		});
+		
+		it('Can update the TestPlan isActive', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				is_active: true
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				is_active: false
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan(updateVal)
+				]
+			}));
+
+			expect(tp1.isActive()).toEqual(true);
+
+			await tp1.setIsActive(false);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.isActive()).toEqual(false);
+		});
+		
+		it('Can update the TestPlan to be Active', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				is_active: false
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				is_active: true
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan(updateVal)
+				]
+			}));
+
+			expect(tp1.isActive()).toEqual(false);
+
+			await tp1.setActive();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.isActive()).toEqual(true);
+		});
+		
+		it('Can update the TestPlan to be Disabled', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				is_active: true
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				is_active: false
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan(updateVal)
+				]
+			}));
+
+			expect(tp1.isActive()).toEqual(true);
+
+			await tp1.setDisabled();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.isActive()).toEqual(false);
 		});
 	});
 

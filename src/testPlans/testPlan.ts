@@ -39,6 +39,18 @@ export default class TestPlan extends KiwiNamedItem {
 	public isDisabled(): boolean {
 		return !this.isActive();
 	}
+	
+	public async setIsActive(active: boolean): Promise<void> {
+		await this.serverUpdate({ is_active: active });
+	}
+	
+	public async setActive(): Promise<void> {
+		return this.setIsActive(true);
+	}
+	
+	public async setDisabled(): Promise<void> {
+		return this.setIsActive(false);
+	}
 
 	public getExtraLink(): string {
 		return this.serialized['extra_link'] as string;
