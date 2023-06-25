@@ -55,6 +55,11 @@ export default class TestPlan extends KiwiNamedItem {
 	public getExtraLink(): string {
 		return this.serialized['extra_link'] as string;
 	}
+	
+	public async setExtraLink(link?: string): Promise<void> {
+		const newLink = link ?? '';
+		await this.serverUpdate({ extra_link: newLink });
+	}
 
 	public getProductVersionId(): number {
 		return this.serialized['product_version'] as number;

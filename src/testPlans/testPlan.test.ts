@@ -541,6 +541,70 @@ describe('Test Plan', () => {
 			);
 			expect(tp1.isActive()).toEqual(false);
 		});
+
+		it('Can set the TestPlan Extra Link', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				extra_link: null
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				extra_link: 'new link'
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						extra_link: 'new link'
+					})
+				]
+			}));
+
+			expect(tp1.getExtraLink()).toBeNull();
+
+			await tp1.setExtraLink('new link');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getExtraLink()).toEqual('new link');
+		});
+
+		it('Can remove the TestPlan Extra Link', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				extra_link: 'original link'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				extra_link: ''
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						extra_link: null
+					})
+				]
+			}));
+
+			expect(tp1.getExtraLink()).toEqual('original link');
+
+			await tp1.setExtraLink();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getExtraLink()).toBeNull();
+		});
 	});
 
 	describe('Basic Server Functions', () => {
