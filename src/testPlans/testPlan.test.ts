@@ -851,6 +851,56 @@ describe('Test Plan', () => {
 			expect(tp1.getTypeId()).toEqual(2);
 			expect(tp1.getTypeName()).toEqual('Integration');
 		});
+		
+		it('Can update the TestPlan Type via Type Name', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				type: 1,
+				type__name: 'Unit'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				type: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ mockTestPlanType({
+					id: 2,
+					name: 'Integration'
+				})]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						type: 2,
+						type__name: 'Integration'
+					})
+				]
+			}));
+			
+			expect(tp1.getTypeId()).toEqual(1);
+			expect(tp1.getTypeName()).toEqual('Unit');
+
+			await tp1.setType('Integration');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'PlanType.filter',
+				[ { name: 'Integration' }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getTypeId()).toEqual(2);
+			expect(tp1.getTypeName()).toEqual('Integration');
+		});
 	});
 
 	describe('Basic Server Functions', () => {
