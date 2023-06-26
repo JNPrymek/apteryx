@@ -1,18 +1,35 @@
 import axios from 'axios';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
-import { mockTestCase, mockTestPlan } from '../../test/mockKiwiValues';
+import { 
+	mockProduct,
+	mockTestCase,
+	mockTestPlan,
+	mockVersion,
+	mockTestPlanType,
+	mockTestPlanUpdateResponse
+} from '../../test/mockKiwiValues';
 import Product from '../management/product';
 import Version from '../management/version';
 import TestCase from '../testCases/testCase';
 import PlanType from './planType';
 
 import TestPlan from './testPlan';
+import { TestPlanWriteValues } from './testPlan.type';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+// import { 
+// 	mockTestPlanUpdateResponse
+// } from '../../test/mockValues/testPlans/mockTestPlanValues';
+import TimeUtils from '../utils/timeUtils';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Plan', () => {
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
 	const plan1Vals = mockTestPlan();
 	const plan2Vals = mockTestPlan({
@@ -44,8 +61,6 @@ describe('Test Plan', () => {
 		extra_link: null,
 		parent: 3
 	});
-
-	
 
 	it('Can instantiate a TestPlan', () => {
 		const tp1 = new TestPlan(plan1Vals);
@@ -194,6 +209,796 @@ describe('Test Plan', () => {
 			expect(tp1Parent).toBeNull();
 		});
 
+	});
+
+	describe('Updating TestPlan values', () => {
+		
+		it('Can call the update method with specified paramters', async () => {
+			const update1Vals: Partial<TestPlanWriteValues> = {
+				text: 'new text value'
+			};
+			const update2Vals: Partial<TestPlanWriteValues> = {
+				is_active: false,
+				type: 3
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					text: 'new text value'
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						text: 'new text value'
+					})
+				]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					id: 2,
+					is_active: false,
+					type: 3
+				}),
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						id: 2,
+						is_active: false,
+						type: 3,
+						type__name: 'Function'
+					})
+				]
+			}));
+
+			const plan1 = new TestPlan(mockTestPlan());
+			const plan2 = new TestPlan(mockTestPlan({ id: 2 }));
+
+			/* eslint-disable-next-line max-len */
+			expect(plan1.getText()).toEqual('An example test plan used for unit tests.\nThis is the description.');
+			expect(plan2.isActive()).toEqual(true);
+			expect(plan2.getTypeId()).toEqual(1);
+			expect(plan2.getTypeName()).toEqual('Unit');
+
+			await plan1.serverUpdate(update1Vals);
+			await plan2.serverUpdate(update2Vals);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, update1Vals]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.update',
+				[2, update2Vals]
+			);
+
+			expect(plan1.getText()).toEqual('new text value');
+			expect(plan2.isActive()).toEqual(false);
+			expect(plan2.getTypeId()).toEqual(3);
+			expect(plan2.getTypeName()).toEqual('Function');
+		});
+
+		it('Can update the TestPlan Name', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				name: 'Original Name'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				name: 'Updated Name'
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan(updateVal)
+				]
+			}));
+
+			expect(tp1.getName()).toEqual('Original Name');
+
+			await tp1.setName('Updated Name');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getName()).toEqual('Updated Name');
+		});
+
+		it('Can remove the TestPlan Text', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				text: 'Original Text'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				text: 'Updated Text'
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					text: 'Updated Text'
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						text: 'Updated Text'
+					})
+				]
+			}));
+
+			expect(tp1.getText()).toEqual('Original Text');
+
+			await tp1.setText('Updated Text');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getText()).toEqual('Updated Text');
+		});
+
+		it('Can update the TestPlan Text', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				text: 'Original Text'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				text: ''
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					text: ''
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						text: ''
+					})
+				]
+			}));
+
+			expect(tp1.getText()).toEqual('Original Text');
+
+			await tp1.setText();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getText()).toEqual('');
+		});
+
+		it('Can update the TestPlan Creation Date using strings', async () => {
+			const origDate = '2022-12-08T23:42:11.042';
+			const newDate = '2023-03-07T23:42:11.042';
+
+			const tp1 = new TestPlan(mockTestPlan({
+				create_date: origDate
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				create_date: newDate
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					create_date: newDate
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						create_date: newDate
+					})
+				]
+			}));
+
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(origDate));
+
+			await tp1.setCreateDate(newDate);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(newDate));
+		});
+
+		it('Can update the TestPlan Creation Date using Dates', async () => {
+			const origDate = '2022-12-08T23:42:11.042';
+			const newDate = '2023-03-07T23:42:11.042';
+
+			const tp1 = new TestPlan(mockTestPlan({
+				create_date: origDate
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				create_date: newDate
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					create_date: newDate
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						create_date: newDate
+					})
+				]
+			}));
+
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(origDate));
+
+			await tp1.setCreateDate(TimeUtils.serverStringToDate(newDate));
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getCreateDate())
+				.toEqual(TimeUtils.serverStringToDate(newDate));
+		});
+		
+		it('Can update the TestPlan isActive', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				is_active: true
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				is_active: false
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan(updateVal)
+				]
+			}));
+
+			expect(tp1.isActive()).toEqual(true);
+
+			await tp1.setIsActive(false);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.isActive()).toEqual(false);
+		});
+		
+		it('Can update the TestPlan to be Active', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				is_active: false
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				is_active: true
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan(updateVal)
+				]
+			}));
+
+			expect(tp1.isActive()).toEqual(false);
+
+			await tp1.setActive();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.isActive()).toEqual(true);
+		});
+		
+		it('Can update the TestPlan to be Disabled', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				is_active: true
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				is_active: false
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan(updateVal)
+				]
+			}));
+
+			expect(tp1.isActive()).toEqual(true);
+
+			await tp1.setDisabled();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.isActive()).toEqual(false);
+		});
+
+		it('Can set the TestPlan Extra Link', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				extra_link: null
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				extra_link: 'new link'
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						extra_link: 'new link'
+					})
+				]
+			}));
+
+			expect(tp1.getExtraLink()).toBeNull();
+
+			await tp1.setExtraLink('new link');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getExtraLink()).toEqual('new link');
+		});
+
+		it('Can remove the TestPlan Extra Link', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				extra_link: 'original link'
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				extra_link: ''
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						extra_link: null
+					})
+				]
+			}));
+
+			expect(tp1.getExtraLink()).toEqual('original link');
+
+			await tp1.setExtraLink();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getExtraLink()).toBeNull();
+		});
+		
+		it('Can update the TestPlan Product Version by ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product_version: 1,
+				product_version__value: 'unspecified'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product_version: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product_version: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product_version: 2,
+						product_version__value: 'v1.0.0'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductVersionId()).toEqual(1);
+			expect(tp1.getProductVersionValue()).toEqual('unspecified');
+			
+			await tp1.setProductVersion(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductVersionId()).toEqual(2);
+			expect(tp1.getProductVersionValue()).toEqual('v1.0.0');
+		});
+		
+		it('Can update the TestPlan Product Version by Version', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product_version: 1,
+				product_version__value: 'unspecified'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product_version: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product_version: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product_version: 2,
+						product_version__value: 'v1.0.0'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductVersionId()).toEqual(1);
+			expect(tp1.getProductVersionValue()).toEqual('unspecified');
+			
+			const v2 = new Version(mockVersion({
+				id: 2,
+				value: 'v1.0.0'
+			}));
+			await tp1.setProductVersion(v2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductVersionId()).toEqual(2);
+			expect(tp1.getProductVersionValue()).toEqual('v1.0.0');
+		});
+		
+		it('Can update the TestPlan Product by ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product: 1,
+				product__name: 'Example Product'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product: 2,
+						product__name: 'Second Product'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductId()).toEqual(1);
+			expect(tp1.getProductName()).toEqual('Example Product');
+			
+			await tp1.setProduct(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductId()).toEqual(2);
+			expect(tp1.getProductName()).toEqual('Second Product');
+		});
+		
+		it('Can update the TestPlan Product by Product', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				product: 1,
+				product__name: 'Example Product'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				product: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						product: 2,
+						product__name: 'Second Product'
+					})
+				]
+			}));
+			
+			expect(tp1.getProductId()).toEqual(1);
+			expect(tp1.getProductName()).toEqual('Example Product');
+			
+			const prod2 = new Product(mockProduct({
+				id: 2,
+				name: 'Second Product'
+			}));
+			await tp1.setProduct(prod2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getProductId()).toEqual(2);
+			expect(tp1.getProductName()).toEqual('Second Product');
+		});
+		
+		it('Can update the TestPlan Type via ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				type: 1,
+				type__name: 'Unit'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				type: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						type: 2,
+						type__name: 'Integration'
+					})
+				]
+			}));
+			
+			expect(tp1.getTypeId()).toEqual(1);
+			expect(tp1.getTypeName()).toEqual('Unit');
+			
+			await tp1.setType(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getTypeId()).toEqual(2);
+			expect(tp1.getTypeName()).toEqual('Integration');
+		});
+		
+		it('Can update the TestPlan Type via Type', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				type: 1,
+				type__name: 'Unit'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				type: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						type: 2,
+						type__name: 'Integration'
+					})
+				]
+			}));
+			
+			expect(tp1.getTypeId()).toEqual(1);
+			expect(tp1.getTypeName()).toEqual('Unit');
+			
+			const type2 = new PlanType(mockTestPlanType({
+				id: 2,
+				name: 'Integration'
+			}));
+			await tp1.setType(type2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getTypeId()).toEqual(2);
+			expect(tp1.getTypeName()).toEqual('Integration');
+		});
+		
+		it('Can update the TestPlan Type via Type Name', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				type: 1,
+				type__name: 'Unit'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				type: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ mockTestPlanType({
+					id: 2,
+					name: 'Integration'
+				})]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						type: 2,
+						type__name: 'Integration'
+					})
+				]
+			}));
+			
+			expect(tp1.getTypeId()).toEqual(1);
+			expect(tp1.getTypeName()).toEqual('Unit');
+
+			await tp1.setType('Integration');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'PlanType.filter',
+				[ { name: 'Integration' }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getTypeId()).toEqual(2);
+			expect(tp1.getTypeName()).toEqual('Integration');
+		});
+
+		it('Can set the TestPlan Parent via ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				parent: null
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				parent: 2
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						parent: 2
+					})
+				]
+			}));
+
+			expect(tp1.getParentId()).toBeNull();
+
+			await tp1.setParent(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getParentId()).toEqual(2);
+		});
+
+		it('Can set the TestPlan Parent via Test Plan', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				parent: null
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				parent: 2
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						parent: 2
+					})
+				]
+			}));
+
+			expect(tp1.getParentId()).toBeNull();
+
+			const tp2 = new TestPlan(mockTestPlan({ id: 2 }));
+			await tp1.setParent(tp2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getParentId()).toEqual(2);
+		});
+
+		it('Can remove the TestPlan Parent', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				parent: 2
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				parent: null
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						parent: null
+					})
+				]
+			}));
+
+			expect(tp1.getParentId()).toEqual(2);
+
+			await tp1.setParent();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getParentId()).toBeNull();
+		});
 	});
 
 	describe('Basic Server Functions', () => {

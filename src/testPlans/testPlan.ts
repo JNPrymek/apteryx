@@ -5,6 +5,7 @@ import Version from '../management/version';
 import TimeUtils from '../utils/timeUtils';
 import PlanType from './planType';
 import TestCase from '../testCases/testCase';
+import { TestPlanWriteValues } from './testPlan.type';
 
 export default class TestPlan extends KiwiNamedItem {
 	// Constructor for all classes
@@ -16,9 +17,19 @@ export default class TestPlan extends KiwiNamedItem {
 		return this.serialized['text'] as string;
 	}
 
+	public async setText(text= ''): Promise<void> {
+		await this.serverUpdate({ text: text });
+	}
+
 	public getCreateDate(): Date {
 		return TimeUtils
 			.serverStringToDate(this.serialized['create_date'] as string);
+	}
+
+	public async setCreateDate(createDate: string | Date): Promise<void> {
+		const dateString = (createDate instanceof Date) ? 
+			TimeUtils.dateToServerString(createDate) : createDate;
+		await this.serverUpdate({ create_date: dateString });
 	}
 
 	public isActive(): boolean {
@@ -28,9 +39,26 @@ export default class TestPlan extends KiwiNamedItem {
 	public isDisabled(): boolean {
 		return !this.isActive();
 	}
+	
+	public async setIsActive(active: boolean): Promise<void> {
+		await this.serverUpdate({ is_active: active });
+	}
+	
+	public async setActive(): Promise<void> {
+		return this.setIsActive(true);
+	}
+	
+	public async setDisabled(): Promise<void> {
+		return this.setIsActive(false);
+	}
 
 	public getExtraLink(): string {
 		return this.serialized['extra_link'] as string;
+	}
+	
+	public async setExtraLink(link?: string): Promise<void> {
+		const newLink = link ?? '';
+		await this.serverUpdate({ extra_link: newLink });
 	}
 
 	public getProductVersionId(): number {
@@ -44,6 +72,12 @@ export default class TestPlan extends KiwiNamedItem {
 	public async getProductVersion(): Promise<Version> {
 		return await Version.getById(this.getProductVersionId());
 	}
+	
+	public async setProductVersion(version: Version | number): Promise<void> {
+		const versionId = (version instanceof Version) 
+			? version.getId() : version;
+		await this.serverUpdate({ product_version: versionId });
+	}
 
 	public getProductId(): number {
 		return this.serialized['product'] as number;
@@ -51,6 +85,12 @@ export default class TestPlan extends KiwiNamedItem {
 
 	public async getProduct(): Promise<Product> {
 		return await Product.getById(this.getProductId());
+	}
+	
+	public async setProduct(product: number | Product): Promise<void> {
+		const productId = (product instanceof Product)
+			? product.getId() : product;
+		await this.serverUpdate({ product: productId });
 	}
 
 	public getProductName(): string {
@@ -68,6 +108,18 @@ export default class TestPlan extends KiwiNamedItem {
 	public async getType(): Promise<PlanType> {
 		return await PlanType.getById(this.getTypeId());
 	}
+	
+	public async setType(type: number | string | PlanType): Promise<void> {
+		let typeId = (type instanceof PlanType) ? type.getId() : 0;
+		if (typeof type === 'number') {
+			typeId = type;
+		}
+		if (typeof type === 'string') {
+			const typeObj = await PlanType.getByName(type);
+			typeId = typeObj.getId();
+		}
+		await this.serverUpdate({ type: typeId });
+	}
 
 	public getParentId(): number {
 		return this.serialized['parent'] as number;
@@ -76,6 +128,15 @@ export default class TestPlan extends KiwiNamedItem {
 	public async getParent(): Promise<TestPlan|null> {
 		const parentId = this.getParentId();
 		return (parentId == null ? null : await TestPlan.getById(parentId));
+	}
+	
+	public async setParent(newParent?: TestPlan | number): Promise<void> {
+		let parentId: number | null = null;
+		if (newParent) {
+			parentId = (newParent instanceof TestPlan) ?
+				newParent.getId() : newParent;
+		}
+		await this.serverUpdate({ parent: parentId });
 	}
 
 	public async getTestCases(
@@ -138,6 +199,20 @@ export default class TestPlan extends KiwiNamedItem {
 			results = results.concat(grandChildren);
 		}
 		return results;
+	}
+
+	public async serverUpdate(
+		updateValues: Partial<TestPlanWriteValues>
+	): Promise<void> {
+		await KiwiConnector.sendRPCMethod('TestPlan.update', [
+			this.getId(),
+			updateValues
+		]);
+		await this.syncServerValues();
+	}
+
+	public async setName(newName: string): Promise<void> {
+		await this.serverUpdate({ name: newName });
 	}
 
 	// Inherited methods

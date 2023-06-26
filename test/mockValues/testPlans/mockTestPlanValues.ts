@@ -1,4 +1,7 @@
-import { TestPlanValues } from '../../../src/testPlans/testPlan.type';
+import { 
+	TestPlanUpdateResponse,
+	TestPlanValues
+} from '../../../src/testPlans/testPlan.type';
 import testPlanDefaults from './testPlan.json';
 
 export function mockTestPlan(
@@ -6,6 +9,16 @@ export function mockTestPlan(
 ): TestPlanValues {
 	return {
 		...testPlanDefaults,
+		...overrideValues
+	};
+}
+
+import testPlanUpdateValDefaults from './testPlan_update.json';
+export function mockTestPlanUpdateResponse(
+	overrideValues?: Partial<TestPlanUpdateResponse>
+): TestPlanUpdateResponse {
+	return {
+		...testPlanUpdateValDefaults,
 		...overrideValues
 	};
 }
