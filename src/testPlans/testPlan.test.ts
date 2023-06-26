@@ -4,7 +4,8 @@ import {
 	mockProduct,
 	mockTestCase,
 	mockTestPlan,
-	mockVersion
+	mockVersion,
+	mockTestPlanType
 } from '../../test/mockKiwiValues';
 import Product from '../management/product';
 import Version from '../management/version';
@@ -769,6 +770,86 @@ describe('Test Plan', () => {
 			
 			expect(tp1.getProductId()).toEqual(2);
 			expect(tp1.getProductName()).toEqual('Second Product');
+		});
+		
+		it('Can update the TestPlan Type via ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				type: 1,
+				type__name: 'Unit'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				type: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						type: 2,
+						type__name: 'Integration'
+					})
+				]
+			}));
+			
+			expect(tp1.getTypeId()).toEqual(1);
+			expect(tp1.getTypeName()).toEqual('Unit');
+			
+			await tp1.setType(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getTypeId()).toEqual(2);
+			expect(tp1.getTypeName()).toEqual('Integration');
+		});
+		
+		it('Can update the TestPlan Type via Type', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				type: 1,
+				type__name: 'Unit'
+			}));
+			const updateVal: Partial<TestPlanWriteValues> = {
+				type: 2
+			};
+			
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse({
+					product: 2,
+				})
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						type: 2,
+						type__name: 'Integration'
+					})
+				]
+			}));
+			
+			expect(tp1.getTypeId()).toEqual(1);
+			expect(tp1.getTypeName()).toEqual('Unit');
+			
+			const type2 = new PlanType(mockTestPlanType({
+				id: 2,
+				name: 'Integration'
+			}));
+			await tp1.setType(type2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[1, updateVal]
+			);
+			
+			expect(tp1.getTypeId()).toEqual(2);
+			expect(tp1.getTypeName()).toEqual('Integration');
 		});
 	});
 

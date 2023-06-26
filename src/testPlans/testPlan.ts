@@ -108,6 +108,18 @@ export default class TestPlan extends KiwiNamedItem {
 	public async getType(): Promise<PlanType> {
 		return await PlanType.getById(this.getTypeId());
 	}
+	
+	public async setType(type: number | string | PlanType): Promise<void> {
+		let typeId = (type instanceof PlanType) ? type.getId() : 0;
+		if (typeof type === 'number') {
+			typeId = type;
+		}
+		if (typeof type === 'string') {
+			const typeObj = await PlanType.getByName(type);
+			typeId = typeObj.getId();
+		}
+		await this.serverUpdate({ type: typeId });
+	}
 
 	public getParentId(): number {
 		return this.serialized['parent'] as number;
