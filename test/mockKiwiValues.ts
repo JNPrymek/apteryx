@@ -20,7 +20,8 @@ import {
 import {
 	mockPlanType,
 	mockTestPlan,
-	mockTestPlanType
+	mockTestPlanType,
+	mockTestPlanUpdateResponse
 } from './mockValues/testPlans/mockTestPlanValues';
 
 import {
@@ -49,6 +50,7 @@ export {
 	mockPlanType,
 	mockTestPlan,
 	mockTestPlanType,
+	mockTestPlanUpdateResponse,
 	// Test Runs
 	mockTestExecution,
 	mockTestExecutionStatus,

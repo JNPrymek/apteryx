@@ -5,7 +5,8 @@ import {
 	mockTestCase,
 	mockTestPlan,
 	mockVersion,
-	mockTestPlanType
+	mockTestPlanType,
+	mockTestPlanUpdateResponse
 } from '../../test/mockKiwiValues';
 import Product from '../management/product';
 import Version from '../management/version';
@@ -15,9 +16,9 @@ import PlanType from './planType';
 import TestPlan from './testPlan';
 import { TestPlanWriteValues } from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import { 
-	mockTestPlanUpdateResponse
-} from '../../test/mockValues/testPlans/mockTestPlanValues';
+// import { 
+// 	mockTestPlanUpdateResponse
+// } from '../../test/mockValues/testPlans/mockTestPlanValues';
 import TimeUtils from '../utils/timeUtils';
 
 // Init Mock Axios
