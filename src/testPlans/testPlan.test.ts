@@ -901,6 +901,103 @@ describe('Test Plan', () => {
 			expect(tp1.getTypeId()).toEqual(2);
 			expect(tp1.getTypeName()).toEqual('Integration');
 		});
+
+		it('Can set the TestPlan Parent via ID', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				parent: null
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				parent: 2
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						parent: 2
+					})
+				]
+			}));
+
+			expect(tp1.getParentId()).toBeNull();
+
+			await tp1.setParent(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getParentId()).toEqual(2);
+		});
+
+		it('Can set the TestPlan Parent via Test Plan', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				parent: null
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				parent: 2
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						parent: 2
+					})
+				]
+			}));
+
+			expect(tp1.getParentId()).toBeNull();
+
+			const tp2 = new TestPlan(mockTestPlan({ id: 2 }));
+			await tp1.setParent(tp2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getParentId()).toEqual(2);
+		});
+
+		it('Can remove the TestPlan Parent', async () => {
+			const tp1 = new TestPlan(mockTestPlan({
+				parent: 2
+			}));
+
+			const updateVal: Partial<TestPlanWriteValues> = {
+				parent: null
+			};
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestPlanUpdateResponse(updateVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestPlan({
+						parent: null
+					})
+				]
+			}));
+
+			expect(tp1.getParentId()).toEqual(2);
+
+			await tp1.setParent();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update',
+				[ 1, updateVal ]
+			);
+			expect(tp1.getParentId()).toBeNull();
+		});
 	});
 
 	describe('Basic Server Functions', () => {

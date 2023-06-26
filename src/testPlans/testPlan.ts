@@ -129,6 +129,15 @@ export default class TestPlan extends KiwiNamedItem {
 		const parentId = this.getParentId();
 		return (parentId == null ? null : await TestPlan.getById(parentId));
 	}
+	
+	public async setParent(newParent?: TestPlan | number): Promise<void> {
+		let parentId: number | null = null;
+		if (newParent) {
+			parentId = (newParent instanceof TestPlan) ?
+				newParent.getId() : newParent;
+		}
+		await this.serverUpdate({ parent: parentId });
+	}
 
 	public async getTestCases(
 		sortOrder: 'TESTCASE_ID' | 'SORTKEY' = 'SORTKEY'
