@@ -371,6 +371,10 @@ export default class TestCase extends KiwiBaseItem {
 		const caseIds = await tagObj.getTaggedTestCaseIds();
 		return TestCase.getByIds(caseIds);
 	}
+
+	public static resolveTestCaseId(testCase: number | TestCase): number {
+		return (testCase instanceof TestCase) ? testCase.getId() : testCase;
+	}
 	
 	public static async create(
 		testCaseValues: TestCaseCreateValues
