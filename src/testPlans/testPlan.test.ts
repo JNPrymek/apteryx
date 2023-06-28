@@ -17,7 +17,9 @@ import TestPlan from './testPlan';
 import { TestPlanWriteValues } from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
-import { mockTestPlanAddCaseResponse } from '../../test/mockValues/testCases/mockTestCaseValues';
+import {
+	mockTestPlanAddCaseResponse
+} from '../../test/mockValues/testCases/mockTestCaseValues';
 
 // Init Mock Axios
 jest.mock('axios');

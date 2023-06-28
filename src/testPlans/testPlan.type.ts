@@ -1,4 +1,7 @@
-import { TestCaseComputedFields, TestCaseValues } from '../testCases/testCase.type';
+import { 
+	TestCaseComputedFields,
+	TestCaseValues
+} from '../testCases/testCase.type';
 
 export type TestPlanValues = {
 	id: number;
