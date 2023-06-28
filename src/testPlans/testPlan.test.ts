@@ -16,10 +16,8 @@ import PlanType from './planType';
 import TestPlan from './testPlan';
 import { TestPlanWriteValues } from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-// import { 
-// 	mockTestPlanUpdateResponse
-// } from '../../test/mockValues/testPlans/mockTestPlanValues';
 import TimeUtils from '../utils/timeUtils';
+import { mockTestPlanAddCaseResponse } from '../../test/mockValues/testCases/mockTestCaseValues';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -1154,6 +1152,64 @@ describe('Test Plan', () => {
 					.toEqual(expect.arrayContaining([plan1, plan3]));
 				expect(tc1Plans.length).toEqual(2);
 			});
+
+		it('Can add a TestCase to the TestPlan via TestCase', async () => {
+			const tc2 = new TestCase(case2Vals);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: mockTestPlanAddCaseResponse()
+			}));
+
+			await plan1.addTestCase(tc2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.add_case',
+				[1, 2]
+			);
+		});
+
+		it('Can add a TestCase to the TestPlan via ID', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: mockTestPlanAddCaseResponse()
+			}));
+
+			await plan1.addTestCase(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.add_case',
+				[1, 2]
+			);
+		});
+
+		it('Can remove a TestCase from the TestPlan via TestCase', async () => {
+			const tc2 = new TestCase(case2Vals);
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await plan1.removeTestCase(tc2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.remove_case',
+				[1, 2]
+			);
+		});
+
+		it('Can remove a TestCase from the TestPlan via ID', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await plan1.removeTestCase(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.remove_case',
+				[1, 2]
+			);
+		});
 	});
 
 	describe('TestPlan - TestPlan Relations', () => {

@@ -169,6 +169,22 @@ export default class TestPlan extends KiwiNamedItem {
 		return testCases;
 	}
 
+	public async addTestCase(testCase: number | TestCase): Promise<void> {
+		const tcId = TestCase.resolveTestCaseId(testCase);
+		await KiwiConnector.sendRPCMethod(
+			'TestPlan.add_case',
+			[this.getId(), tcId]
+		);
+	}
+
+	public async removeTestCase(testCase: number | TestCase): Promise<void> {
+		const tcId = TestCase.resolveTestCaseId(testCase);
+		await KiwiConnector.sendRPCMethod(
+			'TestPlan.remove_case',
+			[this.getId(), tcId]
+		);
+	}
+
 	public static async getPlansWithTestCase(
 		test: TestCase | number
 	): Promise<Array<TestPlan>> {
