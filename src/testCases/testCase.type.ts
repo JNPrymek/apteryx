@@ -33,7 +33,7 @@ export type TestCaseValues = {
  * Computed fields depend on values of other fields.
  * Cannot be directly set by the client.
  */
-type TestCaseComputedFields = {
+export type TestCaseComputedFields = {
 	id: number;
 	case_status__name: string;
 	category__name: string;
