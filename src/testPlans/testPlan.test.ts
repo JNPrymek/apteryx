@@ -1212,6 +1212,120 @@ describe('Test Plan', () => {
 				[1, 2]
 			);
 		});
+
+		it('Can set a TestCase SortKey via ID', async () => {
+			// Setting sortkey returns nothing
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+			await plan1.setSpecificTestCaseSortOrder(25, 30);
+			await plan3.setSpecificTestCaseSortOrder(82, 20);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update_case_order',
+				[1, 25, 30]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.update_case_order',
+				[3, 82, 20]
+			);
+		});
+
+		it('Can set a TestCase SortKey via TestCase objects', async () => {
+			// Setting sortkey returns nothing
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+			const tc25 = new TestCase(mockTestCase({ id: 25 }));
+			const tc82 = new TestCase(mockTestCase({ id: 82 }));
+
+			await plan1.setSpecificTestCaseSortOrder(tc25, 30);
+			await plan3.setSpecificTestCaseSortOrder(tc82, 20);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update_case_order',
+				[1, 25, 30]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.update_case_order',
+				[3, 82, 20]
+			);
+		});
+
+		it('Can set a SortKeys for all TestCases in TestPlan', async () => {
+			// Setting sortkey returns nothing
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			const testCaseList = [
+				new TestCase(mockTestCase({ id: 25 })),
+				new TestCase(mockTestCase({ id: 82 })),
+				56,
+				new TestCase(mockTestCase({ id: 1 })),
+				new TestCase(mockTestCase({ id: 57 })),
+				435,
+				823,
+				new TestCase(mockTestCase({ id: 12 })),
+			];
+
+			await plan1.setAllTestCaseSortOrder(testCaseList);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.update_case_order',
+				[1, 25, 0]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.update_case_order',
+				[1, 82, 10]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.update_case_order',
+				[1, 56, 20]
+			);
+			verifyRpcCall(
+				mockAxios,
+				3,
+				'TestPlan.update_case_order',
+				[1, 1, 30]
+			);
+			verifyRpcCall(
+				mockAxios,
+				4,
+				'TestPlan.update_case_order',
+				[1, 57, 40]
+			);
+			verifyRpcCall(
+				mockAxios,
+				5,
+				'TestPlan.update_case_order',
+				[1, 435, 50]
+			);
+			verifyRpcCall(
+				mockAxios,
+				6,
+				'TestPlan.update_case_order',
+				[1, 823, 60]
+			);
+			verifyRpcCall(
+				mockAxios,
+				7,
+				'TestPlan.update_case_order',
+				[1, 12, 70]
+			);
+		});
 	});
 
 	describe('TestPlan - TestPlan Relations', () => {

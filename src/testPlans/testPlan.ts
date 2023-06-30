@@ -185,6 +185,36 @@ export default class TestPlan extends KiwiNamedItem {
 		);
 	}
 
+	/**
+	 * Sets the SortKey value for a specific TestCase-TestPlan pair.  
+	 * Does NOT handle TestCases with duplicate SortKeys
+	 * @param testCase TestCase object or numeric ID
+	 * @param sortKey Numeric key used for sorting TestCases (ASC order)
+	 */
+	public async setSpecificTestCaseSortOrder(
+		testCase: number | TestCase,
+		sortKey: number
+	): Promise<void> {
+		const caseId = TestCase.resolveTestCaseId(testCase);
+		await KiwiConnector.sendRPCMethod(
+			'TestPlan.update_case_order',
+			[this.getId(), caseId, sortKey]
+		);
+	}
+
+	/**
+	 * Sorts the TestCases within the TestPlan to match the given array.  
+	 * Does NOT verify that specified TestCases are added to the TestPlan
+	 * @param testCases pre-sorted list of TestCase objects or numeric IDs
+	 */
+	public async setAllTestCaseSortOrder(
+		testCases: Array<TestCase | number>
+	): Promise<void> {
+		for (let i = 0; i < testCases.length; i++) {
+			await this.setSpecificTestCaseSortOrder(testCases[i], (i * 10));
+		}
+	}
+
 	public static async getPlansWithTestCase(
 		test: TestCase | number
 	): Promise<Array<TestPlan>> {
