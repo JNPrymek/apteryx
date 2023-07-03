@@ -22,6 +22,7 @@ export function mockTestCaseUpdateResponse(
 	};
 }
 
+import { TestPlanAddCaseResponse } from '../../../src/testPlans/testPlan.type';
 export function mockTestPlanAddCaseResponse(
 	overrideValues?: Partial<TestPlanAddCaseResponse>
 ): TestPlanAddCaseResponse {
@@ -65,7 +66,6 @@ export function mockTestCaseStatus(
 import { CategoryValues } 
 	from '../../../src/testCases/category.type';
 import categoryDefaults from './category.json';
-import { TestPlanAddCaseResponse } from '../../../src/testPlans/testPlan.type';
 
 export function mockCategory(
 	overrideValues?: Partial<CategoryValues>
