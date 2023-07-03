@@ -2346,4 +2346,20 @@ describe('TestCase', () => {
 			expect(result.getNotes()).toEqual('Custom notes');
 		});
 	});
+
+	it('Can resolve TestCase ID from TestCase', () => {
+		const tc5 = new TestCase(mockTestCase({
+			id: 5
+		}));
+		const tc10 = new TestCase(mockTestCase({
+			id: 10
+		}));
+		expect(TestCase.resolveTestCaseId(tc5)).toEqual(5);
+		expect(TestCase.resolveTestCaseId(tc10)).toEqual(10);
+	});
+
+	it('Can resolve TestCase ID given ID', () => {
+		expect(TestCase.resolveTestCaseId(4)).toEqual(4);
+		expect(TestCase.resolveTestCaseId(6)).toEqual(6);
+	});
 });

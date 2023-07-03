@@ -1,3 +1,8 @@
+import { 
+	TestCaseComputedFields,
+	TestCaseValues
+} from '../testCases/testCase.type';
+
 export type TestPlanValues = {
 	id: number;
 	name: string;
@@ -30,3 +35,9 @@ export type TestPlanWriteValues =
 export type TestPlanUpdateResponse = TestPlanWriteValues & {
 	id: number;
 };
+
+export type TestPlanAddCaseResponse =
+	Omit<TestCaseValues, keyof TestCaseComputedFields> & {
+		id: number;
+		sortkey: number;
+	}
