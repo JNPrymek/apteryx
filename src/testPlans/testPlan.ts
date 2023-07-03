@@ -146,7 +146,7 @@ export default class TestPlan extends KiwiNamedItem {
 			return (await TestCase.serverFilter({ 'plan': this.getId() }));
 		}
 
-		const rawResponse = await KiwiConnector.sendRPCMethod(
+		const sortKeys = await KiwiConnector.sendRPCMethod(
 			'TestCase.sortkeys', 
 			[{ plan: this.getId() }]
 		) as Record<string, unknown>;
@@ -154,14 +154,14 @@ export default class TestPlan extends KiwiNamedItem {
 		/*
 			example result: { "1": 10, "2": 20 ... }
 		*/
-		const tcIds = Object.keys(rawResponse).map(
+		const tcIds = Object.keys(sortKeys).map(
 			strKey => { return parseInt(strKey); }
 		);
 
 		const testCases = await TestCase.getByIds(tcIds);
 		testCases.sort( (a, b) => {
-			const aSortKey = rawResponse[a.getId()] as number;
-			const bSortKey = rawResponse[b.getId()] as number;
+			const aSortKey = sortKeys[a.getId()] as number;
+			const bSortKey = sortKeys[b.getId()] as number;
 			return (aSortKey - bSortKey);
 			
 		});
@@ -204,7 +204,8 @@ export default class TestPlan extends KiwiNamedItem {
 
 	/**
 	 * Sorts the TestCases within the TestPlan to match the given array.  
-	 * Does NOT verify that specified TestCases are added to the TestPlan
+	 * Does NOT verify that specified TestCases are added to the TestPlan.  
+	 * Assigns normailized sortKey values.
 	 * @param testCases pre-sorted list of TestCase objects or numeric IDs
 	 */
 	public async setAllTestCaseSortOrder(
@@ -212,6 +213,40 @@ export default class TestPlan extends KiwiNamedItem {
 	): Promise<void> {
 		for (let i = 0; i < testCases.length; i++) {
 			await this.setSpecificTestCaseSortOrder(testCases[i], (i * 10));
+		}
+	}
+
+	/**
+	 * Normalizes TestCase SortKeys to the default 0, 10, 20... values.  
+	 * Current sort order is preserved.
+	 */
+	public async normalizeSortKeys(): Promise<void> {
+		// Example result: { "1": 10, "2": 20 ... }
+		const sortKeys = await KiwiConnector.sendRPCMethod(
+			'TestCase.sortkeys', 
+			[{ plan: this.getId() }]
+		) as Record<string, number>;
+
+		type SortMapping = {
+			tcId: number;
+			sortKey: number;
+		}
+		const sortMappings: Array<SortMapping> = [];
+		for (const [idStr, sortKey] of Object.entries(sortKeys)) {
+			sortMappings.push({
+				tcId: parseInt(idStr),
+				sortKey
+			});
+		}
+		// Ascending order by sortKey, then by tcId
+		sortMappings.sort((a, b) => {
+			if (a.sortKey == b.sortKey) return a.tcId - b.tcId;
+			return a.sortKey - b.sortKey;
+		});
+		
+		for (let i = 0; i< sortMappings.length; i++ ) {
+			const item = sortMappings[i];
+			await this.setSpecificTestCaseSortOrder(item.tcId, (i * 10));
 		}
 	}
 

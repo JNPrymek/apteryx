@@ -1326,6 +1326,66 @@ describe('Test Plan', () => {
 				[1, 12, 70]
 			);
 		});
+
+		it('Can normalize SortKeys', async () => {
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: {
+					'1': 20,
+					'2': 10,
+					'3': 0,
+					'4': 30,
+					'5': 15,
+					'6': 15
+				}
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+
+			await plan1.normalizeSortKeys();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.sortkeys',
+				[{ plan: 1 }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.update_case_order',
+				[ 1, 3, 0 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.update_case_order',
+				[ 1, 2, 10 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				3,
+				'TestPlan.update_case_order',
+				[ 1, 5, 20 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				4,
+				'TestPlan.update_case_order',
+				[ 1, 6, 30 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				5,
+				'TestPlan.update_case_order',
+				[ 1, 1, 40 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				6,
+				'TestPlan.update_case_order',
+				[ 1, 4, 50 ]
+			);
+		});
 	});
 
 	describe('TestPlan - TestPlan Relations', () => {
