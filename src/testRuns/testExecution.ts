@@ -43,6 +43,11 @@ export default class TestExecution extends KiwiBaseItem {
 		return (lastTesterId === null) ? null : User.getById(lastTesterId);
 	}
 
+	public async setLastTester(tester?: User | number | null): Promise<void> {
+		const userId = (tester) ? (await User.resolveUserId(tester)) : null;
+		await this.serverUpdate({ tested_by: userId });
+	}
+
 	public getTestCaseVersion(): number {
 		return this.serialized['case_text_version'] as number;
 	}

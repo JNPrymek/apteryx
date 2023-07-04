@@ -459,7 +459,7 @@ describe('Test Execution', () => {
 			);
 		});
 
-		it('Can update TestExecution Start Date', async () => {
+		it('Can update TestExecution Stop Date', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				stop_date: '2022-05-18T03:14:34.500'
 			}));
@@ -493,7 +493,7 @@ describe('Test Execution', () => {
 			);
 		});
 
-		it('Can rmeove TestExecution Start Date', async () => {
+		it('Can rmeove TestExecution Stop Date', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				stop_date: '2022-05-18T03:14:34.500'
 			}));
@@ -521,6 +521,168 @@ describe('Test Execution', () => {
 			);
 
 			expect(te1.getStopDate()).toBeNull();
+		});
+
+		it('Can set TestExecution Last Tester by ID', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				tested_by: null,
+				tested_by__username: null
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				tested_by: 1
+			};
+			const updateVal = mockTestExecution({
+				tested_by: 1,
+				tested_by__username: 'alice'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getLastTesterId()).toBeNull();
+			expect(te1.getLastTesterName()).toBeNull();
+
+			await te1.setLastTester(1);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getLastTesterId()).toEqual(1);
+			expect(te1.getLastTesterName()).toEqual('alice');
+		});
+
+		it('Can set TestExecution Last Tester by User', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				tested_by: null,
+				tested_by__username: null
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				tested_by: 1
+			};
+			const updateVal = mockTestExecution({
+				tested_by: 1,
+				tested_by__username: 'alice'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getLastTesterId()).toBeNull();
+			expect(te1.getLastTesterName()).toBeNull();
+
+			const user1 = new User(mockUser());
+			await te1.setLastTester(user1);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getLastTesterId()).toEqual(1);
+			expect(te1.getLastTesterName()).toEqual('alice');
+		});
+
+		it('Can remove TestExecution Last Tester', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				tested_by: 1,
+				tested_by__username: 'alice'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				tested_by: null
+			};
+			const updateVal = mockTestExecution({
+				tested_by: null,
+				tested_by__username: null
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getLastTesterId()).toEqual(1);
+			expect(te1.getLastTesterName()).toEqual('alice');
+
+			await te1.setLastTester();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getLastTesterId()).toBeNull();
+			expect(te1.getLastTesterName()).toBeNull();
+		});
+
+		it('Can update TestExecution Last Tester by ID', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				tested_by: 1,
+				tested_by__username: 'alice'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				tested_by: 2
+			};
+			const updateVal = mockTestExecution({
+				tested_by: 2,
+				tested_by__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getLastTesterId()).toEqual(1);
+			expect(te1.getLastTesterName()).toEqual('alice');
+
+			await te1.setLastTester(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getLastTesterId()).toEqual(2);
+			expect(te1.getLastTesterName()).toEqual('bob');
+		});
+
+		it('Can update TestExecution Last Tester by User', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				tested_by: 1,
+				tested_by__username: 'alice'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				tested_by: 2
+			};
+			const updateVal = mockTestExecution({
+				tested_by: 2,
+				tested_by__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getLastTesterId()).toEqual(1);
+			expect(te1.getLastTesterName()).toEqual('alice');
+
+			const user2 = new User(mockUser({ id: 2, username: 'bob' }));
+			await te1.setLastTester(user2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getLastTesterId()).toEqual(2);
+			expect(te1.getLastTesterName()).toEqual('bob');
 		});
 	});
 
