@@ -1,8 +1,10 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
+import KiwiConnector from '../core/kiwiConnector';
 import Product from '../management/product';
 import User from '../management/user';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
+import { TestRunWriteValues } from './testRun.type';
 
 export default class TestRun extends KiwiBaseItem {
 	
@@ -129,6 +131,19 @@ export default class TestRun extends KiwiBaseItem {
 	public async getDefaultTester(): Promise<User | null> {
 		const testerId = this.getDefaultTesterId();
 		return (testerId === null) ? null : User.getById(testerId);
+	}
+
+	public async serverUpdate(
+		updateVal: Partial<TestRunWriteValues>
+	): Promise<void> {
+		await KiwiConnector.sendRPCMethod(
+			'TestRun.update',
+			[
+				this.getId(),
+				updateVal
+			]
+		);
+		await this.syncServerValues();
 	}
 
 	// Inherited methods

@@ -8,14 +8,22 @@ import {
 	mockProduct, 
 	mockTestPlan, 
 	mockTestRun, 
+	mockTestRunUpdateResponse, 
 	mockUser 
 } from '../../test/mockKiwiValues';
+import { TestRunWriteValues } from './testRun.type';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Run', () => {
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
 	// Raw Values
 	const run1Vals = mockTestRun();
 	const run2Vals = mockTestRun({
@@ -223,6 +231,50 @@ describe('Test Run', () => {
 				mockRpcResponse({ result: [productVals] })
 			);
 			expect(await tr1.getProduct()).toEqual(expectedProduct);
+		});
+	});
+
+	describe('Update TestRun values', () => {
+		it('Can update TestRun values', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				summary: 'Original summary',
+				notes: 'Original notes'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				summary: 'New summary',
+				notes: 'New notes'
+			};
+			const updateVal = mockTestRun({
+				summary: 'New summary',
+				notes: 'New notes'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tr1.getTitle()).toEqual('Original summary');
+			expect(tr1.getNotes()).toEqual('Original notes');
+
+			await tr1.serverUpdate(updateVal);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, updateVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getTitle()).toEqual('New summary');
+			expect(tr1.getNotes()).toEqual('New notes');
 		});
 	});
 });
