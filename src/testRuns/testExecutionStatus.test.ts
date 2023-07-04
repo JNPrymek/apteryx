@@ -8,6 +8,10 @@ jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Execution Status', () => {
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 	
 	// Data values
 	const stat1Vals = mockTestExecutionStatus();
@@ -146,6 +150,72 @@ describe('Test Execution Status', () => {
 					/* eslint-disable-next-line max-len */
 					`TestExecutionStatus with name "${name}" could not be found.`
 				);
+		});
+	});
+
+	describe('Resolve TestExecutionStatus ID', () => {
+		it('Can resolve ID from number', async () => {
+			const stat1 = await TestExecutionStatus.resolveId(1);
+			const stat5 = await TestExecutionStatus.resolveId(5);
+			const stat42 = await TestExecutionStatus.resolveId(42);
+
+			expect(stat1).toEqual(1);
+			expect(stat5).toEqual(5);
+			expect(stat42).toEqual(42);
+		});
+
+		it('Can resolve ID from TestExecutionStatus', async () => {
+			const stat1 = new TestExecutionStatus(mockTestExecutionStatus({
+				id: 1,
+				name: 'one'
+			}));
+			const stat5 = new TestExecutionStatus(mockTestExecutionStatus({
+				id: 5,
+				name: 'five'
+			}));
+			const stat42 = new TestExecutionStatus(mockTestExecutionStatus({
+				id: 42,
+				name: 'forty-two'
+			}));
+
+			expect(await TestExecutionStatus.resolveId(stat1)).toEqual(1);
+			expect(await TestExecutionStatus.resolveId(stat5)).toEqual(5);
+			expect(await TestExecutionStatus.resolveId(stat42)).toEqual(42);
+		});
+
+		it('Can resolve ID from Name', async () => {
+			const stat1 = 'one';
+			const stat5 = 'five';
+			const stat42 = 'fourty-two';
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestExecutionStatus({
+						id: 1,
+						name: 'one'
+					})
+				]
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestExecutionStatus({
+						id: 5,
+						name: 'five'
+					})
+				]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTestExecutionStatus({
+						id: 42,
+						name: 'forty-two'
+					})
+				]
+			}));
+
+			expect(await TestExecutionStatus.resolveId(stat1)).toEqual(1);
+			expect(await TestExecutionStatus.resolveId(stat5)).toEqual(5);
+			expect(await TestExecutionStatus.resolveId(stat42)).toEqual(42);
 		});
 	});
 });
