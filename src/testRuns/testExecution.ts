@@ -139,6 +139,13 @@ export default class TestExecution extends KiwiBaseItem {
 		return await TestExecutionStatus.getById(this.getStatusId());
 	}
 
+	public async setStatus(
+		status: TestExecutionStatus | number | string
+	): Promise<void> {
+		const statusId = await TestExecutionStatus.resolveId(status);
+		await this.serverUpdate({ status: statusId });
+	}
+
 	public async serverUpdate(
 		updateValues: Partial<TestExecutionWriteValues>
 	): Promise<void> {

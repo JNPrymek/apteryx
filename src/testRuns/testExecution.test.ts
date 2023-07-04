@@ -846,6 +846,121 @@ describe('Test Execution', () => {
 			expect(te1.getAssigneeId()).toEqual(2);
 			expect(te1.getAssigneeUsername()).toEqual('bob');
 		});
+
+		it('Can update TestExecution Status by ID', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				status: 1,
+				status__name: 'IDLE'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				status: 4,
+			};
+			const updateVal = mockTestExecution({
+				status: 4,
+				status__name: 'PASSED'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStatusId()).toEqual(1);
+			expect(te1.getStatusName()).toEqual('IDLE');
+
+			await te1.setStatus(4);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStatusId()).toEqual(4);
+			expect(te1.getStatusName()).toEqual('PASSED');
+		});
+
+		/* eslint-disable-next-line max-len */
+		it('Can update TestExecution Status by TestExecutionStatus', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				status: 1,
+				status__name: 'IDLE'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				status: 4,
+			};
+			const updateVal = mockTestExecution({
+				status: 4,
+				status__name: 'PASSED'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStatusId()).toEqual(1);
+			expect(te1.getStatusName()).toEqual('IDLE');
+
+			const status4 = new TestExecutionStatus(mockTestExecutionStatus({
+				id: 4,
+				name: 'PASSED'
+			}));
+			await te1.setStatus(status4);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStatusId()).toEqual(4);
+			expect(te1.getStatusName()).toEqual('PASSED');
+		});
+
+		it('Can update TestExecution Status by Name', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				status: 1,
+				status__name: 'IDLE'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				status: 4,
+			};
+			const updateVal = mockTestExecution({
+				status: 4,
+				status__name: 'PASSED'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestExecutionStatus({
+						id: 4,
+						name: 'PASSED'
+					})
+				]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStatusId()).toEqual(1);
+			expect(te1.getStatusName()).toEqual('IDLE');
+
+			await te1.setStatus('PASSED');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecutionStatus.filter',
+				[{ name: 'PASSED' }]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStatusId()).toEqual(4);
+			expect(te1.getStatusName()).toEqual('PASSED');
+		});
 	});
 
 	describe('Fetch values from server', () => {
