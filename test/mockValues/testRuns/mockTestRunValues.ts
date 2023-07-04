@@ -36,3 +36,14 @@ export function mockTestRun(
 		...overrideValues
 	};
 }
+
+import { TestRunUpdateResponse } from '../../../src/testRuns/testRun.type';
+import testRunUpdateResponseDefaults from './testRun_update.json';
+export function mockTestRunUpdateResponse(
+	overrideValues?: Partial<TestRunUpdateResponse>
+): TestRunUpdateResponse {
+	return {
+		...testRunUpdateResponseDefaults,
+		...overrideValues
+	};
+}

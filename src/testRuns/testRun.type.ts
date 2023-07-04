@@ -18,3 +18,22 @@ export type TestRunValues = {
 	default_tester: number | null;
 	default_tester__username: string | null;
 }
+
+export type TestRunComputedFields = {
+	id: number;
+	plan__product_version: number;
+	plan__product_version__value: string;
+	plan__product: number;
+	plan__name: string;
+	build__name: string;
+	manager__username: string;
+	default_tester__username: string | null;
+}
+
+export type TestRunWriteValues =
+	Omit<TestRunValues, keyof TestRunComputedFields>;
+
+export type TestRunUpdateResponse =
+	TestRunWriteValues & {
+		id: number;
+	};
