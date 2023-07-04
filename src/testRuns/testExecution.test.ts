@@ -14,12 +14,18 @@ import {
 	mockTestRun,
 	mockUser 
 } from '../../test/mockKiwiValues';
+import { TestExecutionWriteValues } from './testExecution.type';
+import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 // Init Mock Axios
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Test Execution', () => {
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 	
 	const execution1Vals = mockTestExecution();
 	const execution2Vals = mockTestExecution({
@@ -70,7 +76,7 @@ describe('Test Execution', () => {
 		expect(te2['serialized']).toEqual(execution2Vals);
 	});
 
-	describe ('Access local properties', () => {
+	describe('Access local properties', () => {
 
 		const te1 = new TestExecution(execution1Vals);
 		const te2 = new TestExecution(execution2Vals);
@@ -289,6 +295,40 @@ describe('Test Execution', () => {
 				.toEqual(new TestExecutionStatus(failedValues));
 		});
 
+	});
+
+	describe('Update TestExecution Properties', () => {
+		it('Can update TestExecution values', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				assignee: 1,
+				assignee__username: 'alice'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				assignee: 2
+			};
+			const updateVal = mockTestExecution({
+				assignee: 2,
+				assignee__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getAssigneeId()).toEqual(1);
+			expect(te1.getAssigneeUsername()).toEqual('alice');
+
+			await te1.serverUpdate(changeVal);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getAssigneeId()).toEqual(2);
+			expect(te1.getAssigneeUsername()).toEqual('bob');
+		});
 	});
 
 	describe('Fetch values from server', () => {

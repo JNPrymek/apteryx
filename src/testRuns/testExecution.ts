@@ -1,8 +1,13 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
+import KiwiConnector from '../core/kiwiConnector';
 import Build from '../management/build';
 import User from '../management/user';
 import TestCase from '../testCases/testCase';
 import TimeUtils from '../utils/timeUtils';
+import {
+	TestExecutionValues,
+	TestExecutionWriteValues
+} from './testExecution.type';
 import TestExecutionStatus from './testExecutionStatus';
 import TestRun from './testRun';
 
@@ -110,6 +115,18 @@ export default class TestExecution extends KiwiBaseItem {
 
 	public async getStatus(): Promise<TestExecutionStatus> {
 		return await TestExecutionStatus.getById(this.getStatusId());
+	}
+
+	public async serverUpdate(
+		updateValues: Partial<TestExecutionWriteValues>
+	): Promise<void> {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestExecution.update', [
+				this.getId(),
+				updateValues
+			]);
+		console.log(JSON.stringify(result, null, 2));
+		this.serialized = result as TestExecutionValues;
 	}
 
 	// Inherited methods
