@@ -684,6 +684,168 @@ describe('Test Execution', () => {
 			expect(te1.getLastTesterId()).toEqual(2);
 			expect(te1.getLastTesterName()).toEqual('bob');
 		});
+
+		it('Can set TestExecution Assignee by ID', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				assignee: null,
+				assignee__username: null
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				assignee: 1
+			};
+			const updateVal = mockTestExecution({
+				assignee: 1,
+				assignee__username: 'alice'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getAssigneeId()).toBeNull();
+			expect(te1.getAssigneeUsername()).toBeNull();
+
+			await te1.setAssignee(1);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getAssigneeId()).toEqual(1);
+			expect(te1.getAssigneeUsername()).toEqual('alice');
+		});
+
+		it('Can set TestExecution Assignee by User', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				assignee: null,
+				assignee__username: null
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				assignee: 1
+			};
+			const updateVal = mockTestExecution({
+				assignee: 1,
+				assignee__username: 'alice'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getAssigneeId()).toBeNull();
+			expect(te1.getAssigneeUsername()).toBeNull();
+
+			const user1 = new User(mockUser());
+			await te1.setAssignee(user1);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getAssigneeId()).toEqual(1);
+			expect(te1.getAssigneeUsername()).toEqual('alice');
+		});
+
+		it('Can remove TestExecution Assignee', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				assignee: 1,
+				assignee__username: 'alice'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				assignee: null
+			};
+			const updateVal = mockTestExecution({
+				assignee: null,
+				assignee__username: null
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getAssigneeId()).toEqual(1);
+			expect(te1.getAssigneeUsername()).toEqual('alice');
+
+			await te1.setAssignee();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getAssigneeId()).toBeNull();
+			expect(te1.getAssigneeUsername()).toBeNull();
+		});
+
+		it('Can update TestExecution Assignee by ID', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				assignee: 1,
+				assignee__username: 'alice'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				assignee: 2
+			};
+			const updateVal = mockTestExecution({
+				assignee: 2,
+				assignee__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getAssigneeId()).toEqual(1);
+			expect(te1.getAssigneeUsername()).toEqual('alice');
+
+			await te1.setAssignee(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getAssigneeId()).toEqual(2);
+			expect(te1.getAssigneeUsername()).toEqual('bob');
+		});
+
+		it('Can update TestExecution Assignee by User', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				assignee: 1,
+				assignee__username: 'alice'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				assignee: 2
+			};
+			const updateVal = mockTestExecution({
+				assignee: 2,
+				assignee__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getAssigneeId()).toEqual(1);
+			expect(te1.getAssigneeUsername()).toEqual('alice');
+
+			const user2 = new User(mockUser({ id: 2, username: 'bob' }));
+			await te1.setAssignee(user2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getAssigneeId()).toEqual(2);
+			expect(te1.getAssigneeUsername()).toEqual('bob');
+		});
 	});
 
 	describe('Fetch values from server', () => {

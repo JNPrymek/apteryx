@@ -30,6 +30,13 @@ export default class TestExecution extends KiwiBaseItem {
 		return (assigneeId === null) ? null : User.getById(assigneeId);
 	}
 
+	public async setAssignee(assignee?: User | number): Promise<void> {
+		const assigneeId = assignee ?
+			(await User.resolveUserId(assignee)) :
+			null;
+		await this.serverUpdate({ assignee: assigneeId });
+	}
+
 	public getLastTesterId(): number {
 		return this.serialized['tested_by'] as number;
 	}
