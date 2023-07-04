@@ -919,14 +919,20 @@ describe('Test Execution', () => {
 		it('Can update TestExecution Status by Name', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				status: 1,
-				status__name: 'IDLE'
+				status__name: 'IDLE',
+				tested_by: null,
+				tested_by__username: null,
+				stop_date: null
 			}));
 			const changeVal: Partial<TestExecutionWriteValues> = {
 				status: 4,
 			};
 			const updateVal = mockTestExecution({
 				status: 4,
-				status__name: 'PASSED'
+				status__name: 'PASSED',
+				tested_by: 1,
+				tested_by__username: 'alice',
+				stop_date: '2023-07-03T14:56:32.453'
 			});
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
@@ -943,6 +949,10 @@ describe('Test Execution', () => {
 
 			expect(te1.getStatusId()).toEqual(1);
 			expect(te1.getStatusName()).toEqual('IDLE');
+			// Changing status has side effects
+			expect(te1.getLastTesterId()).toBeNull();
+			expect(te1.getLastTesterName()).toBeNull();
+			expect(te1.getStopDate()).toBeNull();
 
 			await te1.setStatus('PASSED');
 			verifyRpcCall(
@@ -960,6 +970,12 @@ describe('Test Execution', () => {
 
 			expect(te1.getStatusId()).toEqual(4);
 			expect(te1.getStatusName()).toEqual('PASSED');
+			// Changing status has side effects
+			expect(te1.getLastTesterId()).toEqual(1);
+			expect(te1.getLastTesterName()).toEqual('alice');
+			const stopTime = TimeUtils
+				.serverStringToDate('2023-07-03T14:56:32.453');
+			expect(te1.getStopDate()).toEqual(stopTime);
 		});
 	});
 
