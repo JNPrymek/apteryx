@@ -70,6 +70,11 @@ export default class TestExecution extends KiwiBaseItem {
 		}
 	}
 
+	public async setStopDate(date?: Date | null): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : null;
+		await this.serverUpdate({ stop_date: dateString });
+	}
+
 	public getSortKey(): number {
 		return this.serialized['sortkey'] as number;
 	}

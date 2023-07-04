@@ -426,6 +426,102 @@ describe('Test Execution', () => {
 
 			expect(te1.getStartDate()).toBeNull();
 		});
+
+		it('Can set TestExecution Stop Date', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				stop_date: null
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				stop_date: '2023-08-24T08:13:54.123'
+			};
+			const updateVal = mockTestExecution({
+				stop_date: '2023-08-24T08:13:54.123'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStopDate()).toBeNull();
+
+			await te1.setStopDate(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStopDate()).toEqual(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+		});
+
+		it('Can update TestExecution Start Date', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				stop_date: '2022-05-18T03:14:34.500'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				stop_date: '2023-08-24T08:13:54.123'
+			};
+			const updateVal = mockTestExecution({
+				stop_date: '2023-08-24T08:13:54.123'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStopDate()).toEqual(
+				TimeUtils.serverStringToDate('2022-05-18T03:14:34.500')
+			);
+
+			await te1.setStopDate(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStopDate()).toEqual(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+		});
+
+		it('Can rmeove TestExecution Start Date', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				stop_date: '2022-05-18T03:14:34.500'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				stop_date: null
+			};
+			const updateVal = mockTestExecution({
+				stop_date: null
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStopDate()).toEqual(
+				TimeUtils.serverStringToDate('2022-05-18T03:14:34.500')
+			);
+
+			await te1.setStopDate();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStopDate()).toBeNull();
+		});
 	});
 
 	describe('Fetch values from server', () => {
