@@ -56,6 +56,11 @@ export default class TestExecution extends KiwiBaseItem {
 		}
 	}
 
+	public async setStartDate(date?: Date | null): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : null;
+		await this.serverUpdate({ start_date: dateString });
+	}
+
 	public getStopDate(): Date | null {
 		const rawString = this.serialized['stop_date'] as string;
 		if (rawString) {
@@ -125,7 +130,6 @@ export default class TestExecution extends KiwiBaseItem {
 				this.getId(),
 				updateValues
 			]);
-		console.log(JSON.stringify(result, null, 2));
 		this.serialized = result as TestExecutionValues;
 	}
 

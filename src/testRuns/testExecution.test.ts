@@ -16,6 +16,7 @@ import {
 } from '../../test/mockKiwiValues';
 import { TestExecutionWriteValues } from './testExecution.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import TimeUtils from '../utils/timeUtils';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -328,6 +329,102 @@ describe('Test Execution', () => {
 
 			expect(te1.getAssigneeId()).toEqual(2);
 			expect(te1.getAssigneeUsername()).toEqual('bob');
+		});
+
+		it('Can set TestExecution Start Date', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				start_date: null
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				start_date: '2023-08-24T08:13:54.123'
+			};
+			const updateVal = mockTestExecution({
+				start_date: '2023-08-24T08:13:54.123'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStartDate()).toBeNull();
+
+			await te1.setStartDate(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStartDate()).toEqual(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+		});
+
+		it('Can update TestExecution Start Date', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				start_date: '2022-05-18T03:14:34.500'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				start_date: '2023-08-24T08:13:54.123'
+			};
+			const updateVal = mockTestExecution({
+				start_date: '2023-08-24T08:13:54.123'
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStartDate()).toEqual(
+				TimeUtils.serverStringToDate('2022-05-18T03:14:34.500')
+			);
+
+			await te1.setStartDate(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStartDate()).toEqual(
+				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
+			);
+		});
+
+		it('Can rmeove TestExecution Start Date', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				start_date: '2022-05-18T03:14:34.500'
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				start_date: null
+			};
+			const updateVal = mockTestExecution({
+				start_date: null
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getStartDate()).toEqual(
+				TimeUtils.serverStringToDate('2022-05-18T03:14:34.500')
+			);
+
+			await te1.setStartDate();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getStartDate()).toBeNull();
 		});
 	});
 
