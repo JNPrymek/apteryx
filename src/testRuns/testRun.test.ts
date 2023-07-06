@@ -13,6 +13,7 @@ import {
 } from '../../test/mockKiwiValues';
 import { TestRunWriteValues } from './testRun.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import TimeUtils from '../utils/timeUtils';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -534,6 +535,86 @@ describe('Test Run', () => {
 			);
 
 			expect(tr1.getDescription()).toEqual('');
+		});
+
+		it('Can update TestRun Planned Start Date', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				planned_start: '2023-08-13T14:23:43.874'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				planned_start: '2023-08-26T12:00:00.000'
+			};
+			const updateVal = mockTestRun({
+				planned_start: '2023-08-26T12:00:00.000'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			const oldDate = TimeUtils
+				.serverStringToDate('2023-08-13T14:23:43.874');
+			expect(tr1.getPlannedStartDate()).toEqual(oldDate);
+
+			const newDate = TimeUtils
+				.serverStringToDate('2023-08-26T12:00:00.000');
+			await tr1.setPlannedStartDate(newDate);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getPlannedStartDate()).toEqual(newDate);
+		});
+
+		it('Can remove TestRun Planned Start Date', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				planned_start: '2023-08-13T14:23:43.874'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				planned_start: ''
+			};
+			const updateVal = mockTestRun({
+				planned_start: ''
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			const oldDate = TimeUtils
+				.serverStringToDate('2023-08-13T14:23:43.874');
+			expect(tr1.getPlannedStartDate()).toEqual(oldDate);
+
+			await tr1.setPlannedStartDate();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getPlannedStartDate()).toBeNull();
 		});
 	});
 });
