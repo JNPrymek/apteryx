@@ -387,5 +387,79 @@ describe('Test Run', () => {
 
 			expect(tr1.getName()).toEqual('New summary');
 		});
+
+		it('Can update TestRun Notes', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				notes: 'Original notes'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				notes: 'New notes'
+			};
+			const updateVal = mockTestRun({
+				notes: 'New notes'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tr1.getNotes()).toEqual('Original notes');
+
+			await tr1.setNotes('New notes');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getNotes()).toEqual('New notes');
+		});
+
+		it('Can delete TestRun Notes', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				notes: 'Original notes'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				notes: ''
+			};
+			const updateVal = mockTestRun({
+				notes: ''
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tr1.getNotes()).toEqual('Original notes');
+
+			await tr1.setNotes();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getNotes()).toEqual('');
+		});
 	});
 });

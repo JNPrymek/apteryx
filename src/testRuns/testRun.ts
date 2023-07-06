@@ -40,6 +40,11 @@ export default class TestRun extends KiwiBaseItem {
 		return this.serialized['notes'] as string;
 	}
 
+	public async setNotes(notes?: string): Promise<void> {
+		const newNotes = notes ?? '';
+		await this.serverUpdate({ notes: newNotes });
+	}
+
 	public getDescription(): string {
 		return this.getNotes();
 	}
