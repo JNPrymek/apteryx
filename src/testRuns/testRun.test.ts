@@ -259,12 +259,12 @@ describe('Test Run', () => {
 			expect(tr1.getTitle()).toEqual('Original summary');
 			expect(tr1.getNotes()).toEqual('Original notes');
 
-			await tr1.serverUpdate(updateVal);
+			await tr1.serverUpdate(changeVal);
 			verifyRpcCall(
 				mockAxios,
 				0,
 				'TestRun.update',
-				[ 1, updateVal ]
+				[ 1, changeVal ]
 			);
 			verifyRpcCall(
 				mockAxios,
@@ -275,6 +275,117 @@ describe('Test Run', () => {
 
 			expect(tr1.getTitle()).toEqual('New summary');
 			expect(tr1.getNotes()).toEqual('New notes');
+		});
+
+		it('Can update TestRun Summary', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				summary: 'Original summary'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				summary: 'New summary'
+			};
+			const updateVal = mockTestRun({
+				summary: 'New summary'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tr1.getSummary()).toEqual('Original summary');
+
+			await tr1.setSummary('New summary');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getSummary()).toEqual('New summary');
+		});
+
+		it('Can update TestRun Title (Summary alias)', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				summary: 'Original summary'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				summary: 'New summary'
+			};
+			const updateVal = mockTestRun({
+				summary: 'New summary'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tr1.getTitle()).toEqual('Original summary');
+
+			await tr1.setTitle('New summary');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getTitle()).toEqual('New summary');
+		});
+
+		it('Can update TestRun Name (Summary alias)', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				summary: 'Original summary'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				summary: 'New summary'
+			};
+			const updateVal = mockTestRun({
+				summary: 'New summary'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			expect(tr1.getName()).toEqual('Original summary');
+
+			await tr1.setName('New summary');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getName()).toEqual('New summary');
 		});
 	});
 });

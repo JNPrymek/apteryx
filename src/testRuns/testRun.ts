@@ -16,12 +16,24 @@ export default class TestRun extends KiwiBaseItem {
 		return this.serialized['summary'] as string;
 	}
 
+	public async setSummary(summary: string): Promise<void> {
+		await this.serverUpdate({ summary: summary });
+	}
+
 	public getName(): string {
 		return this.getSummary();
 	}
 
+	public async setName(name: string): Promise<void> {
+		return this.setSummary(name);
+	}
+
 	public getTitle(): string {
 		return this.getSummary();
+	}
+
+	public async setTitle(title: string): Promise<void> {
+		return this.setSummary(title);
 	}
 
 	public getNotes(): string {
