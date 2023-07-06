@@ -616,5 +616,85 @@ describe('Test Run', () => {
 
 			expect(tr1.getPlannedStartDate()).toBeNull();
 		});
+
+		it('Can update TestRun Planned Stop Date', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				planned_stop: '2023-08-13T14:23:43.874'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				planned_stop: '2023-08-26T12:00:00.000'
+			};
+			const updateVal = mockTestRun({
+				planned_stop: '2023-08-26T12:00:00.000'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			const oldDate = TimeUtils
+				.serverStringToDate('2023-08-13T14:23:43.874');
+			expect(tr1.getPlannedStopDate()).toEqual(oldDate);
+
+			const newDate = TimeUtils
+				.serverStringToDate('2023-08-26T12:00:00.000');
+			await tr1.setPlannedStopDate(newDate);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getPlannedStopDate()).toEqual(newDate);
+		});
+
+		it('Can remove TestRun Planned Stop Date', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				planned_stop: '2023-08-13T14:23:43.874'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				planned_stop: ''
+			};
+			const updateVal = mockTestRun({
+				planned_stop: ''
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+
+			const oldDate = TimeUtils
+				.serverStringToDate('2023-08-13T14:23:43.874');
+			expect(tr1.getPlannedStopDate()).toEqual(oldDate);
+
+			await tr1.setPlannedStopDate();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+
+			expect(tr1.getPlannedStopDate()).toBeNull();
+		});
 	});
 });

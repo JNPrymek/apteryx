@@ -108,6 +108,11 @@ export default class TestRun extends KiwiBaseItem {
 		}
 	}
 
+	public async setPlannedStopDate(date?: Date): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : '';
+		await this.serverUpdate({ planned_stop: dateString });
+	}
+
 	public getStartDate(): Date | null {
 		const rawString = this.serialized['start_date'] as string;
 		if (rawString) {
