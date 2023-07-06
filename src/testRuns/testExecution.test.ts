@@ -977,6 +977,34 @@ describe('Test Execution', () => {
 				.serverStringToDate('2023-07-03T14:56:32.453');
 			expect(te1.getStopDate()).toEqual(stopTime);
 		});
+
+		it('Can set TestExecution SortKey', async () => {
+			const te1 = new TestExecution(mockTestExecution({
+				sortkey: 10
+			}));
+			const changeVal: Partial<TestExecutionWriteValues> = {
+				sortkey: 20
+			};
+			const updateVal = mockTestExecution({
+				sortkey: 20,
+			});
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: updateVal
+			}));
+
+			expect(te1.getSortKey()).toEqual(10);
+
+			await te1.setSortKey(20);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestExecution.update',
+				[ 1, changeVal ]
+			);
+
+			expect(te1.getSortKey()).toEqual(20);
+		});
 	});
 
 	describe('Fetch values from server', () => {

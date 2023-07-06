@@ -91,6 +91,10 @@ export default class TestExecution extends KiwiBaseItem {
 		return this.serialized['sortkey'] as number;
 	}
 
+	public async setSortKey(sortkey: number): Promise<void> {
+		await this.serverUpdate({ sortkey: sortkey });
+	}
+
 	public getTestRunId(): number {
 		return this.serialized['run'] as number;
 	}
