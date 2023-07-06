@@ -136,6 +136,11 @@ export default class TestRun extends KiwiBaseItem {
 		}
 	}
 
+	public async setStopDate(date?: Date): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : '';
+		await this.serverUpdate({ stop_date: dateString });
+	}
+
 	public getActualStartDate(): Date | null {
 		return this.getStartDate();
 	}

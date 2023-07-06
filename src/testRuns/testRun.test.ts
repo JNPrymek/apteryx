@@ -776,5 +776,85 @@ describe('Test Run', () => {
 
 			expect(tr1.getStartDate()).toBeNull();
 		});
+
+		it('Can update TestRun Actual Stop Date', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				stop_date: '2023-08-13T14:23:43.874'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				stop_date: '2023-08-26T12:00:00.000'
+			};
+			const updateVal = mockTestRun({
+				stop_date: '2023-08-26T12:00:00.000'
+			});
+		
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+		
+			const oldDate = TimeUtils
+				.serverStringToDate('2023-08-13T14:23:43.874');
+			expect(tr1.getStopDate()).toEqual(oldDate);
+		
+			const newDate = TimeUtils
+				.serverStringToDate('2023-08-26T12:00:00.000');
+			await tr1.setStopDate(newDate);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+		
+			expect(tr1.getStopDate()).toEqual(newDate);
+		});
+		
+		it('Can remove TestRun Actual Stop Date', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				stop_date: '2023-08-13T14:23:43.874'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				stop_date: ''
+			};
+			const updateVal = mockTestRun({
+				stop_date: ''
+			});
+		
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+		
+			const oldDate = TimeUtils
+				.serverStringToDate('2023-08-13T14:23:43.874');
+			expect(tr1.getStopDate()).toEqual(oldDate);
+		
+			await tr1.setStopDate();
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+		
+			expect(tr1.getStopDate()).toBeNull();
+		});
 	});
 });
