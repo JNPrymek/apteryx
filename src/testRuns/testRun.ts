@@ -49,6 +49,10 @@ export default class TestRun extends KiwiBaseItem {
 		return this.getNotes();
 	}
 
+	public async setDescription(description?: string): Promise<void> {
+		return this.setNotes(description);
+	}
+
 	public getPlanId(): number {
 		return this.serialized['plan'] as number;
 	}
