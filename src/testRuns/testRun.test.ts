@@ -938,5 +938,177 @@ describe('Test Run', () => {
 		
 			expect(tr1.getStopDate()).toBeNull();
 		});
+
+		it('Can update TestRun Manager by ID', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				manager: 1,
+				manager__username: 'alice'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				manager: 2
+			};
+			const updateVal = mockTestRun({
+				manager: 2,
+				manager__username: 'bob'
+			});
+		
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+		
+			expect(tr1.getManagerId()).toEqual(1);
+			expect(tr1.getManagerUsername()).toEqual('alice');
+		
+			await tr1.setManager(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+		
+			expect(tr1.getManagerId()).toEqual(2);
+			expect(tr1.getManagerUsername()).toEqual('bob');
+		});
+
+		it('Can update TestRun Manager by User', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				manager: 1,
+				manager__username: 'alice'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				manager: 2
+			};
+			const updateVal = mockTestRun({
+				manager: 2,
+				manager__username: 'bob'
+			});
+		
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+		
+			expect(tr1.getManagerId()).toEqual(1);
+			expect(tr1.getManagerUsername()).toEqual('alice');
+		
+			const newManager = new User(mockUser({
+				id: 2,
+				username: 'bob'
+			}));
+			await tr1.setManager(newManager);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+		
+			expect(tr1.getManagerId()).toEqual(2);
+			expect(tr1.getManagerUsername()).toEqual('bob');
+		});
+
+		it('Can update TestRun Default Tester by ID', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				default_tester: 1,
+				default_tester__username: 'alice'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				default_tester: 2
+			};
+			const updateVal = mockTestRun({
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+		
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+		
+			expect(tr1.getDefaultTesterId()).toEqual(1);
+			expect(tr1.getDefaultTesterUsername()).toEqual('alice');
+		
+			await tr1.setDefaultTester(2);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+		
+			expect(tr1.getDefaultTesterId()).toEqual(2);
+			expect(tr1.getDefaultTesterUsername()).toEqual('bob');
+		});
+
+		it('Can update TestRun Default Tester by User', async () => {
+			const tr1 = new TestRun(mockTestRun({
+				default_tester: 1,
+				default_tester__username: 'alice'
+			}));
+			const changeVal: Partial<TestRunWriteValues> = {
+				default_tester: 2
+			};
+			const updateVal = mockTestRun({
+				default_tester: 2,
+				default_tester__username: 'bob'
+			});
+		
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestRunUpdateResponse(changeVal)
+			}));
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [ updateVal ]
+			}));
+		
+			expect(tr1.getDefaultTesterId()).toEqual(1);
+			expect(tr1.getDefaultTesterUsername()).toEqual('alice');
+		
+			const newTester = new User(mockUser({
+				id: 2,
+				username: 'bob'
+			}));
+			await tr1.setDefaultTester(newTester);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.update',
+				[ 1, changeVal ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[{ id: tr1.getId() }]
+			);
+		
+			expect(tr1.getDefaultTesterId()).toEqual(2);
+			expect(tr1.getDefaultTesterUsername()).toEqual('bob');
+		});
 	});
 });

@@ -169,6 +169,11 @@ export default class TestRun extends KiwiBaseItem {
 		return User.getById(this.getManagerId());
 	}
 
+	public async setManager(manager: User | number): Promise<void> {
+		const managerId = await User.resolveUserId(manager);
+		await this.serverUpdate({ manager: managerId });
+	}
+
 	public getDefaultTesterId(): number {
 		return this.serialized['default_tester'] as number;
 	}
@@ -180,6 +185,11 @@ export default class TestRun extends KiwiBaseItem {
 	public async getDefaultTester(): Promise<User | null> {
 		const testerId = this.getDefaultTesterId();
 		return (testerId === null) ? null : User.getById(testerId);
+	}
+
+	public async setDefaultTester(tester: User | number): Promise<void> {
+		const testerId = await User.resolveUserId(tester);
+		await this.serverUpdate({ default_tester: testerId });
 	}
 
 	public async serverUpdate(
