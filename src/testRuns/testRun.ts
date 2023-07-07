@@ -145,8 +145,16 @@ export default class TestRun extends KiwiBaseItem {
 		return this.getStartDate();
 	}
 
+	public async setActualStartDate(date?: Date): Promise<void> {
+		return this.setStartDate(date);
+	}
+
 	public getActualStopDate(): Date | null {
 		return this.getStopDate();
+	}
+
+	public async setActualStopDate(date?: Date): Promise<void> {
+		return this.setStopDate(date);
 	}
 
 	public getManagerId(): number {
