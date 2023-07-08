@@ -1238,7 +1238,7 @@ describe('Test Plan', () => {
 				result: mockTestPlanAddCaseResponse()
 			}));
 
-			await plan1.addSingleTestCase(tc2);
+			await plan1.addTestCases(tc2);
 			verifyRpcCall(
 				mockAxios,
 				0,
@@ -1252,12 +1252,52 @@ describe('Test Plan', () => {
 				result: mockTestPlanAddCaseResponse()
 			}));
 
-			await plan1.addSingleTestCase(2);
+			await plan1.addTestCases(2);
 			verifyRpcCall(
 				mockAxios,
 				0,
 				'TestPlan.add_case',
 				[1, 2]
+			);
+		});
+
+		it('Can add multiple TestCases to the TestPlan', async () => {
+			const tc2 = new TestCase(case2Vals);
+			const caseList = [
+				5,
+				3,
+				tc2,
+				8
+			];
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: mockTestPlanAddCaseResponse()
+			}));
+
+			await plan1.addTestCases(caseList);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.add_case',
+				[1, 5]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.add_case',
+				[1, 3]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.add_case',
+				[1, 2]
+			);
+			verifyRpcCall(
+				mockAxios,
+				3,
+				'TestPlan.add_case',
+				[1, 8]
 			);
 		});
 
