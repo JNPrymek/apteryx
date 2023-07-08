@@ -192,14 +192,22 @@ export default class TestPlan extends KiwiNamedItem {
 		
 	}
 
-	public async removeSingleTestCase(
-		testCase: number | TestCase
+	public async removeTestCases(
+		testCases: number | TestCase | Array<number | TestCase>
 	): Promise<void> {
-		const tcId = TestCase.resolveTestCaseId(testCase);
-		await KiwiConnector.sendRPCMethod(
-			'TestPlan.remove_case',
-			[this.getId(), tcId]
-		);
+		let caseList: Array<number | TestCase>;
+		if (Array.isArray(testCases)) {
+			caseList = testCases;
+		} else {
+			caseList = [ testCases ];
+		}
+		for (let i = 0; i < caseList.length; i++) {
+			const tcId = TestCase.resolveTestCaseId(caseList[i]);
+			await KiwiConnector.sendRPCMethod(
+				'TestPlan.remove_case',
+				[this.getId(), tcId]
+			);
+		}
 	}
 
 	/**

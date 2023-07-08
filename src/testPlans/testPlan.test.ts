@@ -1307,7 +1307,7 @@ describe('Test Plan', () => {
 				result: null
 			}));
 
-			await plan1.removeSingleTestCase(tc2);
+			await plan1.removeTestCases(tc2);
 			verifyRpcCall(
 				mockAxios,
 				0,
@@ -1321,12 +1321,52 @@ describe('Test Plan', () => {
 				result: null
 			}));
 
-			await plan1.removeSingleTestCase(2);
+			await plan1.removeTestCases(2);
 			verifyRpcCall(
 				mockAxios,
 				0,
 				'TestPlan.remove_case',
 				[1, 2]
+			);
+		});
+
+		it('Can remove multiple TestCases from the TestPlan', async () => {
+			const tc2 = new TestCase(case2Vals);
+			const caseList = [
+				5,
+				3,
+				tc2,
+				8
+			];
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: mockTestPlanAddCaseResponse()
+			}));
+
+			await plan1.removeTestCases(caseList);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.remove_case',
+				[1, 5]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.remove_case',
+				[1, 3]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.remove_case',
+				[1, 2]
+			);
+			verifyRpcCall(
+				mockAxios,
+				3,
+				'TestPlan.remove_case',
+				[1, 8]
 			);
 		});
 
