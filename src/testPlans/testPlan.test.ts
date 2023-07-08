@@ -14,7 +14,11 @@ import TestCase from '../testCases/testCase';
 import PlanType from './planType';
 
 import TestPlan from './testPlan';
-import { TestPlanCreateResponse, TestPlanCreateValues, TestPlanWriteValues } from './testPlan.type';
+import {
+	TestPlanCreateResponse,
+	TestPlanCreateValues,
+	TestPlanWriteValues
+} from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
 import {

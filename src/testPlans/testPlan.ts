@@ -5,7 +5,11 @@ import Version from '../management/version';
 import TimeUtils from '../utils/timeUtils';
 import PlanType from './planType';
 import TestCase from '../testCases/testCase';
-import { TestPlanCreateResponse, TestPlanCreateValues, TestPlanWriteValues } from './testPlan.type';
+import { 
+	TestPlanCreateResponse,
+	TestPlanCreateValues,
+	TestPlanWriteValues
+} from './testPlan.type';
 
 export default class TestPlan extends KiwiNamedItem {
 	// Constructor for all classes
