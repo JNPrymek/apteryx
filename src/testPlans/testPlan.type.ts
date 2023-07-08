@@ -36,6 +36,21 @@ export type TestPlanUpdateResponse = TestPlanWriteValues & {
 	id: number;
 };
 
+export type TestPlanCreateValues = Partial<TestPlanWriteValues> & {
+	product: number;
+	product_version: number;
+	type: number;
+	name: string;
+}
+
+export type TestPlanCreateResponse =
+Omit<TestPlanValues,
+'product_version__value' |
+'product__name' |
+'author__username' |
+'type__name'
+>
+
 export type TestPlanAddCaseResponse =
 	Omit<TestCaseValues, keyof TestCaseComputedFields> & {
 		id: number;

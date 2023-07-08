@@ -14,7 +14,7 @@ import TestCase from '../testCases/testCase';
 import PlanType from './planType';
 
 import TestPlan from './testPlan';
-import { TestPlanWriteValues } from './testPlan.type';
+import { TestPlanCreateResponse, TestPlanCreateValues, TestPlanWriteValues } from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
 import {
@@ -1038,6 +1038,79 @@ describe('Test Plan', () => {
 				.toThrowError(
 					`TestPlan with name "${name}" could not be found.`
 				);
+		});
+
+		it('Can create a TestPlan with minimum values', async () => {
+			const createVals: TestPlanCreateValues = {
+				product: 1,
+				product_version: 1,
+				type: 1,
+				name: 'A New Test Plan'
+			};
+			const createResponse: TestPlanCreateResponse = {
+				id: 8,
+				parent: null,
+				name: 'A New Test Plan',
+				text: '',
+				is_active: true,
+				extra_link: null,
+				product_version: 1,
+				author: 2,
+				product: 1,
+				type: 1,
+				create_date: '2023-08-24T13:08:56.456',
+			};
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: createResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockTestPlan(createResponse)]
+			}));
+
+			const result = await TestPlan.create(createVals);
+
+			expect(result).toBeInstanceOf(TestPlan);
+			expect(result.getId()).toEqual(8);
+			expect(result.getName()).toEqual('A New Test Plan');
+		});
+
+		it('Can create a TestPlan with extra values', async () => {
+			const createVals: TestPlanCreateValues = {
+				product: 1,
+				product_version: 1,
+				type: 2,
+				name: 'A New Test Plan',
+				parent: 3,
+				text: 'Some description text'
+			};
+			const createResponse: TestPlanCreateResponse = {
+				id: 8,
+				parent: 3,
+				name: 'A New Test Plan',
+				text: 'Some description text',
+				is_active: true,
+				extra_link: null,
+				product_version: 1,
+				author: 2,
+				product: 1,
+				type: 2,
+				create_date: '2023-08-24T13:08:56.456',
+			};
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: createResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockTestPlan(createResponse)]
+			}));
+
+			const result = await TestPlan.create(createVals);
+
+			expect(result).toBeInstanceOf(TestPlan);
+			expect(result.getId()).toEqual(8);
+			expect(result.getName()).toEqual('A New Test Plan');
+			expect(result.getParentId()).toEqual(3);
+			expect(result.getTypeId()).toEqual(2);
+			expect(result.getText()).toEqual('Some description text');
 		});
 	});
 
