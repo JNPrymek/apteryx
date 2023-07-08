@@ -1238,7 +1238,7 @@ describe('Test Plan', () => {
 				result: mockTestPlanAddCaseResponse()
 			}));
 
-			await plan1.addTestCase(tc2);
+			await plan1.addSingleTestCase(tc2);
 			verifyRpcCall(
 				mockAxios,
 				0,
@@ -1252,7 +1252,7 @@ describe('Test Plan', () => {
 				result: mockTestPlanAddCaseResponse()
 			}));
 
-			await plan1.addTestCase(2);
+			await plan1.addSingleTestCase(2);
 			verifyRpcCall(
 				mockAxios,
 				0,
@@ -1267,7 +1267,7 @@ describe('Test Plan', () => {
 				result: null
 			}));
 
-			await plan1.removeTestCase(tc2);
+			await plan1.removeSingleTestCase(tc2);
 			verifyRpcCall(
 				mockAxios,
 				0,
@@ -1281,7 +1281,7 @@ describe('Test Plan', () => {
 				result: null
 			}));
 
-			await plan1.removeTestCase(2);
+			await plan1.removeSingleTestCase(2);
 			verifyRpcCall(
 				mockAxios,
 				0,
