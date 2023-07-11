@@ -45,3 +45,24 @@ export type TestRunCreateValues =
 		plan: number;
 		build: number;
 	};
+
+export type TestRunCaseEntry = {
+	id: number;
+	create_date: string;
+	is_automated: boolean;
+	script: string;
+	arguments: string;
+	extra_link: string | null;
+	summary: string;
+	requirement: string | null;
+	notes: string;
+	text: string;
+	case_status: number;
+	category: number;
+	priority: number;
+	author: number;
+	default_tester: number | null;
+	reviewer: number | null;
+	execution_id: number;
+	status: string;
+}

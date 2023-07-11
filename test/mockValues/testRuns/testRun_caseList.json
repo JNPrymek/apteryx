@@ -1,0 +1,20 @@
+{
+	"id": 1,
+	"create_date": "2022-12-02T20:13:27.697",
+	"is_automated": false,
+	"script": "Sample script or an empty string",
+	"arguments": "Sample args or an empty string",
+	"extra_link": null,
+	"summary": "Example Test Case Title",
+	"requirement": null,
+	"notes": "Custom notes go here",
+	"text": "An example test case for unit testing",
+	"case_status": 2,
+	"category": 4,
+	"priority": 1,
+	"author": 1,
+	"default_tester": 1,
+	"reviewer": 2,
+	"execution_id": 1,
+	"status": "IDLE"
+}

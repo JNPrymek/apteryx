@@ -47,3 +47,14 @@ export function mockTestRunUpdateResponse(
 		...overrideValues
 	};
 }
+
+import { TestRunCaseEntry } from '../../../src/testRuns/testRun.type';
+import testRunCaseListDefaults from './testRun_caseList.json';
+export function mockTestRunCaseListItem(
+	overrideValues?: Partial<TestRunCaseEntry>
+): TestRunCaseEntry {
+	return {
+		...testRunCaseListDefaults,
+		...overrideValues
+	};
+}
