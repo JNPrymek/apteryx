@@ -11,7 +11,10 @@ import {
 	mockTestRunUpdateResponse, 
 	mockUser 
 } from '../../test/mockKiwiValues';
-import { TestRunWriteValues } from './testRun.type';
+import { 
+	TestRunCreateValues,
+	TestRunWriteValues
+} from './testRun.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
 
@@ -1109,6 +1112,121 @@ describe('Test Run', () => {
 		
 			expect(tr1.getDefaultTesterId()).toEqual(2);
 			expect(tr1.getDefaultTesterUsername()).toEqual('bob');
+		});
+	});
+
+	describe('Create TestRuns', () => {
+		it('Can create TestRun with minimum values', async () => {
+			const createVals: TestRunCreateValues = {
+				summary: 'Example Test Run',
+				plan: 4,
+				manager: 2,
+				build: 1
+			};
+			const createResponse = mockTestRunUpdateResponse({
+				id: 8,
+				summary: 'Example Test Run',
+				plan: 4,
+				manager: 2,
+				build: 1
+			});
+			const runVals = mockTestRun({
+				id: 8,
+				summary: 'Example Test Run',
+				plan: 4,
+				plan__name: 'TestPlan 4',
+				manager: 2,
+				manager__username: 'bob'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: createResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ runVals ]
+			}));
+
+			const newRun = await TestRun.create(createVals);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.create',
+				[ createVals ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[ { id__in: [8] } ]
+			);
+
+			expect(newRun).toBeInstanceOf(TestRun);
+			expect(newRun.getId()).toEqual(8);
+			expect(newRun.getSummary()).toEqual('Example Test Run');
+			expect(newRun.getManagerId()).toEqual(2);
+		});
+
+		it('Can create TestRun with extra values', async () => {
+			const createVals: TestRunCreateValues = {
+				summary: 'Example Test Run',
+				plan: 4,
+				manager: 2,
+				build: 1,
+				default_tester: 1,
+				notes: 'Custom description'
+			};
+			const createResponse = mockTestRunUpdateResponse({
+				id: 8,
+				summary: 'Example Test Run',
+				plan: 4,
+				manager: 2,
+				build: 1,
+				default_tester: 1,
+				notes: 'Custom description'
+			});
+			const runVals = mockTestRun({
+				id: 8,
+				summary: 'Example Test Run',
+				plan: 4,
+				plan__name: 'TestPlan 4',
+				manager: 2,
+				manager__username: 'bob',
+				default_tester: 1,
+				default_tester__username: 'alice',
+				notes: 'Custom description'
+			});
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: createResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ runVals ]
+			}));
+
+			const newRun = await TestRun.create(createVals);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.create',
+				[ createVals ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestRun.filter',
+				[ { id__in: [8] } ]
+			);
+
+			expect(newRun).toBeInstanceOf(TestRun);
+			expect(newRun.getId()).toEqual(8);
+			expect(newRun.getSummary()).toEqual('Example Test Run');
+			expect(newRun.getManagerId()).toEqual(2);
+			expect(newRun.getManagerUsername()).toEqual('bob');
+			expect(newRun.getDefaultTesterId()).toEqual(1);
+			expect(newRun.getDefaultTesterUsername()).toEqual('alice');
+			expect(newRun.getDescription()).toEqual('Custom description');
 		});
 	});
 });

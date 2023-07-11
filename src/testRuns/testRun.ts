@@ -4,7 +4,11 @@ import Product from '../management/product';
 import User from '../management/user';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
-import { TestRunWriteValues } from './testRun.type';
+import {
+	TestRunCreateValues,
+	TestRunUpdateResponse,
+	TestRunWriteValues
+} from './testRun.type';
 
 export default class TestRun extends KiwiBaseItem {
 	
@@ -190,6 +194,14 @@ export default class TestRun extends KiwiBaseItem {
 	public async setDefaultTester(tester: User | number): Promise<void> {
 		const testerId = await User.resolveUserId(tester);
 		await this.serverUpdate({ default_tester: testerId });
+	}
+
+	public static async create(values: TestRunCreateValues): Promise<TestRun> {
+		const response = (await KiwiConnector.sendRPCMethod(
+			'TestRun.create',
+			[values]
+		)) as TestRunUpdateResponse;
+		return TestRun.getById(response.id);
 	}
 
 	public async serverUpdate(

@@ -37,3 +37,11 @@ export type TestRunUpdateResponse =
 	TestRunWriteValues & {
 		id: number;
 	};
+
+export type TestRunCreateValues =
+	Partial<TestRunWriteValues> & {
+		summary: string;
+		manager: number;
+		plan: number;
+		build: number;
+	};
