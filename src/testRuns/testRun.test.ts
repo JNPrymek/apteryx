@@ -1272,5 +1272,33 @@ describe('Test Run', () => {
 			expect(tests).toContainEqual(new TestCase(testCaseValues[1]));
 			expect(tests).toContainEqual(new TestCase(testCaseValues[2]));
 		});
+
+		it('Can get TestCases included in TestRun - 0 results', async () => {
+			const tr1 = new TestRun(mockTestRun({ id: 3 }));
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: []
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: []
+			}));
+
+			const tests = await tr1.getTestCases();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.get_cases',
+				[ 3 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCase.filter',
+				[ { id__in: [] }]
+			);
+
+			expect(tests).toEqual([]);
+		});
 	});
 });
