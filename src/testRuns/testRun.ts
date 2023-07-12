@@ -5,6 +5,7 @@ import User from '../management/user';
 import TestCase from '../testCases/testCase';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
+import TestExecution from './testExecution';
 import {
 	TestRunCaseEntry,
 	TestRunCreateValues,
@@ -206,6 +207,18 @@ export default class TestRun extends KiwiBaseItem {
 		const caseIdList: Array<number> = [];
 		rawCaseList.forEach( value => { caseIdList.push(value.id); });
 		return TestCase.getByIds(caseIdList);
+	}
+
+	public async getTestExecutions(): Promise<Array<TestExecution>> {
+		const rawCaseList = (await KiwiConnector.sendRPCMethod(
+			'TestRun.get_cases', 
+			[ this.getId() ]
+		)) as Array<TestRunCaseEntry>;
+		const executionIdList: Array<number> = [];
+		rawCaseList.forEach( value => {
+			executionIdList.push(value.execution_id);
+		});
+		return TestExecution.getByIds(executionIdList);
 	}
 
 	public static async create(values: TestRunCreateValues): Promise<TestRun> {

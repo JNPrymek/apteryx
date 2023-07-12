@@ -7,6 +7,7 @@ import User from '../management/user';
 import { 
 	mockProduct, 
 	mockTestCase, 
+	mockTestExecution, 
 	mockTestPlan, 
 	mockTestRun, 
 	mockTestRunCaseListItem, 
@@ -20,6 +21,7 @@ import {
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
 import TestCase from '../testCases/testCase';
+import TestExecution from './testExecution';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -1244,9 +1246,15 @@ describe('Test Run', () => {
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
 				result: [
-					mockTestRunCaseListItem({ id: 1, summary: 'First Case' }),
-					mockTestRunCaseListItem({ id: 2, summary: 'Second Case' }),
-					mockTestRunCaseListItem({ id: 30, summary: 'TC Thirty' }),
+					mockTestRunCaseListItem(
+						{ id: 1, execution_id: 8, summary: 'First Case' }
+					),
+					mockTestRunCaseListItem(
+						{ id: 2, execution_id: 9, summary: 'Second Case' }
+					),
+					mockTestRunCaseListItem(
+						{ id: 30, execution_id: 10, summary: 'TC Thirty' }
+					),
 				]
 			}));
 			mockAxios.post.mockResolvedValue(mockRpcResponse({
@@ -1273,7 +1281,7 @@ describe('Test Run', () => {
 			expect(tests).toContainEqual(new TestCase(testCaseValues[2]));
 		});
 
-		it('Can get TestCases included in TestRun - 0 results', async () => {
+		it('Can get TestCases included in empty TestRun', async () => {
 			const tr1 = new TestRun(mockTestRun({ id: 3 }));
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
@@ -1295,6 +1303,85 @@ describe('Test Run', () => {
 				mockAxios,
 				1,
 				'TestCase.filter',
+				[ { id__in: [] }]
+			);
+
+			expect(tests).toEqual([]);
+		});
+
+		it('Can get TestExecutions included in TestRun', async () => {
+			const tr1 = new TestRun(mockTestRun({ id: 3 }));
+			const executionValues = [
+				mockTestExecution(
+					{ id: 8, case: 1, case__summary: 'First Case' }
+				),
+				mockTestExecution(
+					{ id: 9, case: 2, case__summary: 'Second Case' }
+				),
+				mockTestExecution(
+					{ id: 10, case: 30, case__summary: 'TC Thirty' }
+				),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestRunCaseListItem(
+						{ id: 1, execution_id: 8, summary: 'First Case' }
+					),
+					mockTestRunCaseListItem(
+						{ id: 2, execution_id: 9, summary: 'Second Case' }
+					),
+					mockTestRunCaseListItem(
+						{ id: 30, execution_id: 10, summary: 'TC Thirty' }
+					),
+				]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: executionValues
+			}));
+
+			const tests = await tr1.getTestExecutions();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.get_cases',
+				[ 3 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestExecution.filter',
+				[ { id__in: [8, 9, 10] }]
+			);
+
+			expect(tests).toContainEqual(new TestExecution(executionValues[0]));
+			expect(tests).toContainEqual(new TestExecution(executionValues[1]));
+			expect(tests).toContainEqual(new TestExecution(executionValues[2]));
+		});
+
+		it('Can get TestExecutions included in empty TestRun', async () => {
+			const tr1 = new TestRun(mockTestRun({ id: 3 }));
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: []
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: []
+			}));
+
+			const tests = await tr1.getTestExecutions();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.get_cases',
+				[ 3 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestExecution.filter',
 				[ { id__in: [] }]
 			);
 
