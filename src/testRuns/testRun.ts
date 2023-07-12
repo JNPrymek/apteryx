@@ -2,9 +2,11 @@ import KiwiBaseItem from '../core/kiwiBaseItem';
 import KiwiConnector from '../core/kiwiConnector';
 import Product from '../management/product';
 import User from '../management/user';
+import TestCase from '../testCases/testCase';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
 import {
+	TestRunCaseEntry,
 	TestRunCreateValues,
 	TestRunUpdateResponse,
 	TestRunWriteValues
@@ -194,6 +196,16 @@ export default class TestRun extends KiwiBaseItem {
 	public async setDefaultTester(tester: User | number): Promise<void> {
 		const testerId = await User.resolveUserId(tester);
 		await this.serverUpdate({ default_tester: testerId });
+	}
+
+	public async getTestCases(): Promise<Array<TestCase>> {
+		const rawCaseList = (await KiwiConnector.sendRPCMethod(
+			'TestRun.get_cases', 
+			[ this.getId() ]
+		)) as Array<TestRunCaseEntry>;
+		const caseIdList: Array<number> = [];
+		rawCaseList.forEach( value => { caseIdList.push(value.id); });
+		return TestCase.getByIds(caseIdList);
 	}
 
 	public static async create(values: TestRunCreateValues): Promise<TestRun> {

@@ -6,8 +6,10 @@ import Product from '../management/product';
 import User from '../management/user';
 import { 
 	mockProduct, 
+	mockTestCase, 
 	mockTestPlan, 
 	mockTestRun, 
+	mockTestRunCaseListItem, 
 	mockTestRunUpdateResponse, 
 	mockUser 
 } from '../../test/mockKiwiValues';
@@ -17,6 +19,7 @@ import {
 } from './testRun.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
+import TestCase from '../testCases/testCase';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -1227,6 +1230,47 @@ describe('Test Run', () => {
 			expect(newRun.getDefaultTesterId()).toEqual(1);
 			expect(newRun.getDefaultTesterUsername()).toEqual('alice');
 			expect(newRun.getDescription()).toEqual('Custom description');
+		});
+	});
+
+	describe('TestRun - TestCase/Execution relations', () => {
+		it('Can get TestCases included in TestRun', async () => {
+			const tr1 = new TestRun(mockTestRun({ id: 3 }));
+			const testCaseValues = [
+				mockTestCase({ id: 1, summary: 'First Case' }),
+				mockTestCase({ id: 2, summary: 'Second Case' }),
+				mockTestCase({ id: 30, summary: 'TC Thirty' }),
+			];
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestRunCaseListItem({ id: 1, summary: 'First Case' }),
+					mockTestRunCaseListItem({ id: 2, summary: 'Second Case' }),
+					mockTestRunCaseListItem({ id: 30, summary: 'TC Thirty' }),
+				]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: testCaseValues
+			}));
+
+			const tests = await tr1.getTestCases();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.get_cases',
+				[ 3 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestCase.filter',
+				[ { id__in: [1, 2, 30] }]
+			);
+
+			expect(tests).toContainEqual(new TestCase(testCaseValues[0]));
+			expect(tests).toContainEqual(new TestCase(testCaseValues[1]));
+			expect(tests).toContainEqual(new TestCase(testCaseValues[2]));
 		});
 	});
 });
