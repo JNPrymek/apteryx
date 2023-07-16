@@ -8,6 +8,7 @@ import {
 	mockProduct, 
 	mockTestCase, 
 	mockTestExecution, 
+	mockTestExecutionCreateResponse, 
 	mockTestPlan, 
 	mockTestRun, 
 	mockTestRunCaseListItem, 
@@ -1386,6 +1387,94 @@ describe('Test Run', () => {
 			);
 
 			expect(tests).toEqual([]);
+		});
+
+		it('Can add a TestCase to the TestRun by ID', async () => {
+			const tr2 = new TestRun(mockTestRun({ id: 2 }));
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestExecutionCreateResponse({
+					case: 5,
+					run: 2,
+					id: 14
+				})
+			}));
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTestExecution({
+						id: 14,
+						case: 5,
+						case__summary: 'Test 5',
+						run: 2,
+					}),
+				]
+			}));
+
+			const te14 = await tr2.addTestCase(5);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.add_case',
+				[ 2, 5 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestExecution.filter',
+				[ { id__in: [ 14 ] }]
+			);
+
+			expect(te14.getId()).toEqual(14);
+			expect(te14.getTestCaseId()).toEqual(5);
+			expect(te14.getTestRunId()).toEqual(2);
+		});
+
+		it('Can add a TestCase to the TestRun by TestCase', async () => {
+			const tr2 = new TestRun(mockTestRun({ id: 2 }));
+			const tc5 = new TestCase(mockTestCase({
+				id: 5,
+				summary: 'Test 5'
+			}));
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: mockTestExecutionCreateResponse({
+					case: 5,
+					run: 2,
+					id: 14
+				})
+			}));
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTestExecution({
+						id: 14,
+						case: 5,
+						case__summary: 'Test 5',
+						run: 2,
+					}),
+				]
+			}));
+
+			const te14 = await tr2.addTestCase(tc5);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.add_case',
+				[ 2, 5 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestExecution.filter',
+				[ { id__in: [ 14 ] }]
+			);
+
+			expect(te14.getId()).toEqual(14);
+			expect(te14.getTestCaseId()).toEqual(5);
+			expect(te14.getTestRunId()).toEqual(2);
 		});
 	});
 });

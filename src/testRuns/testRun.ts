@@ -6,6 +6,7 @@ import TestCase from '../testCases/testCase';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
 import TestExecution from './testExecution';
+import { TestExecutionCreateResponse } from './testExecution.type';
 import {
 	TestRunCaseEntry,
 	TestRunCreateValues,
@@ -240,6 +241,22 @@ export default class TestRun extends KiwiBaseItem {
 			]
 		);
 		await this.syncServerValues();
+	}
+
+	public async addTestCase(
+		testCase: number | TestCase
+	): Promise<TestExecution> {
+		const caseId: number = 
+			(typeof testCase === 'number') ? 
+				testCase : 
+				testCase.getId();
+		
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestRun.add_case',
+			[ this.getId(), caseId ]
+		);
+		const executionId = (response as TestExecutionCreateResponse).id;
+		return TestExecution.getById(executionId);
 	}
 
 	// Inherited methods
