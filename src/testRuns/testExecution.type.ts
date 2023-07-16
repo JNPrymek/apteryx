@@ -28,3 +28,8 @@ export type TestExecutionCalculatedValues = {
 
 export type TestExecutionWriteValues =
 	Omit<TestExecutionValues, keyof TestExecutionCalculatedValues>;
+
+export type TestExecutionCreateResponse = 
+	TestExecutionWriteValues & {
+		id: number;
+	}

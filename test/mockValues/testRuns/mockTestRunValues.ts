@@ -58,3 +58,16 @@ export function mockTestRunCaseListItem(
 		...overrideValues
 	};
 }
+
+import testExecutionCreateDefaults from './testExecution_create.json';
+import {
+	TestExecutionCreateResponse
+} from '../../../src/testRuns/testExecution.type';
+export function mockTestExecutionCreateResponse(
+	overrideValues?: Partial<TestExecutionCreateResponse>
+): TestExecutionCreateResponse {
+	return {
+		...testExecutionCreateDefaults,
+		...overrideValues
+	};
+}
