@@ -1,0 +1,13 @@
+{
+	"id": 1,
+	"start_date": null,
+	"stop_date": null,
+	"planned_start": "2023-01-04T00:00:00",
+	"planned_stop": "2023-01-05T00:00:00",
+	"summary": "The First Test Run",
+	"notes": "This is an example test run",
+	"plan": 1,
+	"build": 1,
+	"manager": 1,
+	"default_tester": 2
+}

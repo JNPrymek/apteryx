@@ -36,3 +36,38 @@ export function mockTestRun(
 		...overrideValues
 	};
 }
+
+import { TestRunUpdateResponse } from '../../../src/testRuns/testRun.type';
+import testRunUpdateResponseDefaults from './testRun_update.json';
+export function mockTestRunUpdateResponse(
+	overrideValues?: Partial<TestRunUpdateResponse>
+): TestRunUpdateResponse {
+	return {
+		...testRunUpdateResponseDefaults,
+		...overrideValues
+	};
+}
+
+import { TestRunCaseEntry } from '../../../src/testRuns/testRun.type';
+import testRunCaseListDefaults from './testRun_caseList.json';
+export function mockTestRunCaseListItem(
+	overrideValues?: Partial<TestRunCaseEntry>
+): TestRunCaseEntry {
+	return {
+		...testRunCaseListDefaults,
+		...overrideValues
+	};
+}
+
+import testExecutionCreateDefaults from './testExecution_create.json';
+import {
+	TestExecutionCreateResponse
+} from '../../../src/testRuns/testExecution.type';
+export function mockTestExecutionCreateResponse(
+	overrideValues?: Partial<TestExecutionCreateResponse>
+): TestExecutionCreateResponse {
+	return {
+		...testExecutionCreateDefaults,
+		...overrideValues
+	};
+}

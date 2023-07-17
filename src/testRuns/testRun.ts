@@ -1,8 +1,18 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
+import KiwiConnector from '../core/kiwiConnector';
 import Product from '../management/product';
 import User from '../management/user';
+import TestCase from '../testCases/testCase';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
+import TestExecution from './testExecution';
+import { TestExecutionCreateResponse } from './testExecution.type';
+import {
+	TestRunCaseEntry,
+	TestRunCreateValues,
+	TestRunUpdateResponse,
+	TestRunWriteValues
+} from './testRun.type';
 
 export default class TestRun extends KiwiBaseItem {
 	
@@ -14,20 +24,41 @@ export default class TestRun extends KiwiBaseItem {
 		return this.serialized['summary'] as string;
 	}
 
+	public async setSummary(summary: string): Promise<void> {
+		await this.serverUpdate({ summary: summary });
+	}
+
 	public getName(): string {
 		return this.getSummary();
+	}
+
+	public async setName(name: string): Promise<void> {
+		return this.setSummary(name);
 	}
 
 	public getTitle(): string {
 		return this.getSummary();
 	}
 
+	public async setTitle(title: string): Promise<void> {
+		return this.setSummary(title);
+	}
+
 	public getNotes(): string {
 		return this.serialized['notes'] as string;
 	}
 
+	public async setNotes(notes?: string): Promise<void> {
+		const newNotes = notes ?? '';
+		await this.serverUpdate({ notes: newNotes });
+	}
+
 	public getDescription(): string {
 		return this.getNotes();
+	}
+
+	public async setDescription(description?: string): Promise<void> {
+		return this.setNotes(description);
 	}
 
 	public getPlanId(): number {
@@ -71,6 +102,11 @@ export default class TestRun extends KiwiBaseItem {
 		}
 	}
 
+	public async setPlannedStartDate(date?: Date): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : '';
+		await this.serverUpdate({ planned_start: dateString });
+	}
+
 	public getPlannedStopDate(): Date | null {
 		const rawString = this.serialized['planned_stop'] as string;
 		if (rawString) {
@@ -78,6 +114,11 @@ export default class TestRun extends KiwiBaseItem {
 		} else {
 			return null;
 		}
+	}
+
+	public async setPlannedStopDate(date?: Date): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : '';
+		await this.serverUpdate({ planned_stop: dateString });
 	}
 
 	public getStartDate(): Date | null {
@@ -89,6 +130,11 @@ export default class TestRun extends KiwiBaseItem {
 		}
 	}
 
+	public async setStartDate(date?: Date): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : '';
+		await this.serverUpdate({ start_date: dateString });
+	}
+
 	public getStopDate(): Date | null {
 		const rawString = this.serialized['stop_date'] as string;
 		if (rawString) {
@@ -98,12 +144,25 @@ export default class TestRun extends KiwiBaseItem {
 		}
 	}
 
+	public async setStopDate(date?: Date): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : '';
+		await this.serverUpdate({ stop_date: dateString });
+	}
+
 	public getActualStartDate(): Date | null {
 		return this.getStartDate();
 	}
 
+	public async setActualStartDate(date?: Date): Promise<void> {
+		return this.setStartDate(date);
+	}
+
 	public getActualStopDate(): Date | null {
 		return this.getStopDate();
+	}
+
+	public async setActualStopDate(date?: Date): Promise<void> {
+		return this.setStopDate(date);
 	}
 
 	public getManagerId(): number {
@@ -118,6 +177,11 @@ export default class TestRun extends KiwiBaseItem {
 		return User.getById(this.getManagerId());
 	}
 
+	public async setManager(manager: User | number): Promise<void> {
+		const managerId = await User.resolveUserId(manager);
+		await this.serverUpdate({ manager: managerId });
+	}
+
 	public getDefaultTesterId(): number {
 		return this.serialized['default_tester'] as number;
 	}
@@ -129,6 +193,70 @@ export default class TestRun extends KiwiBaseItem {
 	public async getDefaultTester(): Promise<User | null> {
 		const testerId = this.getDefaultTesterId();
 		return (testerId === null) ? null : User.getById(testerId);
+	}
+
+	public async setDefaultTester(tester: User | number): Promise<void> {
+		const testerId = await User.resolveUserId(tester);
+		await this.serverUpdate({ default_tester: testerId });
+	}
+
+	public async getTestCases(): Promise<Array<TestCase>> {
+		const rawCaseList = (await KiwiConnector.sendRPCMethod(
+			'TestRun.get_cases', 
+			[ this.getId() ]
+		)) as Array<TestRunCaseEntry>;
+		const caseIdList: Array<number> = [];
+		rawCaseList.forEach( value => { caseIdList.push(value.id); });
+		return TestCase.getByIds(caseIdList);
+	}
+
+	public async getTestExecutions(): Promise<Array<TestExecution>> {
+		const rawCaseList = (await KiwiConnector.sendRPCMethod(
+			'TestRun.get_cases', 
+			[ this.getId() ]
+		)) as Array<TestRunCaseEntry>;
+		const executionIdList: Array<number> = [];
+		rawCaseList.forEach( value => {
+			executionIdList.push(value.execution_id);
+		});
+		return TestExecution.getByIds(executionIdList);
+	}
+
+	public static async create(values: TestRunCreateValues): Promise<TestRun> {
+		const response = (await KiwiConnector.sendRPCMethod(
+			'TestRun.create',
+			[values]
+		)) as TestRunUpdateResponse;
+		return TestRun.getById(response.id);
+	}
+
+	public async serverUpdate(
+		updateVal: Partial<TestRunWriteValues>
+	): Promise<void> {
+		await KiwiConnector.sendRPCMethod(
+			'TestRun.update',
+			[
+				this.getId(),
+				updateVal
+			]
+		);
+		await this.syncServerValues();
+	}
+
+	public async addTestCase(
+		testCase: number | TestCase
+	): Promise<TestExecution> {
+		const caseId: number = 
+			(typeof testCase === 'number') ? 
+				testCase : 
+				testCase.getId();
+		
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestRun.add_case',
+			[ this.getId(), caseId ]
+		);
+		const executionId = (response as TestExecutionCreateResponse).id;
+		return TestExecution.getById(executionId);
 	}
 
 	// Inherited methods

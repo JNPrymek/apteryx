@@ -14,7 +14,11 @@ import TestCase from '../testCases/testCase';
 import PlanType from './planType';
 
 import TestPlan from './testPlan';
-import { TestPlanWriteValues } from './testPlan.type';
+import {
+	TestPlanCreateResponse,
+	TestPlanCreateValues,
+	TestPlanWriteValues
+} from './testPlan.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
 import {
@@ -1039,6 +1043,79 @@ describe('Test Plan', () => {
 					`TestPlan with name "${name}" could not be found.`
 				);
 		});
+
+		it('Can create a TestPlan with minimum values', async () => {
+			const createVals: TestPlanCreateValues = {
+				product: 1,
+				product_version: 1,
+				type: 1,
+				name: 'A New Test Plan'
+			};
+			const createResponse: TestPlanCreateResponse = {
+				id: 8,
+				parent: null,
+				name: 'A New Test Plan',
+				text: '',
+				is_active: true,
+				extra_link: null,
+				product_version: 1,
+				author: 2,
+				product: 1,
+				type: 1,
+				create_date: '2023-08-24T13:08:56.456',
+			};
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: createResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockTestPlan(createResponse)]
+			}));
+
+			const result = await TestPlan.create(createVals);
+
+			expect(result).toBeInstanceOf(TestPlan);
+			expect(result.getId()).toEqual(8);
+			expect(result.getName()).toEqual('A New Test Plan');
+		});
+
+		it('Can create a TestPlan with extra values', async () => {
+			const createVals: TestPlanCreateValues = {
+				product: 1,
+				product_version: 1,
+				type: 2,
+				name: 'A New Test Plan',
+				parent: 3,
+				text: 'Some description text'
+			};
+			const createResponse: TestPlanCreateResponse = {
+				id: 8,
+				parent: 3,
+				name: 'A New Test Plan',
+				text: 'Some description text',
+				is_active: true,
+				extra_link: null,
+				product_version: 1,
+				author: 2,
+				product: 1,
+				type: 2,
+				create_date: '2023-08-24T13:08:56.456',
+			};
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: createResponse
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [ mockTestPlan(createResponse)]
+			}));
+
+			const result = await TestPlan.create(createVals);
+
+			expect(result).toBeInstanceOf(TestPlan);
+			expect(result.getId()).toEqual(8);
+			expect(result.getName()).toEqual('A New Test Plan');
+			expect(result.getParentId()).toEqual(3);
+			expect(result.getTypeId()).toEqual(2);
+			expect(result.getText()).toEqual('Some description text');
+		});
 	});
 
 	describe('TestPlan -> TestCase relations', () => {
@@ -1161,7 +1238,7 @@ describe('Test Plan', () => {
 				result: mockTestPlanAddCaseResponse()
 			}));
 
-			await plan1.addTestCase(tc2);
+			await plan1.addTestCases(tc2);
 			verifyRpcCall(
 				mockAxios,
 				0,
@@ -1175,12 +1252,52 @@ describe('Test Plan', () => {
 				result: mockTestPlanAddCaseResponse()
 			}));
 
-			await plan1.addTestCase(2);
+			await plan1.addTestCases(2);
 			verifyRpcCall(
 				mockAxios,
 				0,
 				'TestPlan.add_case',
 				[1, 2]
+			);
+		});
+
+		it('Can add multiple TestCases to the TestPlan', async () => {
+			const tc2 = new TestCase(case2Vals);
+			const caseList = [
+				5,
+				3,
+				tc2,
+				8
+			];
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: mockTestPlanAddCaseResponse()
+			}));
+
+			await plan1.addTestCases(caseList);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.add_case',
+				[1, 5]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.add_case',
+				[1, 3]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.add_case',
+				[1, 2]
+			);
+			verifyRpcCall(
+				mockAxios,
+				3,
+				'TestPlan.add_case',
+				[1, 8]
 			);
 		});
 
@@ -1190,7 +1307,7 @@ describe('Test Plan', () => {
 				result: null
 			}));
 
-			await plan1.removeTestCase(tc2);
+			await plan1.removeTestCases(tc2);
 			verifyRpcCall(
 				mockAxios,
 				0,
@@ -1204,12 +1321,52 @@ describe('Test Plan', () => {
 				result: null
 			}));
 
-			await plan1.removeTestCase(2);
+			await plan1.removeTestCases(2);
 			verifyRpcCall(
 				mockAxios,
 				0,
 				'TestPlan.remove_case',
 				[1, 2]
+			);
+		});
+
+		it('Can remove multiple TestCases from the TestPlan', async () => {
+			const tc2 = new TestCase(case2Vals);
+			const caseList = [
+				5,
+				3,
+				tc2,
+				8
+			];
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: mockTestPlanAddCaseResponse()
+			}));
+
+			await plan1.removeTestCases(caseList);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestPlan.remove_case',
+				[1, 5]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestPlan.remove_case',
+				[1, 3]
+			);
+			verifyRpcCall(
+				mockAxios,
+				2,
+				'TestPlan.remove_case',
+				[1, 2]
+			);
+			verifyRpcCall(
+				mockAxios,
+				3,
+				'TestPlan.remove_case',
+				[1, 8]
 			);
 		});
 

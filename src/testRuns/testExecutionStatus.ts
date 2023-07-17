@@ -35,6 +35,21 @@ export default class TestExecutionStatus extends KiwiNamedItem {
 		return this.getWeight() == 0;
 	}
 
+	public static async resolveId(
+		status: string | number | TestExecutionStatus
+	): Promise<number> {
+		if (typeof status === 'number') {
+			return status;
+		}
+		else if (status instanceof TestExecutionStatus) {
+			return status.getId();
+		}
+		else { // typeof status = 'string'
+			const exStat = await TestExecutionStatus.getByName(status);
+			return exStat.getId();
+		}
+	}
+
 	// Inherited methods
 	// ------------------------------------------------------------------------
 	

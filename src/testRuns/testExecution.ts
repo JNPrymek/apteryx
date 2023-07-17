@@ -1,8 +1,13 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
+import KiwiConnector from '../core/kiwiConnector';
 import Build from '../management/build';
 import User from '../management/user';
 import TestCase from '../testCases/testCase';
 import TimeUtils from '../utils/timeUtils';
+import {
+	TestExecutionValues,
+	TestExecutionWriteValues
+} from './testExecution.type';
 import TestExecutionStatus from './testExecutionStatus';
 import TestRun from './testRun';
 
@@ -25,6 +30,13 @@ export default class TestExecution extends KiwiBaseItem {
 		return (assigneeId === null) ? null : User.getById(assigneeId);
 	}
 
+	public async setAssignee(assignee?: User | number): Promise<void> {
+		const assigneeId = assignee ?
+			(await User.resolveUserId(assignee)) :
+			null;
+		await this.serverUpdate({ assignee: assigneeId });
+	}
+
 	public getLastTesterId(): number {
 		return this.serialized['tested_by'] as number;
 	}
@@ -36,6 +48,11 @@ export default class TestExecution extends KiwiBaseItem {
 	public async getLastTester(): Promise<User | null> {
 		const lastTesterId = this.getLastTesterId();
 		return (lastTesterId === null) ? null : User.getById(lastTesterId);
+	}
+
+	public async setLastTester(tester?: User | number | null): Promise<void> {
+		const userId = (tester) ? (await User.resolveUserId(tester)) : null;
+		await this.serverUpdate({ tested_by: userId });
 	}
 
 	public getTestCaseVersion(): number {
@@ -51,6 +68,11 @@ export default class TestExecution extends KiwiBaseItem {
 		}
 	}
 
+	public async setStartDate(date?: Date | null): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : null;
+		await this.serverUpdate({ start_date: dateString });
+	}
+
 	public getStopDate(): Date | null {
 		const rawString = this.serialized['stop_date'] as string;
 		if (rawString) {
@@ -60,8 +82,17 @@ export default class TestExecution extends KiwiBaseItem {
 		}
 	}
 
+	public async setStopDate(date?: Date | null): Promise<void> {
+		const dateString = date ? TimeUtils.dateToServerString(date) : null;
+		await this.serverUpdate({ stop_date: dateString });
+	}
+
 	public getSortKey(): number {
 		return this.serialized['sortkey'] as number;
+	}
+
+	public async setSortKey(sortkey: number): Promise<void> {
+		await this.serverUpdate({ sortkey: sortkey });
 	}
 
 	public getTestRunId(): number {
@@ -110,6 +141,24 @@ export default class TestExecution extends KiwiBaseItem {
 
 	public async getStatus(): Promise<TestExecutionStatus> {
 		return await TestExecutionStatus.getById(this.getStatusId());
+	}
+
+	public async setStatus(
+		status: TestExecutionStatus | number | string
+	): Promise<void> {
+		const statusId = await TestExecutionStatus.resolveId(status);
+		await this.serverUpdate({ status: statusId });
+	}
+
+	public async serverUpdate(
+		updateValues: Partial<TestExecutionWriteValues>
+	): Promise<void> {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestExecution.update', [
+				this.getId(),
+				updateValues
+			]);
+		this.serialized = result as TestExecutionValues;
 	}
 
 	// Inherited methods

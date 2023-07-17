@@ -5,7 +5,11 @@ import Version from '../management/version';
 import TimeUtils from '../utils/timeUtils';
 import PlanType from './planType';
 import TestCase from '../testCases/testCase';
-import { TestPlanWriteValues } from './testPlan.type';
+import { 
+	TestPlanCreateResponse,
+	TestPlanCreateValues,
+	TestPlanWriteValues
+} from './testPlan.type';
 
 export default class TestPlan extends KiwiNamedItem {
 	// Constructor for all classes
@@ -169,20 +173,41 @@ export default class TestPlan extends KiwiNamedItem {
 		return testCases;
 	}
 
-	public async addTestCase(testCase: number | TestCase): Promise<void> {
-		const tcId = TestCase.resolveTestCaseId(testCase);
-		await KiwiConnector.sendRPCMethod(
-			'TestPlan.add_case',
-			[this.getId(), tcId]
-		);
+	public async addTestCases(
+		testCases: number | TestCase | Array<number | TestCase>
+	): Promise<void> {
+		let caseList: Array<number | TestCase>;
+		if (Array.isArray(testCases)) {
+			caseList = testCases;
+		} else {
+			caseList = [ testCases ];
+		}
+		for (let i = 0; i < caseList.length; i++) {
+			const tcId = TestCase.resolveTestCaseId(caseList[i]);
+			await KiwiConnector.sendRPCMethod(
+				'TestPlan.add_case',
+				[this.getId(), tcId]
+			);
+		}
+		
 	}
 
-	public async removeTestCase(testCase: number | TestCase): Promise<void> {
-		const tcId = TestCase.resolveTestCaseId(testCase);
-		await KiwiConnector.sendRPCMethod(
-			'TestPlan.remove_case',
-			[this.getId(), tcId]
-		);
+	public async removeTestCases(
+		testCases: number | TestCase | Array<number | TestCase>
+	): Promise<void> {
+		let caseList: Array<number | TestCase>;
+		if (Array.isArray(testCases)) {
+			caseList = testCases;
+		} else {
+			caseList = [ testCases ];
+		}
+		for (let i = 0; i < caseList.length; i++) {
+			const tcId = TestCase.resolveTestCaseId(caseList[i]);
+			await KiwiConnector.sendRPCMethod(
+				'TestPlan.remove_case',
+				[this.getId(), tcId]
+			);
+		}
 	}
 
 	/**
@@ -280,6 +305,16 @@ export default class TestPlan extends KiwiNamedItem {
 			results = results.concat(grandChildren);
 		}
 		return results;
+	}
+
+	public static async create(
+		values: TestPlanCreateValues
+	): Promise<TestPlan> {
+		const response = (await KiwiConnector
+			.sendRPCMethod('TestPlan.create', [values])
+		) as TestPlanCreateResponse;
+		const plan = await this.getById(response.id);
+		return plan;
 	}
 
 	public async serverUpdate(

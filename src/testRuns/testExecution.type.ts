@@ -16,3 +16,20 @@ export type TestExecutionValues = {
 	status: number;
 	status__name: string;
 }
+
+export type TestExecutionCalculatedValues = {
+	id: number;
+	assignee__username: string | null;
+	tested_by__username: string | null;
+	case__summary: string;
+	build__name: string;
+	status__name: string;
+}
+
+export type TestExecutionWriteValues =
+	Omit<TestExecutionValues, keyof TestExecutionCalculatedValues>;
+
+export type TestExecutionCreateResponse = 
+	TestExecutionWriteValues & {
+		id: number;
+	}
