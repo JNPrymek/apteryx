@@ -179,4 +179,99 @@ describe('Kiwi RPC API - TestCase', () => {
 			(typeof result.testing_duration === 'number')
 		).to.be.true;
 	});
+
+	it('TestCase.update returns expected type', async () => {
+		const filterResponse = await KiwiConnector.sendRPCMethod(
+			'TestCase.filter',
+			[{ id: 1 }]
+		);
+		const original = (filterResponse as Array<Record<string, unknown>>)[0];
+
+		const updateResponse = await KiwiConnector.sendRPCMethod(
+			'TestCase.update',
+			[
+				1,
+				{
+					summary: original.summary
+				}
+			]
+		);
+
+		expect(updateResponse).to.be.an('object').that.has.all.keys(
+			'id',
+			'create_date',
+			'is_automated',
+			'script',
+			'arguments',
+			'extra_link',
+			'summary',
+			'requirement',
+			'notes',
+			'text',
+			'case_status',
+			'case_status__name',
+			'category',
+			'category__name',
+			'priority',
+			'priority__value',
+			'author',
+			'author__username',
+			'default_tester',
+			'default_tester__username',
+			'reviewer',
+			'reviewer__username',
+			'setup_duration',
+			'testing_duration',
+		);
+		const result = (updateResponse) as Record<string, unknown>;
+		expect(result.id).to.be.a('number').that.equals(1);
+		expect(result.create_date).to.be.a('string').that.matches(dateRegex);
+		expect(result.is_automated).to.be.a('boolean');
+		expect(result.script).to.be.a('string');
+		expect(result.arguments).to.be.a('string');
+		expect(
+			(result.extra_link === null) ||
+			(typeof result.extra_link === 'string')
+		).to.be.true;
+		expect(result.summary).to.be.a('string');
+		expect(
+			(result.requirement === null) ||
+			(typeof result.requirement === 'string')
+		).to.be.true;
+		expect(result.notes).to.be.a('string');
+		expect(result.text).to.be.a('string');
+		expect(result.case_status).to.be.a('number');
+		expect(result.case_status__name).to.be.a('string');
+		expect(result.category).to.be.a('number');
+		expect(result.category__name).to.be.a('string');
+		expect(result.priority).to.be.a('number');
+		expect(result.priority__value).to.be.a('string');
+		expect(result.author).to.be.a('number');
+		expect(result.author__username).to.be.a('string');
+		expect(
+			(result.default_tester === null) ||
+			(typeof result.default_tester === 'number')
+		).to.be.true;
+		expect(
+			(result.default_tester__username === null) ||
+			(typeof result.default_tester__username === 'string')
+		).to.be.true;
+		expect(
+			(result.reviewer === null) ||
+			(typeof result.reviewer === 'number')
+		).to.be.true;
+		expect(
+			(result.reviewer__username === null) ||
+			(typeof result.reviewer__username === 'string')
+		).to.be.true;
+		expect(
+			(result.setup_duration === 'None') ||
+			(typeof result.setup_duration === 'number')
+		).to.be.true;
+		expect(
+			(result.testing_duration === 'None') ||
+			(typeof result.testing_duration === 'number')
+		).to.be.true;
+		
+	});
 });
