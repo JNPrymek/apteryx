@@ -274,4 +274,19 @@ describe('Kiwi RPC API - TestCase', () => {
 		).to.be.true;
 		
 	});
+
+	it('TestCase.sortkeys returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.sortkeys',
+			[{ plan: 1 }]
+		);
+		expect(response).is.an('object');
+		const result = (response as Record<string, unknown>);
+		
+		for (const key in result) {
+			expect(key).is.a('string');
+			expect(key).to.match(/\d+/);
+			expect(result[key]).to.be.a('number').that.is.greaterThanOrEqual(0);
+		}
+	});
 });
