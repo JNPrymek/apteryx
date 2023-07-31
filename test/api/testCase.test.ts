@@ -3,7 +3,6 @@ import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
 import { TestCaseCreateValues } from '../../src/testCases/testCase.type';
 
-
 const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
 
 describe('Kiwi RPC API - TestCase', () => {
