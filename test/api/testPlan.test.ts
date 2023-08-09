@@ -9,8 +9,8 @@ describe('Kiwi RPC API - TestPlan', () => {
 	before(async () => {
 		KiwiConnector.init({
 			hostName: 'localhost',
-			useSSL: false,
-			port: 80
+			useSSL: true,
+			port: 443
 		});
 		await KiwiConnector.login('debug', 'debug');
 	});

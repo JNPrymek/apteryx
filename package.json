@@ -14,7 +14,7 @@
 		"lint:fix": "npx eslint . --cache --fix",
 		"test": "npx jest",
 		"test:coverage": "npx jest --coverage",
-		"test:api": "npx ts-mocha",
+		"test:api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx ts-mocha",
 		"coverage": "npx jest --coverage",
 		"build": "tsc"
 	},

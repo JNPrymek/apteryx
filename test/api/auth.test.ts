@@ -7,8 +7,8 @@ describe('Kiwi RPC API - Auth', () => {
 	before(() => {
 		KiwiConnector.init({
 			hostName: 'localhost',
-			useSSL: false,
-			port: 80
+			useSSL: true,
+			port: 443
 		});
 	});
 
