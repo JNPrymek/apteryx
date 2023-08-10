@@ -8,7 +8,8 @@ module.exports = {
 		'<rootDir>/debug/',
 		'<rootDir>/ignored/',
 		'<rootDir>/tmp/',
-		'<rootDir>/temp/'
+		'<rootDir>/temp/',
+		'<rootDir>/test/api/'
 	],
 	collectCoverageFrom: [
 		'<rootDir>/src/**/*.{js,ts}',

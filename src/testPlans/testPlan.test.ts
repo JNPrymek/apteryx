@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { describe, it, expect } from '@jest/globals';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import { 
 	mockProduct,
@@ -1562,7 +1563,7 @@ describe('Test Plan', () => {
 				expect(Array.isArray(results)).toEqual(true);
 				expect(results.length).toEqual(2);
 				expect(results).toEqual(expect.arrayContaining([plan2, plan3]));
-				expect(results).toEqual(expect.not.arrayContaining([plan1]));
+				expect(results).not.toEqual(expect.arrayContaining([plan1]));
 			});
 
 		it('Can check if TestPlan has children', async () => {
@@ -1594,7 +1595,7 @@ describe('Test Plan', () => {
 			expect(Array.isArray(results)).toEqual(true);
 			expect(results.length).toEqual(2);
 			expect(results).toEqual(expect.arrayContaining([plan2, plan3]));
-			expect(results).toEqual(expect.not.arrayContaining([plan1, plan4]));
+			expect(results).not.toEqual(expect.arrayContaining([plan1, plan4]));
 		});
 
 		it('Can get TestPlan children - all nested children, explicit', 
@@ -1638,14 +1639,14 @@ describe('Test Plan', () => {
 				expect(tp1Children)
 					.toEqual(expect.arrayContaining([plan2, plan3, plan4]));
 				expect(tp1Children)
-					.toEqual(expect.not.arrayContaining([plan1]));
+					.not.toEqual(expect.arrayContaining([plan1]));
 
 				expect(Array.isArray(tp3Children)).toEqual(true);
 				expect(tp3Children.length).toEqual(1);
 				expect(tp3Children)
 					.toEqual(expect.arrayContaining([plan4]));
 				expect(tp3Children)
-					.toEqual(expect.not.arrayContaining([plan1, plan2, plan3]));
+					.not.toEqual(expect.arrayContaining([plan1, plan2, plan3]));
 			});
 	});
 });
