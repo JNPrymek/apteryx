@@ -284,21 +284,25 @@ export default class TestPlan extends KiwiNamedItem {
 		
 	}
 
+	public getChildrenCount(): number {
+		return this.serialized['children__count'] as number;
+	}
+
 	public async getDirectChildren(): Promise<Array<TestPlan>> {
 		return await TestPlan.serverFilter({ parent: this.getId() });
 	}
 	
 	public async hasChildren(): Promise<boolean> {
-		return  ((await this.getDirectChildren()).length > 0);
+		return  (this.getChildrenCount() > 0);
 	}
 
 	public async getChildren(direct = false): Promise<Array<TestPlan>> {
+		const directChildren = await this.getDirectChildren();
 		if (direct) {
-			return await this.getDirectChildren();
+			return directChildren;
 		}
 
 		let results: Array<TestPlan> = [];
-		const directChildren = await this.getDirectChildren();
 		for (const child of directChildren) {
 			results.push(child);
 			const grandChildren = await child.getChildren();

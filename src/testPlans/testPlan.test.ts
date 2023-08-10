@@ -34,9 +34,12 @@ describe('Test Plan', () => {
 	// Clear mock calls between tests - required to verify RPC calls
 	beforeEach(() => {
 		jest.clearAllMocks();
+		jest.resetAllMocks();
 	});
 
-	const plan1Vals = mockTestPlan();
+	const plan1Vals = mockTestPlan({
+		children__count: 2
+	});
 	const plan2Vals = mockTestPlan({
 		id: 2,
 		name: 'More Example Tests',
@@ -57,7 +60,9 @@ describe('Test Plan', () => {
 	const plan3Vals = mockTestPlan({
 		...plan2Vals,
 		id: 3,
-		name: 'Plan 3'
+		name: 'Plan 3',
+		parent: 1,
+		children__count: 1
 	});
 	const plan4Vals = mockTestPlan({
 		id: 4,
@@ -1567,17 +1572,6 @@ describe('Test Plan', () => {
 			});
 
 		it('Can check if TestPlan has children', async () => {
-			mockAxios
-				.post
-				.mockResolvedValueOnce(
-					mockRpcResponse({ result: [plan2Vals, plan3Vals] })
-				);
-			mockAxios
-				.post
-				.mockResolvedValueOnce(
-					mockRpcResponse({ result: [] })
-				);
-			
 			const tp1Children = await plan1.hasChildren(); // 2 direct children
 			const tp2Children = await plan2.hasChildren(); // no children
 
@@ -1620,6 +1614,7 @@ describe('Test Plan', () => {
 					.mockResolvedValueOnce(
 						mockRpcResponse({ result: [] })
 					);
+
 				const tp1Children = await plan1.getChildren(false);
 
 				mockAxios
@@ -1629,7 +1624,7 @@ describe('Test Plan', () => {
 					);
 				mockAxios
 					.post
-					.mockResolvedValueOnce(
+					.mockResolvedValue(
 						mockRpcResponse({ result: [] })
 					);
 				const tp3Children = await plan3.getChildren(false);

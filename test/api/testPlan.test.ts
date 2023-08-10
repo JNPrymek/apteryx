@@ -39,7 +39,8 @@ describe('Kiwi RPC API - TestPlan', () => {
 			'author__username',
 			'type',
 			'type__name',
-			'parent'
+			'parent',
+			'children__count'
 		);
 
 		expect(item.id).to.be.a('number').that.equals(1);
@@ -63,6 +64,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 			(item.parent === null) ||
 			(typeof item.parent === 'number')
 		).to.be.true;
+		expect(item.children__count).to.be.a('number');
 	});
 
 	it('TestPlan.create returns expected type', async () => {
