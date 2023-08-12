@@ -284,44 +284,58 @@ describe('Kiwi RPC API - TestRun', () => {
 				2 // TestCase ID
 			]
 		);
-		expect(result).to.be.an('object').that.has.all.keys([
-			'id',
-			'assignee',
-			'tested_by',
-			'case_text_version',
-			'start_date',
-			'stop_date',
-			'sortkey',
-			'run',
-			'case',
-			'build',
-			'status'
-		]);
-		const item = result as TestExecutionCreateResponse;
+		expect(result).to.be.an('array');
+		const executions = result as Array<TestExecutionCreateResponse>;
 
-		expect(item.id).is.a('number');
-		expect(
-			(item.assignee === null) ||
+		executions.forEach( item => {
+			expect(item).to.be.an('object').that.has.all.keys([
+				'id',
+				'assignee',
+				'tested_by',
+				'case_text_version',
+				'start_date',
+				'stop_date',
+				'sortkey',
+				'run',
+				'case',
+				'build',
+				'status',
+				'properties'
+			]);
+			expect(item.id).is.a('number');
+			expect(
+				(item.assignee === null) ||
 			(typeof item.assignee === 'number')
-		).to.be.true;
-		expect(
-			(item.tested_by === null) ||
+			).to.be.true;
+			expect(
+				(item.tested_by === null) ||
 			(typeof item.tested_by === 'number')
-		).to.be.true;
-		expect(item.case_text_version).is.a('number');
-		expect(
-			(item.start_date === null) ||
+			).to.be.true;
+			expect(item.case_text_version).is.a('number');
+			expect(
+				(item.start_date === null) ||
 			(typeof item.start_date === 'string')
-		).to.be.true;
-		expect(
-			(item.stop_date === null) ||
+			).to.be.true;
+			expect(
+				(item.stop_date === null) ||
 			(typeof item.stop_date === 'string')
-		).to.be.true;
-		expect(item.sortkey).is.a('number');
-		expect(item.build).is.a('number');
-		expect(item.status).is.a('number');
+			).to.be.true;
+			expect(item.sortkey).is.a('number');
+			expect(item.build).is.a('number');
+			expect(item.status).is.a('number');
 
-		expect(item.run).is.a('number').that.equals(1);
-		expect(item.case).is.a('number').that.equals(2);
+			expect(item.run).is.a('number').that.equals(1);
+			expect(item.case).is.a('number').that.equals(2);
+
+			expect(item.properties).to.be.an('array');
+			item.properties.forEach( property => {
+				expect(property).to.be.an('object').that.has.all.keys([
+					'name',
+					'value',
+				]);
+				expect(property.name).to.be.a('string');
+				expect(property.value).to.be.a('string');
+			});
+		});
 	});
 });

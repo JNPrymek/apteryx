@@ -37,7 +37,13 @@ export type TestExecutionCalculatedValues = {
 export type TestExecutionWriteValues =
 	Omit<TestExecutionValues, keyof TestExecutionCalculatedValues>;
 
+type Property = {
+	name: string;
+	value: string;
+}
+
 export type TestExecutionCreateResponse = 
 	TestExecutionWriteValues & {
 		id: number;
+		properties: Array<Property>;
 	}
