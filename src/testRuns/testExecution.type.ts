@@ -7,6 +7,8 @@ export type TestExecutionValues = {
 	case_text_version: number;
 	start_date: string | null;
 	stop_date: string | null;
+	expected_duration: number;
+	actual_duration: number | null;
 	sortkey: number;
 	run: number;
 	case: number;
@@ -15,6 +17,8 @@ export type TestExecutionValues = {
 	build__name: string;
 	status: number;
 	status__name: string;
+	status__icon: string;
+	status__color: string;
 }
 
 export type TestExecutionCalculatedValues = {
@@ -24,6 +28,10 @@ export type TestExecutionCalculatedValues = {
 	case__summary: string;
 	build__name: string;
 	status__name: string;
+	status__icon: string;
+	status__color: string;
+	expected_duration: number;
+	actual_duration: number | null;
 }
 
 export type TestExecutionWriteValues =

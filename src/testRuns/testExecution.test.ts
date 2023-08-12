@@ -42,6 +42,8 @@ describe('Test Execution', () => {
 		case__summary: 'The second test case',
 		status: 4,
 		status__name: 'PASSED',
+		expected_duration: 120,
+		actual_duration: 184
 	});
 	const execution3Vals = mockTestExecution({
 		id: 3,
@@ -57,7 +59,9 @@ describe('Test Execution', () => {
 		build: 2,
 		build__name: 'Build2',
 		status: 5,
-		status__name: 'FAILED'
+		status__name: 'FAILED',
+		expected_duration: 60,
+		actual_duration: 45
 	});
 	
 	const user1Vals = mockUser();
@@ -162,6 +166,18 @@ describe('Test Execution', () => {
 			expect(te2.getStopDate())
 				.toEqual(new Date('2023-01-08T16:41:28.001Z'));
 			expect(te3.getStopDate()).toBeNull();
+		});
+
+		it('Can get TestExecution Expected Duration', () => {
+			expect(te1.getExpectedDuration()).toEqual(0.0);
+			expect(te2.getExpectedDuration()).toEqual(120);
+			expect(te3.getExpectedDuration()).toEqual(60);
+		});
+
+		it('Can get TestExecution Actual Duration', () => {
+			expect(te1.getActualDuration()).toBeNull();
+			expect(te2.getActualDuration()).toEqual(184);
+			expect(te3.getActualDuration()).toEqual(45);
 		});
 
 		it('Can get TestExecution SortKey', () => {

@@ -87,6 +87,14 @@ export default class TestExecution extends KiwiBaseItem {
 		await this.serverUpdate({ stop_date: dateString });
 	}
 
+	public getExpectedDuration(): number {
+		return this.serialized['expected_duration'] as number;
+	}
+
+	public getActualDuration(): number | null {
+		return this.serialized['actual_duration'] as number | null;
+	}
+
 	public getSortKey(): number {
 		return this.serialized['sortkey'] as number;
 	}
