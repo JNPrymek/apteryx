@@ -18,7 +18,11 @@ import {
 } from '../../test/mockKiwiValues';
 import User from '../management/user';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import { TestCaseCreateValues, TestCaseProperty, TestCaseWriteValues } from './testCase.type';
+import {
+	TestCaseCreateValues,
+	TestCaseProperty,
+	TestCaseWriteValues
+} from './testCase.type';
 import { 
 	mockTestCaseProperty,
 	mockTestCaseUpdateResponse 
