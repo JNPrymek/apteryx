@@ -99,3 +99,10 @@ export type TestCaseCreateResponseValues =
 	Omit<TestCaseValues, keyof TestCaseComputedFields> & {
 		id: number;
 	}
+
+export type TestCaseProperty = {
+	id: number;
+	case: number;
+	name: string;
+	value: string;
+}

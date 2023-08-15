@@ -14,7 +14,8 @@ import {
 import {
 	mockTestCase,
 	mockTestCaseStatus,
-	mockCategory
+	mockCategory,
+	mockTestCaseProperty
 } from './mockValues/testCases/mockTestCaseValues';
 
 import {
@@ -49,6 +50,7 @@ export {
 	mockTestCase,
 	mockTestCaseStatus,
 	mockCategory,
+	mockTestCaseProperty,
 	// Test Plans
 	mockPlanType,
 	mockTestPlan,

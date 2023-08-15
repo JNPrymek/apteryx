@@ -1,7 +1,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
-import { TestCaseCreateValues } from '../../src/testCases/testCase.type';
+import { TestCaseCreateValues, TestCaseProperty } from '../../src/testCases/testCase.type';
 
 const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
 
@@ -287,5 +287,28 @@ describe('Kiwi RPC API - TestCase', () => {
 			expect(key).to.match(/\d+/);
 			expect(result[key]).to.be.a('number').that.is.greaterThanOrEqual(0);
 		}
+	});
+
+	it('TestCase.properties returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.properties',
+			[{}]
+		);
+		
+		expect(response).is.an('array');
+		const result = response as Array<TestCaseProperty>;
+
+		result.forEach( item => {
+			expect(item).is.an('object').that.has.all.keys([
+				'id',
+				'case',
+				'name',
+				'value'
+			]);
+			expect(item.id).is.a('number');
+			expect(item.case).is.a('number');
+			expect(item.name).is.a('string');
+			expect(item.value).is.a('string');
+		});
 	});
 });

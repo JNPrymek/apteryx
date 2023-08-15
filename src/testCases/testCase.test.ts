@@ -18,8 +18,9 @@ import {
 } from '../../test/mockKiwiValues';
 import User from '../management/user';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import { TestCaseCreateValues, TestCaseWriteValues } from './testCase.type';
+import { TestCaseCreateValues, TestCaseProperty, TestCaseWriteValues } from './testCase.type';
 import { 
+	mockTestCaseProperty,
 	mockTestCaseUpdateResponse 
 } from '../../test/mockValues/testCases/mockTestCaseValues';
 import Component from '../management/component';
@@ -526,6 +527,33 @@ describe('TestCase', () => {
 			expect(tcList).toContainEqual(new TestCase(tcVals[0]));
 			expect(tcList).toContainEqual(new TestCase(tcVals[1]));
 			expect(tcList).toContainEqual(new TestCase(tcVals[2]));
+		});
+
+		it('Can fetch Properties for TestCase', async () => {
+			const props: Array<TestCaseProperty> = [
+				mockTestCaseProperty(),
+				mockTestCaseProperty({
+					id: 2,
+					name: 'fizz',
+					value: 'buzz',
+				})
+			];
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: props 
+			}));
+
+			const tc1 = new TestCase(case1Vals);
+
+			const results = await tc1.getProperties();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.properties',
+				[{ case: 1 }]
+			);
+
+			expect(results).toEqual(props);
 		});
 	});
 
