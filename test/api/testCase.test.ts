@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
 import {
 	TestCaseCreateValues,
-	TestCaseProperty
+	TestCasePropertyValues
 } from '../../src/testCases/testCase.type';
 
 const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
@@ -299,7 +299,7 @@ describe('Kiwi RPC API - TestCase', () => {
 		);
 		
 		expect(response).is.an('array');
-		const result = response as Array<TestCaseProperty>;
+		const result = response as Array<TestCasePropertyValues>;
 
 		result.forEach( item => {
 			expect(item).is.an('object').that.has.all.keys([

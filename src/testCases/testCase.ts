@@ -8,7 +8,7 @@ import User from '../management/user';
 import { 
 	TestCaseCreateResponseValues,
 	TestCaseCreateValues,
-	TestCaseProperty,
+	TestCasePropertyValues,
 	TestCaseValues,
 	TestCaseWriteValues
 } from './testCase.type';
@@ -398,12 +398,12 @@ export default class TestCase extends KiwiBaseItem {
 		await this.syncServerValues();
 	}
 
-	public async getProperties(): Promise<Array<TestCaseProperty>> {
+	public async getProperties(): Promise<Array<TestCasePropertyValues>> {
 		const result = await KiwiConnector.sendRPCMethod(
 			'TestCase.properties',
 			[{ case: this.getId() }]
 		);
-		return result as Array<TestCaseProperty>;
+		return result as Array<TestCasePropertyValues>;
 	}
 	
 	// Inherited methods

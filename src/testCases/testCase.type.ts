@@ -100,7 +100,7 @@ export type TestCaseCreateResponseValues =
 		id: number;
 	}
 
-export type TestCaseProperty = {
+export type TestCasePropertyValues = {
 	id: number;
 	case: number;
 	name: string;

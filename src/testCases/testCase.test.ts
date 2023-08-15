@@ -20,7 +20,7 @@ import User from '../management/user';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import {
 	TestCaseCreateValues,
-	TestCaseProperty,
+	TestCasePropertyValues,
 	TestCaseWriteValues
 } from './testCase.type';
 import { 
@@ -534,7 +534,7 @@ describe('TestCase', () => {
 		});
 
 		it('Can fetch Properties for TestCase', async () => {
-			const props: Array<TestCaseProperty> = [
+			const props: Array<TestCasePropertyValues> = [
 				mockTestCaseProperty(),
 				mockTestCaseProperty({
 					id: 2,
