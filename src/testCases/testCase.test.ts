@@ -29,6 +29,7 @@ import {
 } from '../../test/mockValues/testCases/mockTestCaseValues';
 import Component from '../management/component';
 import Tag from '../management/tag';
+import TestCaseProperty from './testCaseProperty';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -534,7 +535,7 @@ describe('TestCase', () => {
 		});
 
 		it('Can fetch Properties for TestCase', async () => {
-			const props: Array<TestCasePropertyValues> = [
+			const propVals: Array<TestCasePropertyValues> = [
 				mockTestCaseProperty(),
 				mockTestCaseProperty({
 					id: 2,
@@ -542,8 +543,13 @@ describe('TestCase', () => {
 					value: 'buzz',
 				})
 			];
+			const props = [
+				new TestCaseProperty(propVals[0]),
+				new TestCaseProperty(propVals[1])
+			];
+
 			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
-				result: props 
+				result: propVals 
 			}));
 
 			const tc1 = new TestCase(case1Vals);
