@@ -2,9 +2,11 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
 import {
-	TestCaseCreateValues,
-	TestCasePropertyValues
+	TestCaseCreateValues
 } from '../../src/testCases/testCase.type';
+import {
+	TestCasePropertyValues
+} from '../../src/testCases/testCaseProperty.type';
 
 const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
 

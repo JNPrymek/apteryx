@@ -20,9 +20,9 @@ import User from '../management/user';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import {
 	TestCaseCreateValues,
-	TestCasePropertyValues,
 	TestCaseWriteValues
 } from './testCase.type';
+import { TestCasePropertyValues } from './testCaseProperty.type';
 import { 
 	mockTestCaseProperty,
 	mockTestCaseUpdateResponse 

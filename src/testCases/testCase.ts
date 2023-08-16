@@ -8,10 +8,10 @@ import User from '../management/user';
 import { 
 	TestCaseCreateResponseValues,
 	TestCaseCreateValues,
-	TestCasePropertyValues,
 	TestCaseValues,
 	TestCaseWriteValues
 } from './testCase.type';
+import { TestCasePropertyValues } from './testCaseProperty.type';
 import KiwiConnector from '../core/kiwiConnector';
 import Component from '../management/component';
 import Tag from '../management/tag';

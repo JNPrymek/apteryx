@@ -1,5 +1,4 @@
-import { 
-	TestCasePropertyValues,
+import {
 	TestCaseUpdateResponseValues, 
 	TestCaseValues 
 } from '../../../src/testCases/testCase.type';
@@ -77,6 +76,9 @@ export function mockCategory(
 	};
 }
 
+import {
+	TestCasePropertyValues
+} from '../../../src/testCases/testCaseProperty.type';
 import testCasePropertyDefaults from './testCaseProperty.json';
 export function mockTestCaseProperty(
 	overrideValues?: Partial<TestCasePropertyValues>
