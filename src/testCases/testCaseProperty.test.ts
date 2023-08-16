@@ -2,33 +2,9 @@ import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 
-import TestCase from './testCase';
-import Priority from '../management/priority';
-import Category from './category';
-import TestCaseStatus from './testCaseStatus';
-import {
-	mockComponent,
-	mockComponentServerEntry,
-	mockPriority,
-	mockTag,
-	mockTagServerEntry,
-	mockTestCase,
-	mockTestCaseStatus,
-	mockUser,
-} from '../../test/mockKiwiValues';
-import User from '../management/user';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import {
-	TestCaseCreateValues,
-	TestCaseWriteValues
-} from './testCase.type';
-import { TestCasePropertyValues } from './testCaseProperty.type';
 import { 
-	mockTestCaseProperty,
-	mockTestCaseUpdateResponse 
+	mockTestCaseProperty
 } from '../../test/mockValues/testCases/mockTestCaseValues';
-import Component from '../management/component';
-import Tag from '../management/tag';
 import TestCaseProperty from './testCaseProperty';
 
 // Init Mock Axios

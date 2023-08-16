@@ -11,7 +11,6 @@ import {
 	TestCaseValues,
 	TestCaseWriteValues
 } from './testCase.type';
-import { TestCasePropertyValues } from './testCaseProperty.type';
 import KiwiConnector from '../core/kiwiConnector';
 import Component from '../management/component';
 import Tag from '../management/tag';
