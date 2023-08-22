@@ -510,7 +510,7 @@ describe('Test Execution', () => {
 			);
 		});
 
-		it('Can rmeove TestExecution Stop Date', async () => {
+		it('Can remove TestExecution Stop Date', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				stop_date: '2022-05-18T03:14:34.500'
 			}));
@@ -949,7 +949,6 @@ describe('Test Execution', () => {
 				status__name: 'PASSED',
 				tested_by: 1,
 				tested_by__username: 'alice',
-				stop_date: '2023-07-03T14:56:32.453'
 			});
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
@@ -990,9 +989,8 @@ describe('Test Execution', () => {
 			// Changing status has side effects
 			expect(te1.getLastTesterId()).toEqual(1);
 			expect(te1.getLastTesterName()).toEqual('alice');
-			const stopTime = TimeUtils
-				.serverStringToDate('2023-07-03T14:56:32.453');
-			expect(te1.getStopDate()).toEqual(stopTime);
+			// Kiwi 12.2 stopped updating stop_date
+			expect(te1.getStopDate()).toBeNull();
 		});
 
 		it('Can set TestExecution SortKey', async () => {
