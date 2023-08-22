@@ -565,6 +565,53 @@ describe('TestCase', () => {
 
 			expect(results).toEqual(props);
 		});
+
+		it('Can fetch property values for TestCase', async () => {
+			const propVals: Array<TestCasePropertyValues> = [
+				mockTestCaseProperty(), // foo=bar
+				mockTestCaseProperty({
+					id: 2,
+					name: 'fizz',
+					value: 'buzz',
+				}),
+				mockTestCaseProperty({
+					id: 3,
+					name: 'foo',
+					value: 'foo2'
+				})
+			];
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [propVals[0], propVals[2]]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [propVals[1]]
+			}));
+			const tc1 = new TestCase(mockTestCase());
+			expect(await tc1.getPropertyValues('foo'))
+				.toEqual(['bar', 'foo2']);
+			expect(await tc1.getPropertyValues('fizz')).toEqual(['buzz']);
+		});
+
+		it('Can fetch property names for TestCase', async () => {
+			const propVals: Array<TestCasePropertyValues> = [
+				mockTestCaseProperty(), // foo=bar
+				mockTestCaseProperty({
+					id: 2,
+					name: 'fizz',
+					value: 'buzz',
+				}),
+				mockTestCaseProperty({
+					id: 3,
+					name: 'foo',
+					value: 'foo2'
+				})
+			];
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: propVals
+			}));
+			const tc1 = new TestCase(mockTestCase());
+			expect(await tc1.getPropertyKeys()).toEqual(['foo', 'fizz']);
+		});
 	});
 
 	describe('Updating TestCase values', () => {

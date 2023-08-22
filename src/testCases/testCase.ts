@@ -404,6 +404,32 @@ export default class TestCase extends KiwiBaseItem {
 		});
 		return result;
 	}
+
+	public async getPropertyValues(
+		propertyName: string
+	): Promise<Array<string>> {
+		const props = await TestCaseProperty.serverFilter({
+			case: this.getId(),
+			name: propertyName
+		});
+		const results: Array<string> = [];
+		props.forEach( prop => {
+			results.push(prop.getValue());
+		});
+		return results;
+	}
+
+	public async getPropertyKeys(): Promise<Array<string>> {
+		const props = await TestCaseProperty.serverFilter({
+			case: this.getId(),
+		});
+		// Use a Set to de-dupe properties with multiple values
+		const resultSet: Set<string> = new Set();
+		props.forEach( prop => {
+			resultSet.add(prop.getName());
+		});
+		return Array.from<string>(resultSet);
+	}
 	
 	// Inherited methods
 	// ------------------------------------------------------------------------
