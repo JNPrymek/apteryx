@@ -31,7 +31,8 @@ import {
 	mockTestRun,
 	mockTestRunUpdateResponse,
 	mockTestRunCaseListItem,
-	mockTestExecutionCreateResponse
+	mockTestExecutionCreateResponse,
+	mockEnvironment
 } from './mockValues/testRuns/mockTestRunValues';
 
 export {
@@ -63,4 +64,5 @@ export {
 	mockTestRunUpdateResponse,
 	mockTestRunCaseListItem,
 	mockTestExecutionCreateResponse,
+	mockEnvironment,
 };

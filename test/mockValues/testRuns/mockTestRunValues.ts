@@ -71,3 +71,14 @@ export function mockTestExecutionCreateResponse(
 		...overrideValues
 	};
 }
+
+import environmentDefaults from './environment.json';
+import { EnvironmentValues } from '../../../src/testRuns/environment.type';
+export function mockEnvironment(
+	overrideValues?: Partial<EnvironmentValues>
+): EnvironmentValues {
+	return {
+		...environmentDefaults,
+		...overrideValues,
+	};
+}
