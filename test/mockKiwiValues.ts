@@ -32,8 +32,11 @@ import {
 	mockTestRunUpdateResponse,
 	mockTestRunCaseListItem,
 	mockTestExecutionCreateResponse,
-	mockEnvironment
 } from './mockValues/testRuns/mockTestRunValues';
+
+import {
+	mockEnvironment
+} from './mockValues/environments/mockEnvironmentValues';
 
 export {
 	// Management
@@ -64,5 +67,6 @@ export {
 	mockTestRunUpdateResponse,
 	mockTestRunCaseListItem,
 	mockTestExecutionCreateResponse,
+	// Environments
 	mockEnvironment,
 };

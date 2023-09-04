@@ -3,7 +3,7 @@ import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
 
-describe('Kiwi RPC API - Component', () => {
+describe('Kiwi RPC API - Environment', () => {
 	before(async () => {
 		KiwiConnector.init({
 			hostName: 'localhost',
