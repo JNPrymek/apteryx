@@ -35,7 +35,8 @@ import {
 } from './mockValues/testRuns/mockTestRunValues';
 
 import {
-	mockEnvironment
+	mockEnvironment,
+	mockEnvironmentProperty
 } from './mockValues/environments/mockEnvironmentValues';
 
 export {
@@ -69,4 +70,5 @@ export {
 	mockTestExecutionCreateResponse,
 	// Environments
 	mockEnvironment,
+	mockEnvironmentProperty,
 };

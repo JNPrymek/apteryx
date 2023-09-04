@@ -8,3 +8,16 @@ export function mockEnvironment(
 		...overrideValues,
 	};
 }
+
+import environmentPropertyDefaults from './environmentProperty.json';
+import {
+	EnvironmentPropertyValues
+} from '../../../src/environments/environmentProperty.type';
+export function mockEnvironmentProperty(
+	overrideValues?: Partial<EnvironmentPropertyValues>
+): EnvironmentPropertyValues {
+	return {
+		...environmentPropertyDefaults,
+		...overrideValues
+	};
+}
