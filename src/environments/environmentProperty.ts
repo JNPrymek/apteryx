@@ -15,6 +15,12 @@ export default class EnvironmentProperty extends KiwiBaseItem {
 	public getEnvironmentId(): number {
 		return this.serialized.environment as number;
 	}
+
+	public static async getPropertiesForEnvironment(
+		environmentId: number
+	): Promise<Array<EnvironmentProperty>> {
+		return this.serverFilter({ environment: environmentId });
+	}
 	
 	// Inherited methods
 	// ------------------------------------------------------------------------

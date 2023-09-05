@@ -85,5 +85,19 @@ describe('EnvironmentProperty', () => {
 					'Could not find any Environment Property with ID 1'
 				);
 		});
+
+		it('Can get Properties for an Environment', async () => {
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: propVals
+			}));
+
+			const results = 
+				await EnvironmentProperty.getPropertiesForEnvironment(1);
+			
+			expect(results).toEqual(expect.arrayContaining([
+				new EnvironmentProperty(propVals[0]),
+				new EnvironmentProperty(propVals[1]),
+			]));
+		});
 	});
 });
