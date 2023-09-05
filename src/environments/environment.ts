@@ -1,6 +1,7 @@
 import KiwiConnector from '../core/kiwiConnector';
 import KiwiNamedItem from '../core/kiwiNamedItem';
 import { EnvironmentValues, EnvironmentWriteValues } from './environment.type';
+import EnvironmentProperty from './environmentProperty';
 
 export default class Environment extends KiwiNamedItem {
 	constructor(serializedValues: Record<string, unknown>) {
@@ -9,6 +10,34 @@ export default class Environment extends KiwiNamedItem {
 
 	public getDescription(): string {
 		return this.serialized.description as string;
+	}
+
+	public async getProperties(): Promise<Array<EnvironmentProperty>> {
+		return EnvironmentProperty.getPropertiesForEnvironment(this.getId());
+	}
+
+	public async getPropertyKeys(): Promise<Array<string>> {
+		const props = await this.getProperties();
+		// Use a Set to de-dupe properties with multiple values
+		const resultSet: Set<string> = new Set();
+		props.forEach( prop => {
+			resultSet.add(prop.getName());
+		});
+		return Array.from<string>(resultSet);
+	}
+
+	public async getPropertyValues(
+		propertyName: string
+	): Promise<Array<string>> {
+		const props = await EnvironmentProperty.serverFilter({
+			environment: this.getId(),
+			name: propertyName,
+		});
+		const results: Array<string> = [];
+		props.forEach( prop => {
+			results.push(prop.getValue());
+		});
+		return results;
 	}
 
 	public static async create(
