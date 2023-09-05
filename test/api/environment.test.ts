@@ -49,4 +49,25 @@ describe('Kiwi RPC API - Environment', () => {
 		expect(item.name).to.be.a('string').that.equals(rndName);
 		expect(item.description).to.be.a('string').that.equals(description);
 	});
+
+	it('Environment.properties returns the expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'Environment.properties',
+			[{ id: 1 }]
+		);
+		expect(response).to.be.an('array');
+		const arr = (response as Array<Record<string, unknown>>);
+		expect(arr.length).equals(1);
+		const item = arr[0];
+		expect(item).to.be.an('object').that.has.all.keys([
+			'id',
+			'environment',
+			'name',
+			'value',
+		]);
+		expect(item.id).to.be.a('number').that.equals(1);
+		expect(item.environment).to.be.a('number');
+		expect(item.name).to.be.a('string');
+		expect(item.value).to.be.a('string');
+	});
 });
