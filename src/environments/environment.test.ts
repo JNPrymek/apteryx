@@ -80,6 +80,7 @@ describe('Environment', () => {
 				mockEnvironmentProperty(),
 				mockEnvironmentProperty({ id: 2, name: 'fizz', value: 'buzz' }),
 			];
+
 			it('Can get Environment Properties', async () => {
 				mockAxios.post.mockResolvedValue(mockRpcResponse({
 					result: propVals
@@ -152,6 +153,35 @@ describe('Environment', () => {
 				description: env2Val.description,
 			});
 			expect(env2).toEqual(new Environment(env2Val));
+		});
+
+		it('Can add a property to the Environment', async () => {
+			const propVal = mockEnvironmentProperty();
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: propVal
+			}));
+			const env1 = new Environment(mockEnvironment());
+			const envProp = await env1.addProperty('Foo', 'Bar');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Environment.add_property',
+				[1, 'Foo', 'Bar']
+			);
+			expect(envProp).toEqual(new EnvironmentProperty(propVal));
+		});
+
+		it('Can remove a property from the Environment', async () => {
+			const propVal = mockEnvironmentProperty();
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: null }));
+			const env1 = new Environment(mockEnvironment());
+			await env1.removeProperty(propVal.name, propVal.value);
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'Environment.remove_property',
+				[{ environment: 1, name: propVal.name, value: propVal.value }]
+			);
 		});
 	});
 });

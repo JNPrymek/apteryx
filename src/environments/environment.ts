@@ -2,6 +2,7 @@ import KiwiConnector from '../core/kiwiConnector';
 import KiwiNamedItem from '../core/kiwiNamedItem';
 import { EnvironmentValues, EnvironmentWriteValues } from './environment.type';
 import EnvironmentProperty from './environmentProperty';
+import { EnvironmentPropertyValues } from './environmentProperty.type';
 
 export default class Environment extends KiwiNamedItem {
 	constructor(serializedValues: Record<string, unknown>) {
@@ -38,6 +39,35 @@ export default class Environment extends KiwiNamedItem {
 			results.push(prop.getValue());
 		});
 		return results;
+	}
+
+	public async addProperty(
+		propertyName: string,
+		propertyValue: string
+	): Promise<EnvironmentProperty> {
+		const result = await KiwiConnector.sendRPCMethod(
+			'Environment.add_property',
+			[
+				this.getId(),
+				propertyName,
+				propertyValue
+			]
+		);
+		return new EnvironmentProperty(result as EnvironmentPropertyValues);
+	}
+
+	public async removeProperty(
+		propertyName: string,
+		propertyValue: string
+	): Promise<void> {
+		await KiwiConnector.sendRPCMethod(
+			'Environment.remove_property',
+			[{
+				environment: this.getId(),
+				name: propertyName,
+				value: propertyValue
+			}]
+		);
 	}
 
 	public static async create(
