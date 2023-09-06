@@ -70,4 +70,35 @@ describe('Kiwi RPC API - Environment', () => {
 		expect(item.name).to.be.a('string');
 		expect(item.value).to.be.a('string');
 	});
+
+	// Environment to use for adding/removing properties
+	const environmentWithProps = 3;
+	const testPropName = 'EnvProp Integration Test';
+
+	it('Environment.add_property returns the expected type', async () => {
+		const value = randomUUID();
+		const response = await KiwiConnector.sendRPCMethod(
+			'Environment.add_property',
+			[environmentWithProps, testPropName, value]
+		);
+		expect(response).to.be.an('object').that.has.all.keys([
+			'id',
+			'environment',
+			'name',
+			'value'
+		]);
+		const item = response as Record<string, unknown>;
+		expect(item.id).to.be.a('number');
+		expect(item.environment).to.equal(environmentWithProps);
+		expect(item.name).to.equal(testPropName);
+		expect(item.value).to.equal(value);
+	});
+
+	it('Environment.remove_property returns the expected type', async () => {
+		const result = await KiwiConnector.sendRPCMethod(
+			'Environment.remove_property',
+			[{ environment: environmentWithProps, name: testPropName }]
+		);
+		expect(result).to.be.null;
+	});
 });
