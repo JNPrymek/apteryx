@@ -58,15 +58,19 @@ export default class Environment extends KiwiNamedItem {
 
 	public async removeProperty(
 		propertyName: string,
-		propertyValue: string
+		propertyValue?: string
 	): Promise<void> {
+		const paramObj = {
+			environment: this.getId(),
+			name: propertyName,
+			value: propertyValue
+		};
+		if(!propertyValue){
+			delete paramObj.value;
+		}
 		await KiwiConnector.sendRPCMethod(
 			'Environment.remove_property',
-			[{
-				environment: this.getId(),
-				name: propertyName,
-				value: propertyValue
-			}]
+			[paramObj]
 		);
 	}
 
