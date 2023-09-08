@@ -414,7 +414,7 @@ describe('Test Execution', () => {
 			);
 		});
 
-		it('Can rmeove TestExecution Start Date', async () => {
+		it('Can remove TestExecution Start Date', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				start_date: '2022-05-18T03:14:34.500'
 			}));
