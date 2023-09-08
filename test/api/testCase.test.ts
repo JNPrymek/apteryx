@@ -279,41 +279,83 @@ describe('Kiwi RPC API - TestCase', () => {
 		
 	});
 
-	it('TestCase.sortkeys returns expected type', async () => {
-		const response = await KiwiConnector.sendRPCMethod(
-			'TestCase.sortkeys',
-			[{ plan: 1 }]
-		);
-		expect(response).is.an('object');
-		const result = (response as Record<string, unknown>);
-		
-		for (const key in result) {
-			expect(key).is.a('string');
-			expect(key).to.match(/\d+/);
-			expect(result[key]).to.be.a('number').that.is.greaterThanOrEqual(0);
-		}
-	});
+	describe('TestCase Properties', () => {
+		const testPropName = 'api_integration_test_prop';
+		const testPropValue = 'integration_testing';
 
-	it('TestCase.properties returns expected type', async () => {
-		const response = await KiwiConnector.sendRPCMethod(
-			'TestCase.properties',
-			[{}]
-		);
-		
-		expect(response).is.an('array');
-		const result = response as Array<TestCasePropertyValues>;
-
-		result.forEach( item => {
-			expect(item).is.an('object').that.has.all.keys([
+		it('TestCase.sortkeys returns expected type', async () => {
+			const response = await KiwiConnector.sendRPCMethod(
+				'TestCase.sortkeys',
+				[{ plan: 1 }]
+			);
+			expect(response).is.an('object');
+			const result = (response as Record<string, unknown>);
+			
+			for (const key in result) {
+				expect(key).is.a('string');
+				expect(key).to.match(/\d+/);
+				expect(result[key])
+					.to.be.a('number')
+					.that.is.greaterThanOrEqual(0);
+			}
+		});
+	
+		it('TestCase.properties returns expected type', async () => {
+			const response = await KiwiConnector.sendRPCMethod(
+				'TestCase.properties',
+				[{}]
+			);
+			
+			expect(response).is.an('array');
+			const result = response as Array<TestCasePropertyValues>;
+	
+			result.forEach( item => {
+				expect(item).is.an('object').that.has.all.keys([
+					'id',
+					'case',
+					'name',
+					'value'
+				]);
+				expect(item.id).is.a('number');
+				expect(item.case).is.a('number');
+				expect(item.name).is.a('string');
+				expect(item.value).is.a('string');
+			});
+		});
+	
+		it('TestCase.add_property returns expected type', async () => {
+			const response = await KiwiConnector.sendRPCMethod(
+				'TestCase.add_property',
+				[
+					1, // Test Case ID
+					testPropName,
+					testPropValue
+				]
+			);
+			expect(response).is.an('object').that.has.all.keys([
 				'id',
 				'case',
 				'name',
 				'value'
 			]);
-			expect(item.id).is.a('number');
-			expect(item.case).is.a('number');
-			expect(item.name).is.a('string');
-			expect(item.value).is.a('string');
+			const result = response as Record<string, unknown>;
+			expect(result.id).is.a('number');
+			expect(result.case).is.a('number');
+			expect(result.name).is.a('string');
+			expect(result.value).is.a('string');
+		});
+
+		it('TestCase.remove_property returns expected type', async () => {
+			const response = await KiwiConnector.sendRPCMethod(
+				'TestCase.remove_property',
+				[{
+					case: 1,
+					name: testPropName,
+					value: testPropValue,
+				}]
+			);
+			expect(response).is.null;
 		});
 	});
+	
 });

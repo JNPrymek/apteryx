@@ -15,6 +15,7 @@ import KiwiConnector from '../core/kiwiConnector';
 import Component from '../management/component';
 import Tag from '../management/tag';
 import TestCaseProperty from './testCaseProperty';
+import { TestCasePropertyValues } from './testCaseProperty.type';
 
 export default class TestCase extends KiwiBaseItem {
 	
@@ -429,6 +430,40 @@ export default class TestCase extends KiwiBaseItem {
 			resultSet.add(prop.getName());
 		});
 		return Array.from<string>(resultSet);
+	}
+
+	public async addProperty(
+		propertyName: string,
+		propertyValue: string
+	): Promise<TestCaseProperty> {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_property',
+			[
+				this.getId(),
+				propertyName,
+				propertyValue
+			]
+		);
+		const result = response as TestCasePropertyValues;
+		return new TestCaseProperty(result);
+	}
+
+	public async removeProperty(
+		propertyName: string,
+		propertyValue?: string,
+	): Promise<void> {
+		const requestParams = {
+			case: this.getId(),
+			name: propertyName,
+			value: propertyValue
+		};
+		if (!propertyValue) {
+			delete requestParams.value;
+		}
+		await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_property',
+			[requestParams]
+		);
 	}
 	
 	// Inherited methods
