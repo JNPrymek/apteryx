@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { describe, it, expect } from '@jest/globals';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestExecution from './testExecution';
 import TestCase from '../testCases/testCase';
@@ -41,6 +42,8 @@ describe('Test Execution', () => {
 		case__summary: 'The second test case',
 		status: 4,
 		status__name: 'PASSED',
+		expected_duration: 120,
+		actual_duration: 184
 	});
 	const execution3Vals = mockTestExecution({
 		id: 3,
@@ -56,7 +59,9 @@ describe('Test Execution', () => {
 		build: 2,
 		build__name: 'Build2',
 		status: 5,
-		status__name: 'FAILED'
+		status__name: 'FAILED',
+		expected_duration: 60,
+		actual_duration: 45
 	});
 	
 	const user1Vals = mockUser();
@@ -161,6 +166,18 @@ describe('Test Execution', () => {
 			expect(te2.getStopDate())
 				.toEqual(new Date('2023-01-08T16:41:28.001Z'));
 			expect(te3.getStopDate()).toBeNull();
+		});
+
+		it('Can get TestExecution Expected Duration', () => {
+			expect(te1.getExpectedDuration()).toEqual(0.0);
+			expect(te2.getExpectedDuration()).toEqual(120);
+			expect(te3.getExpectedDuration()).toEqual(60);
+		});
+
+		it('Can get TestExecution Actual Duration', () => {
+			expect(te1.getActualDuration()).toBeNull();
+			expect(te2.getActualDuration()).toEqual(184);
+			expect(te3.getActualDuration()).toEqual(45);
 		});
 
 		it('Can get TestExecution SortKey', () => {
@@ -397,7 +414,7 @@ describe('Test Execution', () => {
 			);
 		});
 
-		it('Can rmeove TestExecution Start Date', async () => {
+		it('Can remove TestExecution Start Date', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				start_date: '2022-05-18T03:14:34.500'
 			}));
@@ -493,7 +510,7 @@ describe('Test Execution', () => {
 			);
 		});
 
-		it('Can rmeove TestExecution Stop Date', async () => {
+		it('Can remove TestExecution Stop Date', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				stop_date: '2022-05-18T03:14:34.500'
 			}));
@@ -932,7 +949,6 @@ describe('Test Execution', () => {
 				status__name: 'PASSED',
 				tested_by: 1,
 				tested_by__username: 'alice',
-				stop_date: '2023-07-03T14:56:32.453'
 			});
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
@@ -973,9 +989,8 @@ describe('Test Execution', () => {
 			// Changing status has side effects
 			expect(te1.getLastTesterId()).toEqual(1);
 			expect(te1.getLastTesterName()).toEqual('alice');
-			const stopTime = TimeUtils
-				.serverStringToDate('2023-07-03T14:56:32.453');
-			expect(te1.getStopDate()).toEqual(stopTime);
+			// Kiwi 12.2 stopped updating stop_date
+			expect(te1.getStopDate()).toBeNull();
 		});
 
 		it('Can set TestExecution SortKey', async () => {

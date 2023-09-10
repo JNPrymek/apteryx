@@ -14,7 +14,8 @@ import {
 import {
 	mockTestCase,
 	mockTestCaseStatus,
-	mockCategory
+	mockCategory,
+	mockTestCaseProperty
 } from './mockValues/testCases/mockTestCaseValues';
 
 import {
@@ -30,8 +31,13 @@ import {
 	mockTestRun,
 	mockTestRunUpdateResponse,
 	mockTestRunCaseListItem,
-	mockTestExecutionCreateResponse
+	mockTestExecutionCreateResponse,
 } from './mockValues/testRuns/mockTestRunValues';
+
+import {
+	mockEnvironment,
+	mockEnvironmentProperty
+} from './mockValues/environments/mockEnvironmentValues';
 
 export {
 	// Management
@@ -49,6 +55,7 @@ export {
 	mockTestCase,
 	mockTestCaseStatus,
 	mockCategory,
+	mockTestCaseProperty,
 	// Test Plans
 	mockPlanType,
 	mockTestPlan,
@@ -61,4 +68,7 @@ export {
 	mockTestRunUpdateResponse,
 	mockTestRunCaseListItem,
 	mockTestExecutionCreateResponse,
+	// Environments
+	mockEnvironment,
+	mockEnvironmentProperty,
 };

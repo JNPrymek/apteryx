@@ -7,8 +7,8 @@ describe('Kiwi RPC API - TestExecution', () => {
 	before(async () => {
 		KiwiConnector.init({
 			hostName: 'localhost',
-			useSSL: false,
-			port: 80
+			useSSL: true,
+			port: 443
 		});
 		await KiwiConnector.login('debug', 'debug');
 	});
@@ -38,7 +38,11 @@ describe('Kiwi RPC API - TestExecution', () => {
 			'build',
 			'build__name',
 			'status',
-			'status__name'
+			'status__name',
+			'status__color',
+			'status__icon',
+			'actual_duration',
+			'expected_duration'
 		);
 
 		expect(item.id).to.be.a('number').that.equals(1);
@@ -75,6 +79,13 @@ describe('Kiwi RPC API - TestExecution', () => {
 		expect(item.build__name).to.be.a('string');
 		expect(item.status).to.be.a('number');
 		expect(item.status__name).to.be.a('string');
+		expect(item.status__color).to.be.a('string');
+		expect(item.status__icon).to.be.a('string');
+		expect(item.expected_duration).to.be.a('number');
+		expect(
+			(item.actual_duration === null) ||
+			(typeof item.actual_duration === 'number')
+		).to.be.true;
 	});
 
 	it('TestExecution.update returns expected type', async () => {

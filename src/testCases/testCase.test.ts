@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { describe, it, expect } from '@jest/globals';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 
 import TestCase from './testCase';
@@ -17,12 +18,18 @@ import {
 } from '../../test/mockKiwiValues';
 import User from '../management/user';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
-import { TestCaseCreateValues, TestCaseWriteValues } from './testCase.type';
+import {
+	TestCaseCreateValues,
+	TestCaseWriteValues
+} from './testCase.type';
+import { TestCasePropertyValues } from './testCaseProperty.type';
 import { 
+	mockTestCaseProperty,
 	mockTestCaseUpdateResponse 
 } from '../../test/mockValues/testCases/mockTestCaseValues';
 import Component from '../management/component';
 import Tag from '../management/tag';
+import TestCaseProperty from './testCaseProperty';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -525,6 +532,85 @@ describe('TestCase', () => {
 			expect(tcList).toContainEqual(new TestCase(tcVals[0]));
 			expect(tcList).toContainEqual(new TestCase(tcVals[1]));
 			expect(tcList).toContainEqual(new TestCase(tcVals[2]));
+		});
+
+		it('Can fetch Properties for TestCase', async () => {
+			const propVals: Array<TestCasePropertyValues> = [
+				mockTestCaseProperty(),
+				mockTestCaseProperty({
+					id: 2,
+					name: 'fizz',
+					value: 'buzz',
+				})
+			];
+			const props = [
+				new TestCaseProperty(propVals[0]),
+				new TestCaseProperty(propVals[1])
+			];
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+				result: propVals 
+			}));
+
+			const tc1 = new TestCase(case1Vals);
+
+			const results = await tc1.getProperties();
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.properties',
+				[{ case: 1 }]
+			);
+
+			expect(results).toEqual(props);
+		});
+
+		it('Can fetch property values for TestCase', async () => {
+			const propVals: Array<TestCasePropertyValues> = [
+				mockTestCaseProperty(), // foo=bar
+				mockTestCaseProperty({
+					id: 2,
+					name: 'fizz',
+					value: 'buzz',
+				}),
+				mockTestCaseProperty({
+					id: 3,
+					name: 'foo',
+					value: 'foo2'
+				})
+			];
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [propVals[0], propVals[2]]
+			}));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [propVals[1]]
+			}));
+			const tc1 = new TestCase(mockTestCase());
+			expect(await tc1.getPropertyValues('foo'))
+				.toEqual(['bar', 'foo2']);
+			expect(await tc1.getPropertyValues('fizz')).toEqual(['buzz']);
+		});
+
+		it('Can fetch property names for TestCase', async () => {
+			const propVals: Array<TestCasePropertyValues> = [
+				mockTestCaseProperty(), // foo=bar
+				mockTestCaseProperty({
+					id: 2,
+					name: 'fizz',
+					value: 'buzz',
+				}),
+				mockTestCaseProperty({
+					id: 3,
+					name: 'foo',
+					value: 'foo2'
+				})
+			];
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: propVals
+			}));
+			const tc1 = new TestCase(mockTestCase());
+			expect(await tc1.getPropertyKeys()).toEqual(['foo', 'fizz']);
 		});
 	});
 
@@ -2212,6 +2298,60 @@ describe('TestCase', () => {
 				1,
 				'TestCase.remove_tag',
 				[1, 'ExampleTag']
+			);
+		});
+
+		it('Can add TestCase Property', async () => {
+			const tc = new TestCase(mockTestCase({ id: 3 }));
+			const propVals = mockTestCaseProperty({
+				name: 'propName',
+				value: 'propVal',
+			});
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: propVals
+			}));
+			expect(await tc.addProperty('propName', 'propVal'))
+				.toEqual(new TestCaseProperty(propVals));
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.add_property',
+				[3, 'propName', 'propVal']
+			);
+		});
+
+		it('Can remove TestCase Property by specific value', async () => {
+			const tc = new TestCase(mockTestCase({ id: 3 }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+			await tc.removeProperty('propName', 'propVal');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.remove_property',
+				[{
+					case: 3,
+					name: 'propName',
+					value: 'propVal'
+				}]
+			);
+		});
+
+		it('Can remove TestCase Property (all values)', async () => {
+			const tc = new TestCase(mockTestCase({ id: 3 }));
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: null
+			}));
+			await tc.removeProperty('propName');
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestCase.remove_property',
+				[{
+					case: 3,
+					name: 'propName',
+				}]
 			);
 		});
 	});

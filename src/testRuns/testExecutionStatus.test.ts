@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { describe, it, expect } from '@jest/globals';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import { mockTestExecutionStatus } from '../../test/mockKiwiValues';
 import TestExecutionStatus from './testExecutionStatus';
@@ -129,7 +130,7 @@ describe('Test Execution Status', () => {
 				));
 				const results = await TestExecutionStatus.getByIds([1, 4]);
 				expect(results).toEqual(expect.arrayContaining([tes1, tes2]));
-				expect(results).toEqual(expect.not.arrayContaining([tes3]));
+				expect(results).not.toEqual(expect.arrayContaining([tes3]));
 			});
 
 		// get by name - 0 & 1 matches

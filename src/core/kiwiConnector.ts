@@ -13,6 +13,7 @@ export default class KiwiConnector {
 	
 	private static serverUrl: string;
 	
+	// TODO: Update to handle default SSL for Kiwi 12.5
 	public static init(serverDetails: IServerDetails): void {
 		const protocol = `http${serverDetails.useSSL ? 's' : ''}://`;
 		let host = serverDetails.hostName;

@@ -19,6 +19,7 @@ export type TestPlanValues = {
 	type: number;
 	type__name: string;
 	parent: number | null;
+	children__count: number;
 }
 
 export type TestPlanComputedFields = {
@@ -27,6 +28,7 @@ export type TestPlanComputedFields = {
 	product__name: string;
 	author__username: string;
 	type__name: string;
+	children__count: number;
 }
 
 export type TestPlanWriteValues = 
@@ -48,7 +50,8 @@ Omit<TestPlanValues,
 'product_version__value' |
 'product__name' |
 'author__username' |
-'type__name'
+'type__name' |
+'children__count'
 >
 
 export type TestPlanAddCaseResponse =

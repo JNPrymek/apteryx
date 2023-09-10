@@ -1,6 +1,6 @@
 {
 	"name": "apteryx",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Utility library for interacting with the RPC API of Kiwi TCMS",
 	"main": "app.js",
 	"repository": {
@@ -14,7 +14,7 @@
 		"lint:fix": "npx eslint . --cache --fix",
 		"test": "npx jest",
 		"test:coverage": "npx jest --coverage",
-		"test:api": "npx ts-mocha",
+		"test:api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx ts-mocha",
 		"coverage": "npx jest --coverage",
 		"build": "tsc"
 	},

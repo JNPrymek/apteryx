@@ -13,5 +13,6 @@
 	"author__username": "alice",
 	"type": 1,
 	"type__name": "Unit",
-	"parent": null
+	"parent": null,
+	"children__count": 0
 }

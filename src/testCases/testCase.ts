@@ -14,6 +14,8 @@ import {
 import KiwiConnector from '../core/kiwiConnector';
 import Component from '../management/component';
 import Tag from '../management/tag';
+import TestCaseProperty from './testCaseProperty';
+import { TestCasePropertyValues } from './testCaseProperty.type';
 
 export default class TestCase extends KiwiBaseItem {
 	
@@ -395,6 +397,73 @@ export default class TestCase extends KiwiBaseItem {
 			updateValues
 		]);
 		await this.syncServerValues();
+	}
+
+	public async getProperties(): Promise<Array<TestCaseProperty>> {
+		const result = await TestCaseProperty.serverFilter({
+			case: this.getId()
+		});
+		return result;
+	}
+
+	public async getPropertyValues(
+		propertyName: string
+	): Promise<Array<string>> {
+		const props = await TestCaseProperty.serverFilter({
+			case: this.getId(),
+			name: propertyName
+		});
+		const results: Array<string> = [];
+		props.forEach( prop => {
+			results.push(prop.getValue());
+		});
+		return results;
+	}
+
+	public async getPropertyKeys(): Promise<Array<string>> {
+		const props = await TestCaseProperty.serverFilter({
+			case: this.getId(),
+		});
+		// Use a Set to de-dupe properties with multiple values
+		const resultSet: Set<string> = new Set();
+		props.forEach( prop => {
+			resultSet.add(prop.getName());
+		});
+		return Array.from<string>(resultSet);
+	}
+
+	public async addProperty(
+		propertyName: string,
+		propertyValue: string
+	): Promise<TestCaseProperty> {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_property',
+			[
+				this.getId(),
+				propertyName,
+				propertyValue
+			]
+		);
+		const result = response as TestCasePropertyValues;
+		return new TestCaseProperty(result);
+	}
+
+	public async removeProperty(
+		propertyName: string,
+		propertyValue?: string,
+	): Promise<void> {
+		const requestParams = {
+			case: this.getId(),
+			name: propertyName,
+			value: propertyValue
+		};
+		if (!propertyValue) {
+			delete requestParams.value;
+		}
+		await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_property',
+			[requestParams]
+		);
 	}
 	
 	// Inherited methods

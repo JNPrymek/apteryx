@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { describe, it, expect } from '@jest/globals';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestRun from './testRun';
 import TestPlan from '../testPlans/testPlan';
@@ -1393,11 +1394,11 @@ describe('Test Run', () => {
 			const tr2 = new TestRun(mockTestRun({ id: 2 }));
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
-				result: mockTestExecutionCreateResponse({
+				result: [mockTestExecutionCreateResponse({
 					case: 5,
 					run: 2,
 					id: 14
-				})
+				})]
 			}));
 
 			mockAxios.post.mockResolvedValue(mockRpcResponse({
@@ -1411,7 +1412,7 @@ describe('Test Run', () => {
 				]
 			}));
 
-			const te14 = await tr2.addTestCase(5);
+			const executionList = await tr2.addTestCase(5);
 
 			verifyRpcCall(
 				mockAxios,
@@ -1426,6 +1427,8 @@ describe('Test Run', () => {
 				[ { id__in: [ 14 ] }]
 			);
 
+			expect(executionList.length).toEqual(1);
+			const te14 = executionList[0];
 			expect(te14.getId()).toEqual(14);
 			expect(te14.getTestCaseId()).toEqual(5);
 			expect(te14.getTestRunId()).toEqual(2);
@@ -1439,11 +1442,11 @@ describe('Test Run', () => {
 			}));
 
 			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
-				result: mockTestExecutionCreateResponse({
+				result: [mockTestExecutionCreateResponse({
 					case: 5,
 					run: 2,
 					id: 14
-				})
+				})]
 			}));
 
 			mockAxios.post.mockResolvedValue(mockRpcResponse({
@@ -1457,7 +1460,7 @@ describe('Test Run', () => {
 				]
 			}));
 
-			const te14 = await tr2.addTestCase(tc5);
+			const executionList = await tr2.addTestCase(tc5);
 
 			verifyRpcCall(
 				mockAxios,
@@ -1472,9 +1475,108 @@ describe('Test Run', () => {
 				[ { id__in: [ 14 ] }]
 			);
 
+			expect(executionList.length).toEqual(1);
+			const te14 = executionList[0];
 			expect(te14.getId()).toEqual(14);
 			expect(te14.getTestCaseId()).toEqual(5);
 			expect(te14.getTestRunId()).toEqual(2);
+		});
+
+		it('Can add a TestCase with multiple Properties', async () => {
+			const tr2 = new TestRun(mockTestRun({ id: 2 }));
+
+			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+				result: [
+					mockTestExecutionCreateResponse({
+						case: 5,
+						run: 2,
+						id: 14,
+						properties:[
+							{
+								name: 'Foo',
+								value: 'Bar'
+							}
+						]
+					}),
+					mockTestExecutionCreateResponse({
+						case: 5,
+						run: 2,
+						id: 15,
+						properties:[
+							{
+								name: 'Foo',
+								value: 'Fizz'
+							}
+						]
+					}),
+					mockTestExecutionCreateResponse({
+						case: 5,
+						run: 2,
+						id: 16,
+						properties:[
+							{
+								name: 'Foo',
+								value: 'Buzz'
+							}
+						]
+					}),
+				]
+			}));
+
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [
+					mockTestExecution({
+						id: 14,
+						case: 5,
+						case__summary: 'Test 5',
+						run: 2,
+					}),
+					mockTestExecution({
+						id: 15,
+						case: 5,
+						case__summary: 'Test 5',
+						run: 2,
+					}),
+					mockTestExecution({
+						id: 16,
+						case: 5,
+						case__summary: 'Test 5',
+						run: 2,
+					}),
+				]
+			}));
+
+			const executionList = await tr2.addTestCase(5);
+
+			verifyRpcCall(
+				mockAxios,
+				0,
+				'TestRun.add_case',
+				[ 2, 5 ]
+			);
+			verifyRpcCall(
+				mockAxios,
+				1,
+				'TestExecution.filter',
+				[ { id__in: [ 14, 15, 16 ] }]
+			);
+
+			expect(executionList.length).toEqual(3);
+
+			const te14 = executionList[0];
+			expect(te14.getId()).toEqual(14);
+			expect(te14.getTestCaseId()).toEqual(5);
+			expect(te14.getTestRunId()).toEqual(2);
+
+			const te15 = executionList[1];
+			expect(te15.getId()).toEqual(15);
+			expect(te15.getTestCaseId()).toEqual(5);
+			expect(te15.getTestRunId()).toEqual(2);
+
+			const te16 = executionList[2];
+			expect(te16.getId()).toEqual(16);
+			expect(te16.getTestCaseId()).toEqual(5);
+			expect(te16.getTestRunId()).toEqual(2);
 		});
 	});
 });

@@ -6,8 +6,8 @@ describe('Kiwi RPC API - Priority', () => {
 	before(async () => {
 		KiwiConnector.init({
 			hostName: 'localhost',
-			useSSL: false,
-			port: 80
+			useSSL: true,
+			port: 443
 		});
 		await KiwiConnector.login('debug', 'debug');
 	});

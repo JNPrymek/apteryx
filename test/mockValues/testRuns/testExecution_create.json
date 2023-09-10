@@ -9,5 +9,6 @@
 	"run": 1,
 	"case": 1,
 	"status": 1,
-	"build": 1
+	"build": 1,
+	"properties": []
 }

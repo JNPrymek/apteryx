@@ -245,7 +245,7 @@ export default class TestRun extends KiwiBaseItem {
 
 	public async addTestCase(
 		testCase: number | TestCase
-	): Promise<TestExecution> {
+	): Promise<Array<TestExecution>> {
 		const caseId: number = 
 			(typeof testCase === 'number') ? 
 				testCase : 
@@ -255,8 +255,12 @@ export default class TestRun extends KiwiBaseItem {
 			'TestRun.add_case',
 			[ this.getId(), caseId ]
 		);
-		const executionId = (response as TestExecutionCreateResponse).id;
-		return TestExecution.getById(executionId);
+		const executionList = response as Array<TestExecutionCreateResponse>;
+		const executionIds: Array<number> = [];
+		executionList.forEach( item => {
+			executionIds.push(item.id);
+		});
+		return TestExecution.getByIds(executionIds);
 	}
 
 	// Inherited methods

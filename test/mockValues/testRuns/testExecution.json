@@ -7,6 +7,8 @@
 	"case_text_version": 4,
 	"start_date": null,
 	"stop_date": null,
+	"expected_duration": 0.0,
+	"actual_duration": null,
 	"sortkey": 10,
 	"run": 1,
 	"case": 1,
@@ -14,5 +16,7 @@
 	"build": 1,
 	"build__name": "unspecified",
 	"status": 1,
-	"status__name": "IDLE"
+	"status__name": "IDLE",
+	"status__icon": "fa fa-question-circle-o",
+	"status__color": "#72767b"
 }
