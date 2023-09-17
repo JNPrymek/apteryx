@@ -9,6 +9,7 @@ import Priority from './management/priority';
 import Product from './management/product';
 import Tag from './management/tag';
 import User from './management/user';
+import Version from './management/version';
 
 // Environment
 import Environment from './environments/environment';
@@ -40,6 +41,7 @@ export {
 	Product,
 	Tag,
 	User,
+	Version,
 	// Environment
 	Environment,
 	EnvironmentProperty,

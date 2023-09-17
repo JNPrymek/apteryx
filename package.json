@@ -1,8 +1,13 @@
 {
 	"name": "apteryx",
-	"version": "1.0.0",
+	"version": "0.9.0",
 	"description": "Utility library for interacting with the RPC API of Kiwi TCMS",
-	"main": "app.js",
+	"main": "dist/index.js",
+	"files": [
+		"README.md",
+		"dist"
+	],
+	"typings": "dist/index",
 	"repository": {
 		"type": "git",
 		"url": "http://git.jnprymek.lan/JNPrymek/apteryx.git"
