@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import KiwiConnector from './kiwiConnector';
 
-import { serverDomain } from '../../test/testServerDetails';
+import { kiwiTestServerInfo } from '../../test/testServerDetails';
 import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import KiwiNamedItem from './kiwiNamedItem';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
@@ -12,8 +12,11 @@ jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('KiwiNamedItem', () => {
-	
-	KiwiConnector.init({ hostName: serverDomain });
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+		KiwiConnector.init({ hostName: kiwiTestServerInfo.hostName });
+	});
 	
 	it('Can instantiate a KiwiNamedItem', () => {
 		const initVals = { id: 1, name: 'NamedItem1', b: 'valB' };
