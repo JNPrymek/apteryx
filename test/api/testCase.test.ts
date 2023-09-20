@@ -1,6 +1,7 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
+import { kiwiTestServerInfo } from '../testServerDetails';
 import {
 	TestCaseCreateValues
 } from '../../src/testCases/testCase.type';
@@ -13,12 +14,11 @@ const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
 describe('Kiwi RPC API - TestCase', () => {
 
 	before(async () => {
-		KiwiConnector.init({
-			hostName: 'localhost',
-			useSSL: true,
-			port: 443
-		});
-		await KiwiConnector.login('debug', 'debug');
+		KiwiConnector.init(kiwiTestServerInfo);
+		await KiwiConnector.login(
+			kiwiTestServerInfo.username,
+			kiwiTestServerInfo.password
+		);
 	});
 
 	it('TestCase.filter returns expected type', async () => {
