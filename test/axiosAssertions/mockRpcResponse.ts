@@ -1,7 +1,7 @@
 
 import { AxiosResponse } from 'axios';
 import { IRpcResponseBody, RpcResult } from '../../src/core/networkTypes';
-import { serverDomain } from '../testServerDetails';
+import { kiwiTestServerInfo } from '../testServerDetails';
 
 export default function mockRpcResponse(
 	data: { 
@@ -18,7 +18,7 @@ export default function mockRpcResponse(
 				setCookieHeaderString += ', ';
 			}
 			/* eslint-disable-next-line max-len*/
-			setCookieHeaderString += `${cookieKeyVal}; domain=${serverDomain}; path=/`;
+			setCookieHeaderString += `${cookieKeyVal}; domain=${kiwiTestServerInfo.hostName}; path=/`;
 		}
 	}
 

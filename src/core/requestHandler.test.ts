@@ -10,7 +10,7 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 describe('HTTP Request Handler', () => {
 	
 	const serverDomain = 'example.com';
-	const serverUrl = `http://${serverDomain}`;
+	const serverUrl = `https://${serverDomain}`;
 	const requestPath = `${serverUrl}/json-rpc/`;
 	
 	const mockSuccessPostResponse: AxiosResponse<Record<string, unknown>> = {
