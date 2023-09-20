@@ -5,16 +5,16 @@ import { TestRunCaseEntry } from '../../src/testRuns/testRun.type';
 import {
 	TestExecutionCreateResponse
 } from '../../src/testRuns/testExecution.type';
+import { kiwiTestServerInfo } from '../testServerDetails';
 
 describe('Kiwi RPC API - TestRun', () => {
 
 	before(async () => {
-		KiwiConnector.init({
-			hostName: 'localhost',
-			useSSL: true,
-			port: 443
-		});
-		await KiwiConnector.login('debug', 'debug');
+		KiwiConnector.init(kiwiTestServerInfo);
+		await KiwiConnector.login(
+			kiwiTestServerInfo.username,
+			kiwiTestServerInfo.password
+		);
 	});
 
 	it('TestRun.filter returns expected type', async () => {

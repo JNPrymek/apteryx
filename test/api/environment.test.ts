@@ -2,15 +2,15 @@ import { randomUUID } from 'crypto';
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
+import { kiwiTestServerInfo } from '../testServerDetails';
 
 describe('Kiwi RPC API - Environment', () => {
 	before(async () => {
-		KiwiConnector.init({
-			hostName: 'localhost',
-			useSSL: true,
-			port: 443
-		});
-		await KiwiConnector.login('debug', 'debug');
+		KiwiConnector.init(kiwiTestServerInfo);
+		await KiwiConnector.login(
+			kiwiTestServerInfo.username,
+			kiwiTestServerInfo.password
+		);
 	});
 
 	it('Environment.filter returns the expected type', async () => {

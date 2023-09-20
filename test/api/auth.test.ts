@@ -1,15 +1,12 @@
 import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
 import KiwiConnector from '../../src/core/kiwiConnector';
+import { kiwiTestServerInfo } from '../testServerDetails';
 
 describe('Kiwi RPC API - Auth', () => {
 
 	before(() => {
-		KiwiConnector.init({
-			hostName: 'localhost',
-			useSSL: true,
-			port: 443
-		});
+		KiwiConnector.init(kiwiTestServerInfo);
 	});
 
 	it('Auth.login returns expected type', async () => {
