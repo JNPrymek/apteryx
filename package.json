@@ -13,7 +13,7 @@
 		"url": "http://git.jnprymek.lan/JNPrymek/apteryx.git"
 	},
 	"author": "Jacob N Prymek",
-	"license": "UNLICENSED",
+	"license": "CC-BY-4.0",
 	"scripts": {
 		"lint": "npx eslint . --cache",
 		"lint:fix": "npx eslint . --cache --fix",
