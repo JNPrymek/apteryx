@@ -22,7 +22,7 @@ export default class KiwiConnector {
 	 * @param {number} [serverDetails.port] - Port number.  Default: 80 or 443.
 	 */
 	public static init(serverDetails: IServerDetails): void {
-		const protocol = `http${serverDetails.useSSL ? 's' : ''}://`;
+		const protocol = `http${(serverDetails.useSSL ?? true) ? 's' : ''}://`;
 		let host = serverDetails.hostName;
 		if (host.endsWith('/')) {
 			host = host.slice(0, -1);

@@ -1,8 +1,4 @@
 
-export const serverDomain = 'localhost';
-
-export const requestUrl = `http://${serverDomain}/json-rpc/`;
-
 export const kiwiTestServerInfo = {
 	hostName: process.env.KIWI_HOSTNAME ?? 'localhost',
 	useSSL: process.env.KIWI_USE_SSL ? !!process.env.KIWI_USE_SSL : true,
