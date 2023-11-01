@@ -83,6 +83,9 @@ import {
 	TestRunCreateValues
 } from './testRuns/testRun.type';
 
+// Utilities
+import TimeUtils from './utils/timeUtils';
+
 
 export {
 	// Core
@@ -143,5 +146,7 @@ export {
 	TestRunValues,
 	TestRunWriteValues,
 	TestRunCreateValues,
+	// Utilities
+	TimeUtils,
 };
 
