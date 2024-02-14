@@ -16,6 +16,8 @@ import Component from '../management/component';
 import Tag from '../management/tag';
 import TestCaseProperty from './testCaseProperty';
 import { TestCasePropertyValues } from './testCaseProperty.type';
+import Comment from '../comments/comment';
+import { CommentValues } from '../comments/comment.type';
 
 export default class TestCase extends KiwiBaseItem {
 	
@@ -357,6 +359,15 @@ export default class TestCase extends KiwiBaseItem {
 
 	public async getTags(): Promise<Array<Tag>> {
 		return await Tag.getTagsForTestCase(this.getId());
+	}
+
+	public async getComments(): Promise<Array<Comment>> {
+		const rawResults: Array<CommentValues> = 
+			await KiwiConnector.sendRPCMethod(
+				'TestCase.comments',
+				[this.getId()]
+			) as Array<CommentValues>;
+		return rawResults.map( val => new Comment(val));
 	}
 
 	public static async getTestCasesWithTag(
