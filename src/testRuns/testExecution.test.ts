@@ -18,6 +18,8 @@ import {
 import { TestExecutionWriteValues } from './testExecution.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
+import { mockTestExecutionComment } from '../../test/mockValues/comments/mockComment';
+import Comment from '../comments/comment';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -1019,6 +1021,17 @@ describe('Test Execution', () => {
 			);
 
 			expect(te1.getSortKey()).toEqual(20);
+		});
+	});
+
+	describe('Relational Data', () => {
+		it('Can get Comments for a TestExecution', async () => {
+			const commentVal = mockTestExecutionComment();
+			const te1 = new TestExecution(mockTestExecution());
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [commentVal],
+			}));
+			expect(await te1.getComments()).toEqual([new Comment(commentVal)]);
 		});
 	});
 

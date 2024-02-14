@@ -10,6 +10,8 @@ import {
 } from './testExecution.type';
 import TestExecutionStatus from './testExecutionStatus';
 import TestRun from './testRun';
+import { CommentValues } from '../comments/comment.type';
+import Comment from '../comments/comment';
 
 export default class TestExecution extends KiwiBaseItem {
 	// Constructor for all classes
@@ -156,6 +158,15 @@ export default class TestExecution extends KiwiBaseItem {
 	): Promise<void> {
 		const statusId = await TestExecutionStatus.resolveId(status);
 		await this.serverUpdate({ status: statusId });
+	}
+
+	public async getComments(): Promise<Array<Comment>> {
+		const rawResults: Array<CommentValues> = 
+			await KiwiConnector.sendRPCMethod(
+				'TestExecution.get_comments',
+				[this.getId()]
+			) as Array<CommentValues>;
+		return rawResults.map( val => new Comment(val));
 	}
 
 	public async serverUpdate(
