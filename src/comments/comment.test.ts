@@ -1,7 +1,4 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 
 import Comment from './comment';
 import {
@@ -9,10 +6,6 @@ import {
 	mockTestExecutionComment
 } from '../../test/mockValues/comments/mockComment';
 import TimeUtils from '../utils/timeUtils';
-
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Comment', () => {
 	// Clear mock calls between tests - required to verify RPC calls

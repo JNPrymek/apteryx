@@ -18,7 +18,9 @@ import {
 import { TestExecutionWriteValues } from './testExecution.type';
 import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
-import { mockTestExecutionComment } from '../../test/mockValues/comments/mockComment';
+import {
+	mockTestExecutionComment
+} from '../../test/mockValues/comments/mockComment';
 import Comment from '../comments/comment';
 
 // Init Mock Axios

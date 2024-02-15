@@ -30,7 +30,9 @@ import {
 import Component from '../management/component';
 import Tag from '../management/tag';
 import TestCaseProperty from './testCaseProperty';
-import { mockTestCaseComment } from '../../test/mockValues/comments/mockComment';
+import {
+	mockTestCaseComment
+} from '../../test/mockValues/comments/mockComment';
 import Comment from '../comments/comment';
 
 // Init Mock Axios
