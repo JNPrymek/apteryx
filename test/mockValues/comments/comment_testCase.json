@@ -1,0 +1,15 @@
+{
+	"id": 1,
+	"content_type": 17,
+	"object_pk": "1",
+	"site": 1,
+	"user": 1,
+	"user_name": "alice",
+	"user_email": "alice@example.com",
+	"user_url": "",
+	"comment": "Comment on a TestCase that is not runnable",
+	"submit_date": "2023-12-15T19:51:49.000",
+	"ip_address": null,
+	"is_public": true,
+	"is_removed": false
+}

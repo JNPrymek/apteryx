@@ -30,6 +30,10 @@ import {
 import Component from '../management/component';
 import Tag from '../management/tag';
 import TestCaseProperty from './testCaseProperty';
+import {
+	mockTestCaseComment
+} from '../../test/mockValues/comments/mockComment';
+import Comment from '../comments/comment';
 
 // Init Mock Axios
 jest.mock('axios');
@@ -611,6 +615,15 @@ describe('TestCase', () => {
 			}));
 			const tc1 = new TestCase(mockTestCase());
 			expect(await tc1.getPropertyKeys()).toEqual(['foo', 'fizz']);
+		});
+
+		it('Can get Comments for a TestCase', async () => {
+			const commentVal = mockTestCaseComment();
+			mockAxios.post.mockResolvedValue(mockRpcResponse({
+				result: [commentVal],
+			}));
+			const tc1 = new TestCase(mockTestCase());
+			expect(await tc1.getComments()).toEqual([new Comment(commentVal)]);
 		});
 	});
 

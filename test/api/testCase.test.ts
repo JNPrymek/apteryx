@@ -357,5 +357,46 @@ describe('Kiwi RPC API - TestCase', () => {
 			expect(response).is.null;
 		});
 	});
+
+	it('TestCase.comments returns expected type', async () => {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestCase.comments',
+			[1]
+		);
+
+		expect(result).to.be.an('array');
+		const arr = result as Array<Record<string, unknown>>;
+		expect(arr.length).to.be.greaterThan(0);
+		arr.forEach( item => {
+			expect(item).to.be.an('object').that.has.all.keys([
+				'id',
+				'content_type',
+				'object_pk',
+				'site',
+				'user',
+				'user_name',
+				'user_email',
+				'user_url',
+				'comment',
+				'submit_date',
+				'ip_address',
+				'is_public',
+				'is_removed',
+			]);
+			expect(item.id).to.be.a('number');
+			expect(item.user).to.be.a('number');
+			expect(item.site).to.be.a('number');
+			expect(item.content_type).to.be.a('number');
+			expect(item.object_pk).to.be.a('string');
+			expect(item.user_name).to.be.a('string');
+			expect(item.user_email).to.be.a('string');
+			expect(item.user_url).to.be.a('string');
+			expect(item.comment).to.be.a('string');
+			expect(item.submit_date).to.be.a('string');
+			expect(item.submit_date).to.match(dateRegex);
+			expect(item.is_public).to.be.a('boolean');
+			expect(item.is_removed).to.be.a('boolean');
+		});
+	});
 	
 });
