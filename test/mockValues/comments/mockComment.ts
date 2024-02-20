@@ -11,7 +11,7 @@ export function mockTestCaseComment(
 	};
 }
 
-import CommentTestExeDefault from './comment_testExe  ution.json';
+import CommentTestExeDefault from './comment_testExecution.json';
 export function mockTestExecutionComment(
 	overrideValues?: Partial<CommentValues>
 ): CommentValues {
