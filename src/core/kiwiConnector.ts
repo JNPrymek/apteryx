@@ -1,9 +1,9 @@
 import { 
-	IServerDetails, 
+	ServerDetails, 
 	RpcResult, 
 	RpcParam, 
-	IRpcRequestBody, 
-	IRpcResponseBody 
+	RpcRequestBody, 
+	RpcResponseBody 
 } from './networkTypes';
 import RequestHandler from './requestHandler';
 
@@ -21,7 +21,7 @@ export default class KiwiConnector {
 	 * @param {boolean} [serverDetails.useSSL] - Whether to use HTTPS or not
 	 * @param {number} [serverDetails.port] - Port number.  Default: 80 or 443.
 	 */
-	public static init(serverDetails: IServerDetails): void {
+	public static init(serverDetails: ServerDetails): void {
 		const protocol = `http${(serverDetails.useSSL ?? true) ? 's' : ''}://`;
 		let host = serverDetails.hostName;
 		if (host.endsWith('/')) {
@@ -44,7 +44,7 @@ export default class KiwiConnector {
 		:Promise<RpcResult> {
 		
 		// Construct the body of the POST request
-		const reqBody: IRpcRequestBody = {
+		const reqBody: RpcRequestBody = {
 			method: methodName,
 			params: methodArgs,
 			id: 'jsonrpc',
@@ -64,15 +64,15 @@ export default class KiwiConnector {
 		}
 		
 		// Check status of the RPC response
-		if(this.isRpcResponse(response.data)) {
+		if(this.isRpcResponse(response.body)) {
 			// If RPC method resulted in error, throw that error
-			if(response.data.error) {
-				const err = response.data.error;
+			if(response.body.error) {
+				const err = response.body.error;
 				throw new Error(`RPC Error:  ${err.code} - ${err.message}`);
 			}
 			
 			// result is implied to exist if code reaches this point
-			return response.data.result as RpcResult;
+			return response.body.result as RpcResult;
 		}
 		else {
 			// Completely wrong data returned
@@ -82,13 +82,13 @@ export default class KiwiConnector {
 	
 	// Type guard HTTP response data into RPC Response
 	private static isRpcResponse(rpcResponse: unknown): 
-	rpcResponse is IRpcResponseBody {
+	rpcResponse is RpcResponseBody {
 		const jsonRpcValid = 
-			((rpcResponse as IRpcResponseBody).id === 'jsonrpc') && 
-			((rpcResponse as IRpcResponseBody).jsonrpc === '2.0');
-		const hasResult = ((rpcResponse as IRpcResponseBody)
+			((rpcResponse as RpcResponseBody).id === 'jsonrpc') &&
+			((rpcResponse as RpcResponseBody).jsonrpc === '2.0');
+		const hasResult = ((rpcResponse as RpcResponseBody)
 			.result !== undefined);
-		const hasError = ((rpcResponse as IRpcResponseBody)
+		const hasError = ((rpcResponse as RpcResponseBody)
 			.error !== undefined);
 		
 		// Has required JSON-RPC fields, and a single result / error

@@ -1,3 +1,9 @@
+export type NetworkResponse = {
+	status: number;
+	statusText: string;
+	headers: Record<string, unknown>;
+	body: Record<string, unknown>;
+}
 
 export type RpcResult = 
 	null |
@@ -6,29 +12,29 @@ export type RpcResult =
 	Record<string, unknown> | 
 	Array<string | number | Record<string, unknown>>;
 
-export type RpcParam = Array<string | number | Record<string, unknown>>;
-
-export interface IRpcRequestBody extends Record<string, unknown> {
-	method: string;
-	params: RpcParam;
-	id: 'jsonrpc';
-	jsonrpc: '2.0';
-}
-
-interface IRpcError {
+export type RpcError = {
 	code: number;
 	message: string;
 }
 
-export interface IRpcResponseBody {
+export type RpcParam = Array<string | number | Record<string, unknown>>;
+
+export type RpcResponseBody = {
 	id: string;
 	jsonrpc: string;
 	result?: RpcResult;
-	error?: IRpcError;
+	error?: RpcError;
 }
 
-export interface IServerDetails {
-	readonly useSSL?: boolean;
-	readonly hostName: string;
-	readonly port?: number;
+export type RpcRequestBody = {
+	id: 'jsonrpc';
+	jsonrpc: '2.0';
+	method: string;
+	params: RpcParam;
+}
+
+export type ServerDetails = {
+	useSSL?: boolean;
+	hostName: string;
+	port?: number;
 }
