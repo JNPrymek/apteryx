@@ -1,32 +1,41 @@
-import axios, { AxiosResponse } from 'axios';
+import fetch from 'node-fetch';
 import { Cookie } from 'tough-cookie';
 
 import RequestHandler from './requestHandler';
+import {
+	mockNetworkSuccessResponse
+} from '../../test/networkMocks/mockNetworkResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock Fetch
+jest.mock('node-fetch', () => (jest.fn()));
+const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
+
 
 describe('HTTP Request Handler', () => {
+
+	// Clear mock calls between tests - required to verify RPC calls
+	beforeEach(() => {
+		jest.clearAllMocks();
+		// Remove all cookies from Cookie Jar before each test
+		RequestHandler.cookieJar.removeAllCookies();
+	});
 	
 	const serverDomain = 'example.com';
 	const serverUrl = `https://${serverDomain}`;
 	const requestPath = `${serverUrl}/json-rpc/`;
-	
-	const mockSuccessPostResponse: AxiosResponse<Record<string, unknown>> = {
-		status: 200,
-		statusText: 'OK',
-		config: {},
-		headers: {
-			/* eslint-disable-next-line max-len */
-			'set-cookie' : `resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=${serverDomain}`
-		},
-		data: {
+
+	// Need to return different mock response objects per test
+	// fetch.Response's body can only be read 1 time
+	function getMockSuccessPostResponse() {
+		return mockNetworkSuccessResponse({
 			a: 'a',
 			b: true,
-			c: 3
-		}
-	};
+			c: 3,
+		},
+		/* eslint-disable-next-line max-len */
+		`resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=${serverDomain}`
+		);
+	}
 	
 	// Initialize some test cookies
 	const cookieVals: Array<Record<string, unknown>> = [
@@ -35,17 +44,12 @@ describe('HTTP Request Handler', () => {
 		{ key: 'test-c-key', value: 'test-c-value', domain: serverDomain }
 	];
 	
-	// Remove all cookies from Cookie Jar before each test
-	beforeEach( async () => {
-		RequestHandler.cookieJar.removeAllCookies();
-	});
-	
 	// Handler can send a POST request with given data and return the response
 	it('Can send a POST request with provided data and get response data', 
 		async () => {
 			const reqHeaders = {
 				accept:  'application/json',
-				'X-Requested-With': 'Axios'
+				'X-Requested-With': 'Node-Fetch'
 			};
 		
 			const reqBody = {
@@ -55,19 +59,36 @@ describe('HTTP Request Handler', () => {
 			};
 		
 			// Mock response
-			mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
-		
+			mockFetch.mockResolvedValue(getMockSuccessPostResponse());
+
 			const response = await RequestHandler.sendPostRequest(
 				requestPath,
 				reqBody,
 				reqHeaders
 			);
-			expect(axios.post).toHaveBeenCalledWith(
+			expect(fetch).toHaveBeenCalledWith(
 				requestPath, 
-				reqBody, 
-				{ headers: expect.objectContaining(reqHeaders) }
+				{
+					body: JSON.stringify(reqBody),
+					headers: expect.objectContaining(reqHeaders),
+					method: 'POST',
+				}
 			);
-			expect(response).toEqual(mockSuccessPostResponse);
+			expect(response).toEqual({
+				status: 200,
+				statusText: 'OK',
+				body: {
+					a: 'a',
+					b: true,
+					c: 3,
+				},
+				headers: {
+					'content-type': 'text/plain;charset=UTF-8',
+					'set-cookie': 
+						// eslint-disable-next-line max-len
+						'resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=example.com'
+				}
+			});
 		});
 	
 	
@@ -117,8 +138,8 @@ describe('HTTP Request Handler', () => {
 			};
 			
 			// Mock response
-			mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
-			
+			mockFetch.mockResolvedValue(getMockSuccessPostResponse());
+
 			const response = await RequestHandler.sendPostRequest(
 				requestPath,
 				reqBody,
@@ -127,7 +148,7 @@ describe('HTTP Request Handler', () => {
 			
 			expect(response.headers)
 				.toEqual(expect.objectContaining(
-					mockSuccessPostResponse.headers
+					Object.fromEntries(getMockSuccessPostResponse().headers)
 				));
 			
 			const cookiesInJar = await RequestHandler
@@ -153,7 +174,7 @@ describe('HTTP Request Handler', () => {
 	});
 	
 	// Cookies Send with POST request
-	it('Can send a POST request with provided data and get response data', 
+	it('Can send a POST request with cookie and get response data', 
 		async () => {
 		
 			// Prep Test Cookies
@@ -169,7 +190,7 @@ describe('HTTP Request Handler', () => {
 
 			const reqHeaders = {
 				accept:  'application/json',
-				'X-Requested-With': 'Axios'
+				'X-Requested-With': 'Node-Fetch'
 			};
 		
 			const reqBody = {
@@ -179,21 +200,39 @@ describe('HTTP Request Handler', () => {
 			};
 		
 			// Mock response
-			mockAxios.post.mockResolvedValue(mockSuccessPostResponse);
-		
+			mockFetch.mockResolvedValue(getMockSuccessPostResponse());
+
 			const response = await RequestHandler.sendPostRequest(
 				requestPath,
 				reqBody,
 				reqHeaders
 			);
-			expect(axios.post).toHaveBeenCalledWith(
+
+			expect(fetch).toHaveBeenCalledWith(
 				requestPath, 
-				reqBody, 
-				{ headers: expect.objectContaining({
-					Cookie: cookieHeaderString
-				}) }
+				{
+					body: JSON.stringify(reqBody),
+					headers: expect.objectContaining({
+						Cookie: cookieHeaderString,
+					}),
+					method: 'POST',
+				}
 			);
-			expect(response).toEqual(mockSuccessPostResponse);
+			expect(response).toEqual({
+				status: 200,
+				statusText: 'OK',
+				body: {
+					a: 'a',
+					b: true,
+					c: 3,
+				},
+				headers: {
+					'content-type': 'text/plain;charset=UTF-8',
+					'set-cookie': 
+						// eslint-disable-next-line max-len
+						'resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=example.com'
+				}
+			});
 		});
 	
 	// POST response can delete cookies
