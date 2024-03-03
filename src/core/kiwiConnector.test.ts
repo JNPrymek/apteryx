@@ -1,16 +1,17 @@
-import axios, { AxiosResponse } from 'axios';
-
 import KiwiConnector from './kiwiConnector';
+import RequestHandler from './requestHandler';
 
 import { kiwiTestServerInfo } from '../../test/testServerDetails';
-import expectAxiosPostCalledWith 
-	from '../../test/axiosAssertions/postCalledWith';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
-
+// Mock RequestHandler
+jest.mock('./requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 
 describe('Kiwi Connector', () => {
@@ -62,35 +63,30 @@ describe('Kiwi Connector', () => {
 	});
 	
 	describe('Requests', () => {
-
-		const requestUrl = `https://${kiwiTestServerInfo.hostName}/json-rpc/`;
 		beforeEach(() => {
-			KiwiConnector.init({
-				hostName: kiwiTestServerInfo.hostName,
-				useSSL: true
-			});
+			KiwiConnector.init(kiwiTestServerInfo);
 		});
 
 		// Send a Generic RPC method
 		it('Can send a generic RPC method call', async () => {
-			KiwiConnector.init(kiwiTestServerInfo);
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse(
+				{
 					error: {
-						code: -32601, 
-						message: 'Method not found: "Test.nonExistentMethod"'
+						code: -32601,
+						message: 'Method not found: "Test.nonExistentMethod"',
 					}
-				})
-			);
+				}
+			));
 		
-			await expect(KiwiConnector
-				.sendRPCMethod('Test.nonExistentMethod', ['arg', 1]))
+			await expect(async () =>
+				KiwiConnector
+					.sendRPCMethod('Test.nonExistentMethod', ['arg', 1]))
 				.rejects
 				.toThrowError(/-32601 .* "Test\.nonExistentMethod"/);
 
-			expectAxiosPostCalledWith(
-				requestUrl, 
-				'Test.nonExistentMethod', 
+			assertPostRequestData(
+				mockPostRequest,
+				'Test.nonExistentMethod',
 				['arg', 1]
 			);
 		
@@ -99,67 +95,68 @@ describe('Kiwi Connector', () => {
 		// Login
 		it('Can login successfully', async () => {
 			const mockSessionId = 'aX1bY2cZ3';
-			const mockResponse = mockRpcResponse({ result: mockSessionId });
 			const username = 'testUser';
 			const password = 'Letmein123';
-		
-			mockAxios.post.mockResolvedValue(mockResponse);
+
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: mockSessionId,
+			}));
 		
 			await expect(KiwiConnector.login(username, password))
 				.resolves.toBe(mockSessionId);
-			expectAxiosPostCalledWith(
-				requestUrl, 
-				'Auth.login', 
-				[username, password]);
+			assertPostRequestData(
+				mockPostRequest,
+				'Auth.login',
+				[username, password]
+			);
 		});
 	
 		// Logout
 		it('Can logout successfully', async () => {
-			const mockResponse = mockRpcResponse({ result: '' });
-
-			mockAxios.post.mockResolvedValue(mockResponse);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: '',
+			}));
 		
 			await expect(KiwiConnector.logout()).resolves.toBe(true);
-			expectAxiosPostCalledWith(requestUrl, 'Auth.logout', []);
+			assertPostRequestData(
+				mockPostRequest,
+				'Auth.logout',
+				[]
+			);
 		});
 	
 		// Bad login
 		it('Throws error when logging in with wrong credentials', async () => {
-			const mockResponse = mockRpcResponse(
-				{ 
-					error: { 
-						code: -32603, 
-						message: 'Internal error: Wrong username or password' 
-					} 
-				}
-			);
 			const username = 'testUser';
 			const password = 'wrongPassword';
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				error: {
+					code: -32603,
+					message: 'Internal error: Wrong username or password',
+				}
+			}));
 
-			mockAxios.post.mockResolvedValue(mockResponse);
-		
-			await expect(KiwiConnector.login(username, password))
+			await expect(async () => 
+				KiwiConnector.login(username, password))
 				.rejects
 				.toThrowError(/-32603.*Wrong username or password/);
-			expectAxiosPostCalledWith(
-				requestUrl, 
-				'Auth.login', 
+			assertPostRequestData(
+				mockPostRequest,
+				'Auth.login',
 				[username, password]
 			);
 		});
 
 		describe('Server HTTP Errors', () => {
 			it('Errors on HTTP 400 status', async () => {
-				const mockResponse: AxiosResponse<Record<string, unknown>> = {
+				mockPostRequest.mockResolvedValue({
 					status: 400,
 					statusText: 'Bad Request',
-					config: {},
-					headers: { 'content-type' : 'application/json' },
-					data: {}
-				};
-				mockAxios.post.mockResolvedValue(mockResponse);
-			
-				await expect(KiwiConnector.login('username', 'password'))
+					headers: { 'content-type': 'application/json' },
+					body: {},
+				});
+				await expect(async () => 
+					KiwiConnector.sendRPCMethod('foo', ['foo']))
 					.rejects
 					.toThrowError(/Network Error 400 : Bad Request/);
 			});
@@ -167,20 +164,12 @@ describe('Kiwi Connector', () => {
 			// eslint-disable-next-line max-len
 			it('Errors when RPC reply is missing both "data" and "error" values', 
 				async () => {
-					// eslint-disable-next-line max-len
-					const mockResponse: AxiosResponse<Record<string, unknown>> = {
-						status: 200,
-						statusText: 'OK',
-						config: {},
-						headers: { 'content-type' : 'application/json' },
-						data: {
-							id: 'jsonrpc',
-							jsonrpc: '2.0'
-						}
-					};
-					mockAxios.post.mockResolvedValue(mockResponse);
-			
-					await expect(KiwiConnector.login('username', 'password'))
+					mockPostRequest.mockResolvedValue(
+						mockRpcNetworkResponse({})
+					);
+					
+					await expect(async () =>
+						KiwiConnector.login('username', 'password'))
 						.rejects
 						.toThrowError(/Malformed JSON-RPC reply/);
 				});
