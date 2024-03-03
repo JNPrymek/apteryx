@@ -1,6 +1,6 @@
 
 import { AxiosResponse } from 'axios';
-import { IRpcResponseBody, RpcResult } from '../../src/core/networkTypes';
+import { RpcResponseBody, RpcResult } from '../../src/core/networkTypes';
 import { kiwiTestServerInfo } from '../testServerDetails';
 
 export default function mockRpcResponse(
@@ -9,7 +9,7 @@ export default function mockRpcResponse(
 		error?: { code: number; message: string; };
 	},
 	setCookies?: Array<string>
-): AxiosResponse<IRpcResponseBody> {
+): AxiosResponse<RpcResponseBody> {
 	
 	let setCookieHeaderString = '';
 	if (setCookies) {
@@ -32,7 +32,7 @@ export default function mockRpcResponse(
 			'content-type' : 'application/json'
 		};
 	
-	const response: AxiosResponse<IRpcResponseBody> = {
+	const response: AxiosResponse<RpcResponseBody> = {
 		status: 200,
 		statusText: 'OK',
 		config: {},
