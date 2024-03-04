@@ -1,4 +1,3 @@
-import { Headers } from 'node-fetch';
 import { NetworkResponse, RpcResult } from '../../src/core/networkTypes';
 import { kiwiTestServerInfo } from '../testServerDetails';
 
