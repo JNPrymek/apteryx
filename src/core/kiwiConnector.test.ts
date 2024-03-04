@@ -84,11 +84,11 @@ describe('Kiwi Connector', () => {
 				.rejects
 				.toThrowError(/-32601 .* "Test\.nonExistentMethod"/);
 
-			assertPostRequestData(
+			assertPostRequestData({
 				mockPostRequest,
-				'Test.nonExistentMethod',
-				['arg', 1]
-			);
+				method: 'Test.nonExistentMethod',
+				params: ['arg', 1],
+			});
 		
 		});
 	
@@ -104,11 +104,11 @@ describe('Kiwi Connector', () => {
 		
 			await expect(KiwiConnector.login(username, password))
 				.resolves.toBe(mockSessionId);
-			assertPostRequestData(
+			assertPostRequestData({
 				mockPostRequest,
-				'Auth.login',
-				[username, password]
-			);
+				method: 'Auth.login',
+				params: [username, password]
+			});
 		});
 	
 		// Logout
@@ -118,11 +118,11 @@ describe('Kiwi Connector', () => {
 			}));
 		
 			await expect(KiwiConnector.logout()).resolves.toBe(true);
-			assertPostRequestData(
+			assertPostRequestData({
 				mockPostRequest,
-				'Auth.logout',
-				[]
-			);
+				method: 'Auth.logout',
+				params: []
+			});
 		});
 	
 		// Bad login
@@ -140,11 +140,11 @@ describe('Kiwi Connector', () => {
 				KiwiConnector.login(username, password))
 				.rejects
 				.toThrowError(/-32603.*Wrong username or password/);
-			assertPostRequestData(
+			assertPostRequestData({
 				mockPostRequest,
-				'Auth.login',
-				[username, password]
-			);
+				method: 'Auth.login',
+				params: [username, password]
+			});
 		});
 
 		describe('Server HTTP Errors', () => {
