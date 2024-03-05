@@ -1,13 +1,15 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import Version from './version';
 import Build from './build';
 import { mockBuild, mockVersion } from '../../test/mockKiwiValues';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Version', () => {
 	
@@ -57,13 +59,14 @@ describe('Version', () => {
 		it('Can get Version of Build', async () => {
 			const version1 = new Version(version1Vals);
 			const version4 = new Version(version4Vals);
+
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [version1Vals]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [version4Vals]
+			}));
 			
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [version1Vals] })
-			);
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [version4Vals] })
-			);
 			
 			
 			const build1Version = await build1.getVersion();
@@ -91,19 +94,18 @@ describe('Version', () => {
 	
 	describe('Server Lookups', () => {
 		it('Can get Build by ID', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [build1Vals] })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [build1Vals]
+			}));
 			const build = await Build.getById(6);
 			
 			expect(build['serialized']).toEqual(build1Vals);
 		});
 		
 		it('Can get Build by Name - unique entry matches name', async () => {
-			
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [build1Vals] })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [build1Vals]
+			}));
 			
 			const build = await Build.getByName('Android');
 			expect(build['serialized']).toEqual(build1Vals);
@@ -111,8 +113,10 @@ describe('Version', () => {
 		
 		it('Can get Build by Name - 0 entries matching name', async () => {
 			
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
-			
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
+
 			const name = 'Non-used name';
 			expect(Build.getByName(name))
 				.rejects
@@ -122,10 +126,10 @@ describe('Version', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Build by Name - Multiple name matches require version to be specified', 
 			async () => {
-				mockAxios.post.mockResolvedValue(
-					mockRpcResponse({ result: [build2Vals, build3Vals] })
-				);
-			
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [build2Vals, build3Vals]
+				}));
+				
 				const name = 'Android';
 				expect(Build.getByName(name))
 					.rejects
@@ -137,10 +141,10 @@ describe('Version', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Build by Name - Multiple name matches are filtered by Version ID', 
 			async () => {
-				mockAxios.post.mockResolvedValue(
-					mockRpcResponse({ result: [build2Vals, build3Vals] })
-				);
-			
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [build2Vals, build3Vals]
+				}));
+				
 				const name = 'Android';
 				const versionId = 4;
 			
@@ -152,11 +156,10 @@ describe('Version', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Build by Name - Multiple name matches are filtered by Version', 
 			async () => {
-			
-				mockAxios.post.mockResolvedValue(
-					mockRpcResponse({ result: [build2Vals, build3Vals] })
-				);
-			
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [build2Vals, build3Vals]
+				}));
+				
 				const name = 'Android';
 				const version4 = new Version(version4Vals);
 			
@@ -168,11 +171,10 @@ describe('Version', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Build by Name - Error thrown when multiple name matches, but no version ID match.', 
 			async () => {
-			
-				mockAxios.post.mockResolvedValue(
-					mockRpcResponse({ result: [build2Vals, build3Vals] })
-				);
-			
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [build2Vals, build3Vals]
+				}));
+				
 				const name = 'Android';
 				const versionId = 12;
 			
