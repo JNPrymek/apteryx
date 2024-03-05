@@ -1,13 +1,15 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import Classification from './classification';
 import { ClassificationValues } from './classification.type';
 import { mockClassification } from '../../test/mockKiwiValues';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Classification', () => {
 	
@@ -42,12 +44,11 @@ describe('Classification', () => {
 
 	describe('Server Lookups', () => {
 		it('Can get Classification by ID', async () => {
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse(
-				{ result: [class1Vals] }
-			));
-			mockAxios.post.mockResolvedValue(mockRpcResponse(
-				{ result: [class2Vals] }
-			));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [class1Vals]
+			}));mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [class2Vals]
+			}));
 			
 			const class1 = await Classification.getById(1);
 			const class2 = await Classification.getById(2);
@@ -56,10 +57,9 @@ describe('Classification', () => {
 		});
 		
 		it('Can get Classification by Name', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [class1Vals] }));
-			
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [class1Vals]
+			}));
 			const class1 = await Classification.getByName('Website');
 			expect(class1['serialized']).toEqual(class1Vals);
 		});
