@@ -1,6 +1,4 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
 import Component from './component';
 import Product from './product';
@@ -11,11 +9,17 @@ import {
 	mockUser
 } from '../../test/mockKiwiValues';
 import User from './user';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Component', () => {
 	
@@ -85,13 +89,13 @@ describe('Component', () => {
 				last_name: 'Bar'
 			});
 			
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [user1Vals]
 			}));
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [user2Vals]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [user1Vals]
 			}));
 			
@@ -119,13 +123,13 @@ describe('Component', () => {
 				last_name: 'Bar'
 			});
 			
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [user2Vals]
 			}));
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [user1Vals]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [user2Vals]
 			}));
 			
@@ -146,9 +150,9 @@ describe('Component', () => {
 		it('Can get Component Product', async () => {
 			const product1Vals = mockProduct();
 		
-			mockAxios.post.mockResolvedValue(mockRpcResponse(
-				{ result: [ product1Vals ] }
-			));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [ product1Vals ]
+			}));
 		
 			const compProd = await component1.getProduct();
 		
@@ -173,12 +177,13 @@ describe('Component', () => {
 	
 		it('Can get IDs of TestCases linked to Component', async () => {
 			// Mock distinct entries
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [ 
 					{ ...component1Vals, cases: 1 },
 					{ ...component1Vals, cases: 2 },
 					{ ...component1Vals, cases: 5 }
-				] }));
+				]
+			}));
 			const compTCs = await component1.getLinkedTestCaseIds();
 			expect(compTCs).toEqual([1, 2, 5]);
 		});
@@ -186,31 +191,30 @@ describe('Component', () => {
 	
 	describe('Server Lookups', () => {
 		it('Can get by single ID - 0 TCs linked', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ 
-						result: [ component1ServerVals ] 
-					}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [ component1ServerVals ]
+			}));
 			
 			const comp = await Component.getById(1);
 			expect(comp['serialized']).toEqual(component1Vals);
 		});
 		
 		it('Can get by single ID - 1 TC linked', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [component2ServerVals] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [component2ServerVals]
+			}));
 			
 			const comp = await Component.getById(2);
 			expect(comp['serialized']).toEqual(component2Vals);
 		});
 		
 		it('Can get by single ID - 2 TCs linked', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [ 
 					{ ...component1ServerVals, cases: 1 },
 					{ ...component1ServerVals, cases: 2 }
-				] }));
+				]
+			}));
 			
 			const comp = await Component.getById(1);
 			expect(comp['serialized']).toEqual(component1Vals);
@@ -218,12 +222,13 @@ describe('Component', () => {
 		});
 		
 		it('Can get by multiple IDs - mix of TCs linked', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [ 
 					{ ...component1ServerVals, cases: 1 },
 					{ ...component1ServerVals, cases: 2 },
 					component3ServerVals
-				] }));
+				]
+			}));
 			
 			const comps = await Component.getByIds([1, 3]);
 			
@@ -233,8 +238,9 @@ describe('Component', () => {
 		
 		it('Can get Component by name - 0 matches', async () => {
 		
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 		
 			expect(Component.getByName('First Component'))
 				.rejects
@@ -243,10 +249,9 @@ describe('Component', () => {
 		});
 		
 		it('Can get Component by name - 1 matches', async () => {
-		
-			mockAxios.post.mockResolvedValue(mockRpcResponse(
-				{ result: [component1ServerVals] }
-			));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [component1ServerVals]
+			}));
 			
 			const comp = await Component.getByName('Example Homepage');
 			
@@ -257,10 +262,9 @@ describe('Component', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Component by name - multiple matches without product filter throws Error', 
 			async () => {
-			
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [ component1ServerVals, component3ServerVals] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [ component1ServerVals, component3ServerVals]
+				}));
 			
 				const name = 'Example Homepage';
 				expect(Component.getByName(name))
@@ -272,10 +276,9 @@ describe('Component', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Component by name - single match with non-matching Product results in error', 
 			async () => {
-			
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [component1ServerVals] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [component1ServerVals]
+				}));
 			
 				const name = 'Example Homepage';
 			
@@ -288,10 +291,9 @@ describe('Component', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Component by name - multiple matches with non-matching Product results in error', 
 			async () => {
-			
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [ component1ServerVals, component3ServerVals] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [ component1ServerVals, component3ServerVals]
+				}));
 			
 				const name = 'Example Homepage';
 			
@@ -304,10 +306,9 @@ describe('Component', () => {
 		/* eslint-disable-next-line max-len */
 		it('Can get Component by name - multiple matches filtered by product ID', 
 			async () => {
-			
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [component1ServerVals, component3ServerVals] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [component1ServerVals, component3ServerVals]
+				}));
 			
 				const name = 'Example Homepage';
 				const comp = await Component.getByName(name, 2);
@@ -318,10 +319,9 @@ describe('Component', () => {
 		
 		it('Can get Component by name - multiple matches filtered by Product', 
 			async () => {
-			
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [component1ServerVals, component3ServerVals] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [component1ServerVals, component3ServerVals]
+				}));
 			
 				const name = 'Example Homepage';
 				const prod = new Product(mockProduct());
@@ -333,7 +333,7 @@ describe('Component', () => {
 		
 		it('Can get Component list for given TestCase ID', async () => {
 			const tcId = 3;
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockComponentServerEntry({ name: 'Comp1', cases: tcId }),
 					mockComponentServerEntry(
@@ -346,12 +346,11 @@ describe('Component', () => {
 			}));
 
 			const compoents = await Component.getComponentsForTestCase(tcId);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'Component.filter',
-				[ { cases: tcId }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Component.filter',
+				params: [ { cases: tcId }],
+			});
 
 			expect(compoents)
 				.toContainEqual(new Component(
@@ -390,17 +389,22 @@ describe('Component', () => {
 				}),
 			];
 
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [ origServerVal ]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updatedServerVal
 			}));
 
 			const comp1 = await Component.getById(1);
 			expect(comp1['serialized']).toEqual(origLocalVal);
 			await comp1.syncServerValues();
-			verifyRpcCall(mockAxios, 1, 'Component.filter', [{ id: 1 }]);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Component.filter',
+				params: [{ id: 1 }],
+				callIndex: 1,
+			});
 			expect(comp1['serialized']).toEqual(updatedVal);
 		});
 	});
