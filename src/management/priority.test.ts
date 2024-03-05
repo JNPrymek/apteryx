@@ -1,16 +1,18 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
 
 import Priority from './priority';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
 import { 
 	mockPriority 
 } from '../../test/mockValues/management/mockManagementValues';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Priority', () => {
 	
@@ -46,10 +48,10 @@ describe('Priority', () => {
 	
 	describe('Server Lookups', () => {
 		it('Can get Priority by ID', async () => {
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
-				result: [priority1Vals] 
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [priority1Vals]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [priority2Vals] 
 			}));
 			const priority1 = await Priority.getById(1);
@@ -60,8 +62,8 @@ describe('Priority', () => {
 		});
 		
 		it('Can get multiple Priorities by IDs', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
-				result: [priority1Vals, priority2Vals] 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [priority1Vals, priority2Vals]
 			}));
 			const priorities = await Priority.getByIds([1, 2]);
 		
@@ -71,10 +73,11 @@ describe('Priority', () => {
 	
 	
 		it('Can get Priority by Value', async () => {
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [priority1Vals] 
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [priority2Vals] 
 			}));
 			
@@ -86,7 +89,9 @@ describe('Priority', () => {
 		});
 	
 		it('Throws error if no matches when fetching by Value', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [],
+			}));
 			const value = 'Bad Priority';
 			expect(Priority.getByValue(value))
 				.rejects

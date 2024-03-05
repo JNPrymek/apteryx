@@ -1,14 +1,15 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import Product from './product';
 import Classification from './classification';
 import { mockClassification, mockProduct } from '../../test/mockKiwiValues';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Product', () => {
 	
@@ -48,13 +49,12 @@ describe('Product', () => {
 				name: 'Mobile App'
 			});
 			
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [class1Vals] })
-			);
-
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [class2Vals] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [class1Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [class2Vals]
+			}));
 			
 			expect(await prod1.getClassification())
 				.toEqual(new Classification(class1Vals));
@@ -65,10 +65,10 @@ describe('Product', () => {
 	
 	describe('Fetch from server', () => {
 		it('Can get Product by ID', async () => {
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [prod1Vals] 
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [prod2Vals] 
 			}));
 
@@ -79,11 +79,11 @@ describe('Product', () => {
 		});
 		
 		it('Can get Product by Name', async () => {
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({ 
-				result: [prod1Vals] 
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [prod1Vals]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
-				result: [prod2Vals] 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [prod2Vals]
 			}));
 			
 			const prod1 = await Product.getByName('Example.com Website');

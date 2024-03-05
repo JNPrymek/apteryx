@@ -1,18 +1,19 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
 
 import KiwiConnector from '../core/kiwiConnector';
-
 import { kiwiTestServerInfo } from '../../test/testServerDetails';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import Version from './version';
 import Product from './product';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
 import { mockVersion, mockProduct } from '../../test/mockKiwiValues';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Version', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -59,12 +60,12 @@ describe('Version', () => {
 				name: 'The other product'
 			});
 			
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [product1Vals] })
-			);
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [product2Vals] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [product1Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [product2Vals]
+			}));
 			
 			expect(await version1.getProduct())
 				.toEqual(new Product(product1Vals));
@@ -76,22 +77,18 @@ describe('Version', () => {
 	
 	describe('Server lookups', () => {
 		it('Can get Version by ID', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(
-					mockRpcResponse({ result: [version1Vals] })
-				);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [version1Vals]
+			}));
 			const ver = await Version.getById(1);
 			
 			expect(ver['serialized']).toEqual(version1Vals);
 		});
 		
 		it('Can get multiple Versions by IDs', async () => {
-			mockAxios
-				.post.
-				mockResolvedValue(
-					mockRpcResponse({ result: [version1Vals, version2Vals] })
-				);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [version1Vals, version2Vals]
+			}));
 			const vers = await Version.getByIds([1, 2]);
 			
 			expectArrayWithKiwiItem(vers, version1Vals);
