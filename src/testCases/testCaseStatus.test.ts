@@ -1,14 +1,17 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import { mockTestCaseStatus } from '../../test/mockKiwiValues';
-
 import TestCaseStatus from './testCaseStatus';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
 
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Test Case Status', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -68,7 +71,7 @@ describe('Test Case Status', () => {
 		const stat1 = new TestCaseStatus(stat1Vals);
 
 		it('Can get TestCaseStatus by a single ID (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [stat1Vals] 
 			}));
 			const result = await TestCaseStatus.getById(1);
@@ -76,7 +79,7 @@ describe('Test Case Status', () => {
 		});	
 		
 		it('Can get TestCaseStatus by single ID (no match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [] 
 			}));
 			expect(TestCaseStatus.getById(1))
@@ -85,7 +88,7 @@ describe('Test Case Status', () => {
 		});
 
 		it('Can get TestCaseStatus by Name (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [stat1Vals] 
 			}));
 			const result = await TestCaseStatus.getByName('PROPOSED');
@@ -93,7 +96,9 @@ describe('Test Case Status', () => {
 		});
 
 		it('Can get TestCaseStatus by Name (0 matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			const name = 'Non-used name';
 			expect(TestCaseStatus.getByName(name))
 				.rejects
@@ -130,10 +135,10 @@ describe('Test Case Status', () => {
 				name: 'Second Status'
 			});
 
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [stat1Vals]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [stat2Vals]
 			}));
 
@@ -142,18 +147,17 @@ describe('Test Case Status', () => {
 			expect(await TestCaseStatus.resolveStatusId('Second Status'))
 				.toEqual(2);
 
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestCaseStatus.filter',
-				[{ name: 'First Status' }]
-			);
-			verifyRpcCall(
-				mockAxios,
-				1,
-				'TestCaseStatus.filter',
-				[{ name: 'Second Status' }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCaseStatus.filter',
+				params: [{ name: 'First Status' }],
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCaseStatus.filter',
+				params: [{ name: 'Second Status' }],
+				callIndex: 1,
+			});
 		});
 	});
 	
