@@ -1,12 +1,14 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import { mockPlanType } from '../../test/mockKiwiValues';
 import PlanType from './planType';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('PlanType', () => {
 	
@@ -49,34 +51,34 @@ describe('PlanType', () => {
 		const type1 = new PlanType(type1Vals);
 
 		it('Can get PlanType by a single ID (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [type1Vals] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [type1Vals]
+			}));
 			const result = await PlanType.getById(1);
 			expect(result).toEqual(type1);
 		});
 
 		it('Can get PlanType by single ID (no match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			expect(PlanType.getById(1))
 				.rejects
 				.toThrowError('Could not find any PlanType with ID 1');
 		});
 
 		it('Can get PlanType by Name (one match)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [type1Vals] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [type1Vals]
+			}));
 			const cat = await PlanType.getByName('Unit');
 			expect(cat).toEqual(type1);
 		});
 
 		it('Can get PlanType by Name (0 matches)', async () => {
-			mockAxios
-				.post
-				.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			const name = 'Non-used name';
 			expect(PlanType.getByName(name))
 				.rejects
