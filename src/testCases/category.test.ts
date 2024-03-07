@@ -1,5 +1,4 @@
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import { mockCategory, mockProduct } from '../../test/mockKiwiValues';
 import Product from '../management/product';
 import RequestHandler from '../core/requestHandler';
