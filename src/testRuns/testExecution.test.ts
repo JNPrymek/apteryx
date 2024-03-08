@@ -1,6 +1,4 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import TestExecution from './testExecution';
 import TestCase from '../testCases/testCase';
 import TestRun from './testRun';
@@ -16,16 +14,22 @@ import {
 	mockUser 
 } from '../../test/mockKiwiValues';
 import { TestExecutionWriteValues } from './testExecution.type';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import TimeUtils from '../utils/timeUtils';
 import {
 	mockTestExecutionComment
 } from '../../test/mockValues/comments/mockComment';
 import Comment from '../comments/comment';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
 
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Test Execution', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -111,12 +115,12 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get TestExecution Assignee', async () => {
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [user1Vals] })
-			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [user1Vals] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [user1Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [user1Vals]
+			}));
 			const alice = new User(user1Vals);
 
 			expect(await te1.getAssignee()).toEqual(alice);
@@ -137,12 +141,12 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get TestExecution Last Tester', async () => {
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [user2Vals] })
-			);
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [user1Vals] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [user2Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [user1Vals]
+			}));
 
 			const alice = new User(user1Vals);
 			const bob = new User(user2Vals);
@@ -206,15 +210,15 @@ describe('Test Execution', () => {
 				build__name: 'Build2'
 			});
 
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [run1Vals] })
-			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [run1Vals] })
-			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [run4Vals] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [run1Vals]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [run1Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [run4Vals]
+			}));
 
 			const run1 = new TestRun(run1Vals);
 			const run4 = new TestRun(run4Vals);
@@ -239,9 +243,9 @@ describe('Test Execution', () => {
 		it('Can get TestExecution TestCase', async () => {
 			const tc1Vals = mockTestCase();
 
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [tc1Vals] })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [tc1Vals]
+			}));
 				
 			const testExecCase = await te1.getTestCase();
 			expect(testExecCase).toEqual(new TestCase(tc1Vals));
@@ -261,9 +265,9 @@ describe('Test Execution', () => {
 
 		it('Can get TestExecution Build', async () => {
 			const build1Vals = mockBuild();
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [build1Vals] })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [build1Vals]
+			}));
 
 			expect(await te1.getBuild())
 				.toEqual(new Build(build1Vals));
@@ -299,15 +303,15 @@ describe('Test Execution', () => {
 				color: '#72767b'
 			});
 			
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [idleValues] })
-			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [passedValues] })
-			);
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [failedValues] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [idleValues]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [passedValues]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [failedValues]
+			}));
 
 			expect(await te1.getStatus())
 				.toEqual(new TestExecutionStatus(idleValues));
@@ -333,7 +337,7 @@ describe('Test Execution', () => {
 				assignee__username: 'bob'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -341,12 +345,12 @@ describe('Test Execution', () => {
 			expect(te1.getAssigneeUsername()).toEqual('alice');
 
 			await te1.serverUpdate(changeVal);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getAssigneeId()).toEqual(2);
 			expect(te1.getAssigneeUsername()).toEqual('bob');
@@ -363,7 +367,7 @@ describe('Test Execution', () => {
 				start_date: '2023-08-24T08:13:54.123'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -372,12 +376,12 @@ describe('Test Execution', () => {
 			await te1.setStartDate(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
 			);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStartDate()).toEqual(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
@@ -395,7 +399,7 @@ describe('Test Execution', () => {
 				start_date: '2023-08-24T08:13:54.123'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -406,12 +410,12 @@ describe('Test Execution', () => {
 			await te1.setStartDate(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
 			);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStartDate()).toEqual(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
@@ -429,7 +433,7 @@ describe('Test Execution', () => {
 				start_date: null
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -438,12 +442,12 @@ describe('Test Execution', () => {
 			);
 
 			await te1.setStartDate();
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStartDate()).toBeNull();
 		});
@@ -459,7 +463,7 @@ describe('Test Execution', () => {
 				stop_date: '2023-08-24T08:13:54.123'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -468,12 +472,12 @@ describe('Test Execution', () => {
 			await te1.setStopDate(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
 			);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStopDate()).toEqual(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
@@ -491,7 +495,7 @@ describe('Test Execution', () => {
 				stop_date: '2023-08-24T08:13:54.123'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -502,12 +506,12 @@ describe('Test Execution', () => {
 			await te1.setStopDate(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
 			);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStopDate()).toEqual(
 				TimeUtils.serverStringToDate('2023-08-24T08:13:54.123')
@@ -525,7 +529,7 @@ describe('Test Execution', () => {
 				stop_date: null
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -534,12 +538,12 @@ describe('Test Execution', () => {
 			);
 
 			await te1.setStopDate();
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStopDate()).toBeNull();
 		});
@@ -557,7 +561,7 @@ describe('Test Execution', () => {
 				tested_by__username: 'alice'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -565,12 +569,12 @@ describe('Test Execution', () => {
 			expect(te1.getLastTesterName()).toBeNull();
 
 			await te1.setLastTester(1);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getLastTesterId()).toEqual(1);
 			expect(te1.getLastTesterName()).toEqual('alice');
@@ -589,7 +593,7 @@ describe('Test Execution', () => {
 				tested_by__username: 'alice'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -598,12 +602,12 @@ describe('Test Execution', () => {
 
 			const user1 = new User(mockUser());
 			await te1.setLastTester(user1);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getLastTesterId()).toEqual(1);
 			expect(te1.getLastTesterName()).toEqual('alice');
@@ -622,7 +626,7 @@ describe('Test Execution', () => {
 				tested_by__username: null
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -630,12 +634,12 @@ describe('Test Execution', () => {
 			expect(te1.getLastTesterName()).toEqual('alice');
 
 			await te1.setLastTester();
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getLastTesterId()).toBeNull();
 			expect(te1.getLastTesterName()).toBeNull();
@@ -654,7 +658,7 @@ describe('Test Execution', () => {
 				tested_by__username: 'bob'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -662,12 +666,12 @@ describe('Test Execution', () => {
 			expect(te1.getLastTesterName()).toEqual('alice');
 
 			await te1.setLastTester(2);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getLastTesterId()).toEqual(2);
 			expect(te1.getLastTesterName()).toEqual('bob');
@@ -686,7 +690,7 @@ describe('Test Execution', () => {
 				tested_by__username: 'bob'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -695,12 +699,13 @@ describe('Test Execution', () => {
 
 			const user2 = new User(mockUser({ id: 2, username: 'bob' }));
 			await te1.setLastTester(user2);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getLastTesterId()).toEqual(2);
 			expect(te1.getLastTesterName()).toEqual('bob');
@@ -719,7 +724,7 @@ describe('Test Execution', () => {
 				assignee__username: 'alice'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -727,12 +732,12 @@ describe('Test Execution', () => {
 			expect(te1.getAssigneeUsername()).toBeNull();
 
 			await te1.setAssignee(1);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getAssigneeId()).toEqual(1);
 			expect(te1.getAssigneeUsername()).toEqual('alice');
@@ -751,7 +756,7 @@ describe('Test Execution', () => {
 				assignee__username: 'alice'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -760,12 +765,12 @@ describe('Test Execution', () => {
 
 			const user1 = new User(mockUser());
 			await te1.setAssignee(user1);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getAssigneeId()).toEqual(1);
 			expect(te1.getAssigneeUsername()).toEqual('alice');
@@ -784,7 +789,7 @@ describe('Test Execution', () => {
 				assignee__username: null
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -792,12 +797,12 @@ describe('Test Execution', () => {
 			expect(te1.getAssigneeUsername()).toEqual('alice');
 
 			await te1.setAssignee();
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getAssigneeId()).toBeNull();
 			expect(te1.getAssigneeUsername()).toBeNull();
@@ -816,7 +821,7 @@ describe('Test Execution', () => {
 				assignee__username: 'bob'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -824,12 +829,12 @@ describe('Test Execution', () => {
 			expect(te1.getAssigneeUsername()).toEqual('alice');
 
 			await te1.setAssignee(2);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getAssigneeId()).toEqual(2);
 			expect(te1.getAssigneeUsername()).toEqual('bob');
@@ -848,7 +853,7 @@ describe('Test Execution', () => {
 				assignee__username: 'bob'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -857,12 +862,12 @@ describe('Test Execution', () => {
 
 			const user2 = new User(mockUser({ id: 2, username: 'bob' }));
 			await te1.setAssignee(user2);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getAssigneeId()).toEqual(2);
 			expect(te1.getAssigneeUsername()).toEqual('bob');
@@ -881,7 +886,7 @@ describe('Test Execution', () => {
 				status__name: 'PASSED'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -889,12 +894,12 @@ describe('Test Execution', () => {
 			expect(te1.getStatusName()).toEqual('IDLE');
 
 			await te1.setStatus(4);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStatusId()).toEqual(4);
 			expect(te1.getStatusName()).toEqual('PASSED');
@@ -914,7 +919,7 @@ describe('Test Execution', () => {
 				status__name: 'PASSED'
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -926,12 +931,12 @@ describe('Test Execution', () => {
 				name: 'PASSED'
 			}));
 			await te1.setStatus(status4);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getStatusId()).toEqual(4);
 			expect(te1.getStatusName()).toEqual('PASSED');
@@ -955,7 +960,7 @@ describe('Test Execution', () => {
 				tested_by__username: 'alice',
 			});
 
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTestExecutionStatus({
 						id: 4,
@@ -963,7 +968,7 @@ describe('Test Execution', () => {
 					})
 				]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
@@ -975,18 +980,18 @@ describe('Test Execution', () => {
 			expect(te1.getStopDate()).toBeNull();
 
 			await te1.setStatus('PASSED');
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecutionStatus.filter',
-				[{ name: 'PASSED' }]
-			);
-			verifyRpcCall(
-				mockAxios,
-				1,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecutionStatus.filter',
+				params: [{ name: 'PASSED' }],
+				callIndex: 0,
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 1,
+			});
 
 			expect(te1.getStatusId()).toEqual(4);
 			expect(te1.getStatusName()).toEqual('PASSED');
@@ -1008,19 +1013,19 @@ describe('Test Execution', () => {
 				sortkey: 20,
 			});
 
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: updateVal
 			}));
 
 			expect(te1.getSortKey()).toEqual(10);
 
 			await te1.setSortKey(20);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'TestExecution.update',
-				[ 1, changeVal ]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.update',
+				params: [1, changeVal],
+				callIndex: 0,
+			});
 
 			expect(te1.getSortKey()).toEqual(20);
 		});
@@ -1030,8 +1035,8 @@ describe('Test Execution', () => {
 		it('Can get Comments for a TestExecution', async () => {
 			const commentVal = mockTestExecutionComment();
 			const te1 = new TestExecution(mockTestExecution());
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
-				result: [commentVal],
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [commentVal]
 			}));
 			expect(await te1.getComments()).toEqual([new Comment(commentVal)]);
 		});
@@ -1039,15 +1044,15 @@ describe('Test Execution', () => {
 
 	describe('Fetch values from server', () => {
 		it('Can get a single TestExecution by ID', async () => {
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse(
-				{ result: [execution1Vals] }
-			));
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse(
-				{ result: [execution2Vals] }
-			));
-			mockAxios.post.mockResolvedValue(mockRpcResponse(
-				{ result: [execution3Vals] }
-			));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [execution1Vals]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [execution2Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [execution3Vals]
+			}));
 
 			expect(await TestExecution.getById(1))
 				.toEqual(new TestExecution(execution1Vals));
@@ -1058,12 +1063,12 @@ describe('Test Execution', () => {
 		});
 
 		it('Can get multiple TestExecutions by ID', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					execution1Vals, 
 					execution2Vals, 
 					execution3Vals
-				] 
+				]
 			}));
 			expect(await TestExecution.getByIds([1, 2, 3]))
 				.toEqual(expect.arrayContaining([
@@ -1076,9 +1081,9 @@ describe('Test Execution', () => {
 		/* eslint-disable max-len */
 		it('Throws an error when fetching a TestExecution by ID that does not exist', 
 			async () => {
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: []
+				}));
 				expect(TestExecution.getById(5000))
 					.rejects
 					.toThrowError('Could not find any TestExecution with ID 5000');
@@ -1087,9 +1092,9 @@ describe('Test Execution', () => {
 
 		it('Can get TestExecution by filtering arbitrary data', 
 			async () => {
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [execution1Vals] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [execution1Vals]
+				}));
 				expect(await TestExecution.serverFilter({ run: 1, case: 1 }))
 					.toEqual([new TestExecution(execution1Vals)]);
 			});
