@@ -126,11 +126,6 @@ describe('HTTP Request Handler', () => {
 		
 		// Save cookie to jar from POST response
 		it('Can save cookies returned by a POST response', async () => {
-			const reqHeaders = {
-				accept:  'application/json',
-				'X-Requested-With': 'Axios'
-			};
-			
 			const reqBody = {
 				foo: 'bar',
 				baz: true,
@@ -143,7 +138,6 @@ describe('HTTP Request Handler', () => {
 			const response = await RequestHandler.sendPostRequest(
 				requestPath,
 				reqBody,
-				reqHeaders
 			);
 			
 			expect(response.headers)
