@@ -1,17 +1,21 @@
-import axios from 'axios';
-
 import KiwiConnector from './kiwiConnector';
+import RequestHandler from './requestHandler';
 
 import { kiwiTestServerInfo } from '../../test/testServerDetails';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import KiwiBaseItem from './kiwiBaseItem';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
 import { mockTestCase } from '../../test/mockKiwiValues';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('./requestHandler');
+// const mockRequest = RequestHandler as jest.Mocked<typeof RequestHandler>;
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('KiwiBaseItem', () => {
 	
@@ -46,9 +50,9 @@ describe('KiwiBaseItem', () => {
 	describe('Server Methods', () => {
 		it('Can get a single KiwiBaseItem by ID', async () => {
 			const serverKbis = [{ id: 1, otherKey: 'otherVal' }];
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: serverKbis })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: serverKbis
+			}));
 			const kbi = await KiwiBaseItem.getById(1);
 			expect(kbi['serialized']).toEqual(serverKbis[0]);
 		});
@@ -58,9 +62,9 @@ describe('KiwiBaseItem', () => {
 				{ id: 1, otherKey: 'otherVal' }, 
 				{ id: 2, otherKey: 'otherOtherVal' }
 			];
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: serverKbis })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: serverKbis
+			}));
 			const kbi = await KiwiBaseItem.getByIds([1, 2]);
 			expectArrayWithKiwiItem(kbi, serverKbis[0]);
 			expectArrayWithKiwiItem(kbi, serverKbis[1]);
@@ -68,15 +72,17 @@ describe('KiwiBaseItem', () => {
 		
 		it('GetByIds can handle int', async () => {
 			const serverKbis = [{ id: 1, otherKey: 'otherVal' }];
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: serverKbis })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: serverKbis
+			}));
 			const kbi = await KiwiBaseItem.getById(1);
 			expect(kbi['serialized']).toEqual(serverKbis[0]);
 		});
 		
 		it('GetByID throws error with invalid ID', async ()=> {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			expect(KiwiBaseItem.getById(1))
 				.rejects
 				.toThrowError('Could not find any KiwiBaseItem with ID 1');
@@ -89,23 +95,27 @@ describe('KiwiBaseItem', () => {
 				text: 'This test case was updated by a different client.'
 			});
 
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [ origServerVal ]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [ updatedServerVal ]
 			}));
 
 			const kiwiItem = await KiwiBaseItem.getById(1);
 			expect(kiwiItem['serialized']).toEqual(origServerVal);
-			verifyRpcCall(
-				mockAxios, 
-				0, 
-				'KiwiBaseItem.filter', 
-				[{ id__in: [1] }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'KiwiBaseItem.filter',
+				params: [{ id__in: [1] }]
+			});
 			await kiwiItem.syncServerValues();
-			verifyRpcCall(mockAxios, 1, 'KiwiBaseItem.filter', [{ id: 1 }]);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'KiwiBaseItem.filter',
+				params: [{ id: 1 }],
+				callIndex: 1,
+			});
 			expect(kiwiItem['serialized']).toEqual(updatedServerVal);
 		});
 	});

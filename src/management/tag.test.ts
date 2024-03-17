@@ -1,14 +1,18 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
 import Tag from './tag';
 import { mockTag, mockTagServerEntry } from '../../test/mockKiwiValues';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Tag', () => {
 	
@@ -74,7 +78,7 @@ describe('Tag', () => {
 	
 	describe('Server Lookups of Tags', () => {
 		it('Can get single by ID', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry(tag1Vals),
 					mockTagServerEntry({
@@ -93,7 +97,7 @@ describe('Tag', () => {
 		});
 		
 		it('Can get multiple by ID', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry(tag1Vals),
 					mockTagServerEntry(tag2Vals),
@@ -115,7 +119,9 @@ describe('Tag', () => {
 		});
 		
 		it('Can get Tag by name - 0 matches throws error', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [],
+			}));
 			const name = 'UnusedName';
 			expect(Tag.getByName(name))
 				.rejects
@@ -123,7 +129,7 @@ describe('Tag', () => {
 		});
 		
 		it('Can get Tag by name - 1 discrete match returns Tag', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [ 
 					mockTagServerEntry({
 						...tag1Vals,
@@ -136,7 +142,7 @@ describe('Tag', () => {
 		});
 		
 		it('Can get Tag by name - 1 unique match returns Tag', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry(tag1Vals),
 					mockTagServerEntry({
@@ -166,7 +172,7 @@ describe('Tag', () => {
 		});
 		
 		it('Can get Tag by name - multiple matches throws error', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry(tag1Vals),
 					mockTagServerEntry({
@@ -186,7 +192,7 @@ describe('Tag', () => {
 	
 	describe('Server Lookups of Associated Objects', () => {
 		it('Can get IDs of TestCases with Tag - Multiple matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ ...tag1Vals, case: 2 }),
 					mockTagServerEntry({ ...tag1Vals, case: 4 }),
@@ -204,7 +210,9 @@ describe('Tag', () => {
 		});
 		
 		it('Can get IDs of TestCases with Tag - 0 matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			
 			const tag = new Tag(tag1Vals);
 			const caseIds = await tag.getTaggedTestCaseIds();
@@ -214,7 +222,7 @@ describe('Tag', () => {
 		});
 		
 		it('Can get IDs of TestPlans with Tag - Multiple matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({
 						...tag1Vals,
@@ -247,8 +255,10 @@ describe('Tag', () => {
 		});
 		
 		it('Can get IDs of TestPlans with Tag - 0 matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
-			
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
+
 			const tag = new Tag(tag1Vals);
 			const caseIds = await tag.getTaggedTestPlanIds();
 			
@@ -257,7 +267,7 @@ describe('Tag', () => {
 		});
 		
 		it('Can get IDs of TestRuns with Tag - Multiple matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({
 						...tag1Vals,
@@ -290,7 +300,9 @@ describe('Tag', () => {
 		});
 		
 		it('Can get IDs of TestRuns with Tag - 0 matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			
 			const tag = new Tag(tag1Vals);
 			const caseIds = await tag.getTaggedTestRunIds();
@@ -300,7 +312,7 @@ describe('Tag', () => {
 		});
 		
 		it('Can get IDs of Bugs with Tag - Multiple matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({
 						...tag1Vals,
@@ -333,7 +345,9 @@ describe('Tag', () => {
 		});
 		
 		it('Can get IDs of Bugs with Tag - 0 matches', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			
 			const tag = new Tag(tag1Vals);
 			const caseIds = await tag.getTaggedBugIds();
@@ -344,8 +358,7 @@ describe('Tag', () => {
 
 		it('Can get Tags for given TestCase ID', async () => {
 			const tcId = 35;
-			
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ ...tag1Vals, case: tcId }),
 					mockTagServerEntry({ ...tag2Vals, case: tcId }),
@@ -354,12 +367,11 @@ describe('Tag', () => {
 			}));
 
 			const tagList = await Tag.getTagsForTestCase(tcId);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'Tag.filter',
-				[{ case: tcId }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Tag.filter',
+				params: [{ case: tcId }],
+			});
 
 			expect(tagList).toContainEqual(new Tag(tag1Vals));
 			expect(tagList).toContainEqual(new Tag(tag2Vals));
@@ -368,8 +380,7 @@ describe('Tag', () => {
 
 		it('Can get Tags for given TestPlan ID', async () => {
 			const planId = 35;
-			
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ ...tag1Vals, plan: planId }),
 					mockTagServerEntry({ ...tag2Vals, plan: planId }),
@@ -378,12 +389,11 @@ describe('Tag', () => {
 			}));
 
 			const tagList = await Tag.getTagsForTestPlan(planId);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'Tag.filter',
-				[{ plan: planId }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Tag.filter',
+				params: [{ plan: planId }],
+			});
 
 			expect(tagList).toContainEqual(new Tag(tag1Vals));
 			expect(tagList).toContainEqual(new Tag(tag2Vals));
@@ -392,8 +402,7 @@ describe('Tag', () => {
 
 		it('Can get Tags for given TestRun ID', async () => {
 			const runId = 35;
-			
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ ...tag1Vals, run: runId }),
 					mockTagServerEntry({ ...tag2Vals, run: runId }),
@@ -402,12 +411,11 @@ describe('Tag', () => {
 			}));
 
 			const tagList = await Tag.getTagsForTestRun(runId);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'Tag.filter',
-				[{ run: runId }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Tag.filter',
+				params: [{ run: runId }],
+			});
 
 			expect(tagList).toContainEqual(new Tag(tag1Vals));
 			expect(tagList).toContainEqual(new Tag(tag2Vals));
@@ -421,10 +429,10 @@ describe('Tag', () => {
 			const origServerVal = mockTagServerEntry(origLocalVal);
 			const updatedLocalVal = mockTag({ name: 'New name' });
 
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [ origServerVal ]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry(updatedLocalVal),
 					mockTagServerEntry({
@@ -443,11 +451,20 @@ describe('Tag', () => {
 			}));
 			
 			const tag1 = await Tag.getById(1);
-			verifyRpcCall(mockAxios, 0, 'Tag.filter', [{ id__in: [1] }]);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Tag.filter',
+				params: [{ id__in: [1] }],
+			});
 			expect(tag1['serialized']).toEqual(origLocalVal);
 
 			await tag1.syncServerValues();
-			verifyRpcCall(mockAxios, 1, 'Tag.filter', [{ id: 1 }]);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Tag.filter',
+				params: [{ id: 1 }],
+				callIndex: 1,
+			});
 			expect(tag1['serialized']).toEqual(updatedLocalVal);
 		});
 	});

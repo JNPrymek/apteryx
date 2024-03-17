@@ -1,13 +1,15 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 
 import EnvironmentProperty from './environmentProperty';
 import { mockEnvironmentProperty } from '../../test/mockKiwiValues';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('EnvironmentProperty', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -52,7 +54,7 @@ describe('EnvironmentProperty', () => {
 
 	describe('Server Lookups', () => {
 		it('Can get an EnvironmentProperty By ID (1 match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					propVals[0]
 				]
@@ -62,7 +64,7 @@ describe('EnvironmentProperty', () => {
 		});
 
 		it('Can get an EnvironmentProperty By ID (2 matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					propVals[0],
 					propVals[1],
@@ -76,7 +78,7 @@ describe('EnvironmentProperty', () => {
 		});
 
 		it('Can get an EnvironmentProperty by ID (no match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: []
 			}));
 			expect(EnvironmentProperty.getById(1))
@@ -87,7 +89,7 @@ describe('EnvironmentProperty', () => {
 		});
 
 		it('Can get Properties for an Environment', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: propVals
 			}));
 

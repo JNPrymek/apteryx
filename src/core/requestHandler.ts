@@ -1,6 +1,7 @@
 
-import axios, { AxiosResponse } from 'axios';
+import fetch from 'node-fetch';
 import { CookieJar, Cookie } from 'tough-cookie';
+import { NetworkResponse } from './networkTypes';
 
 /**
  * Utility Class to handle HTTP requests and manage Cookies
@@ -21,24 +22,39 @@ export default class RequestHandler {
 	 * @param url URL the POST request is sent to
 	 * @param body Body of the POST request
 	 * @param headers Headers of the POST request
-	 * @returns An AxiosResponse
+	 * @returns An HTTP Response Object
 	 */
 	static async sendPostRequest(
 		url: string, 
 		body: Record<string, unknown>, 
-		headers: Record<string, unknown> = {}
-	): Promise<AxiosResponse<Record<string, unknown>>> {
+		headers: Record<string, string> = {
+			'Content-Type': 'application/json'
+		}
+	): Promise<Record<string, unknown>> {
 		// Add cookies to request headers
 		const sendHeaders = await this.appendCookiesToHeader(url, headers);
 		
 		// Send POST request
-		const response = await axios.post(url, body, { headers: sendHeaders });
+		const response = await fetch(url, {
+			method: 'POST',
+			body: JSON.stringify(body),
+			headers: sendHeaders,
+		});
 		
 		// Save new/edited cookies to jar
-		await this.saveCookiesFromHeader(url, response.headers);
+		await this.saveCookiesFromHeader(url, response.headers.raw());
+
+		const responseBody = await response.json() as Record<string, unknown>;
+
+		const result: NetworkResponse = {
+			status: response.status,
+			statusText: response.statusText,
+			headers: Object.fromEntries(response.headers),
+			body: responseBody,
+		};
 		
 		// Return results
-		return response;
+		return result;
 	}
 	
 	/**
@@ -49,10 +65,13 @@ export default class RequestHandler {
 	 */
 	static async appendCookiesToHeader(
 		url: string, 
-		headers: Record<string, unknown>
+		headers: Record<string, string>
 	): Promise<Record<string, string>> {
 		const cookieHeader = await this.cookieJar.getCookieString(url);
-		return { ...headers, Cookie:  cookieHeader };
+		if (cookieHeader) {
+			return { ...headers, Cookie:  cookieHeader };
+		}
+		return headers;
 	}
 	
 	/**

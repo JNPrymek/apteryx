@@ -102,7 +102,6 @@ describe('Comment', () => {
 				id: 3,
 			});
 			const invalidComment = new Comment(invalidCommentValues);
-			console.log(JSON.stringify(invalidComment));
 			// Calling expect(invalidComment.getContentType).toThrowError...
 			// Does not catch error
 			expect(() => {

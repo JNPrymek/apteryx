@@ -1,17 +1,21 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
 import {
 	mockEnvironment,
 	mockEnvironmentProperty
 } from '../../test/mockKiwiValues';
 import Environment from './environment';
 import EnvironmentProperty from './environmentProperty';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
 
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Environment', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -47,31 +51,30 @@ describe('Environment', () => {
 
 	describe('Server Lookups', () => {
 		it('Can get Environment by ID (single)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [ env1Val ]
 			}));
 			const result = await Environment.getById(1);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'Environment.filter',
-				[{ id__in: [1] }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Environment.filter',
+				params: [{ id__in: [1] }],
+			});
 			expect(result).toEqual(new Environment(env1Val));
 		});
 
 		it('Can get Environment by Name', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [ env1Val ]
 			}));
+
 			const envName = 'Production';
 			const result = await Environment.getByName(envName);
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'Environment.filter',
-				[{ name: envName }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Environment.filter',
+				params: [{ name: envName }],
+			});
 			expect(result).toEqual(new Environment(env1Val));
 		});
 
@@ -82,7 +85,7 @@ describe('Environment', () => {
 			];
 
 			it('Can get Environment Properties', async () => {
-				mockAxios.post.mockResolvedValue(mockRpcResponse({
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 					result: propVals
 				}));
 				const env1 = new Environment(mockEnvironment());
@@ -91,31 +94,29 @@ describe('Environment', () => {
 					new EnvironmentProperty(propVals[0]),
 					new EnvironmentProperty(propVals[1]),
 				]));
-				verifyRpcCall(
-					mockAxios,
-					0,
-					'Environment.properties',
-					[{ environment: 1 }]
-				);
+				assertPostRequestData({
+					mockPostRequest,
+					method: 'Environment.properties',
+					params: [{ environment: 1 }],
+				});
 			});
 
 			it('Can get Environment Property names', async () => {
-				mockAxios.post.mockResolvedValue(mockRpcResponse({
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 					result: propVals
 				}));
 				const env1 = new Environment(mockEnvironment());
 				const names = await env1.getPropertyKeys();
-				verifyRpcCall(
-					mockAxios,
-					0,
-					'Environment.properties',
-					[{ environment: 1 }]
-				);
+				assertPostRequestData({
+					mockPostRequest,
+					method: 'Environment.properties',
+					params: [{ environment: 1 }],
+				});
 				expect(names).toEqual(['Foo', 'fizz']);
 			});
 
 			it('Can get Environment Property values', async () => {
-				mockAxios.post.mockResolvedValue(mockRpcResponse({
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 					result: [
 						propVals[1],
 						mockEnvironmentProperty({
@@ -132,12 +133,11 @@ describe('Environment', () => {
 				}));
 				const env1 = new Environment(mockEnvironment());
 				const names = await env1.getPropertyValues('fizz');
-				verifyRpcCall(
-					mockAxios,
-					0,
-					'Environment.properties',
-					[{ environment: 1, name: 'fizz' }]
-				);
+				assertPostRequestData({
+					mockPostRequest,
+					method: 'Environment.properties',
+					params: [{ environment: 1, name: 'fizz' }],
+				});
 				expect(names).toEqual(['buzz', 'fizzbuzz', 'fizbin']);
 			});
 		});
@@ -145,69 +145,74 @@ describe('Environment', () => {
 
 	describe('Server Updates', () => {
 		it('Can create a new Environment', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: env2Val,
 			}));
 			const env2 = await Environment.create({
 				name: env2Val.name,
 				description: env2Val.description,
 			});
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Environment.create',
+				params: [{
+					name: env2Val.name,
+					description: env2Val.description,
+				}],
+			});
 			expect(env2).toEqual(new Environment(env2Val));
 		});
 
 		it('Can add a property to the Environment', async () => {
 			const propVal = mockEnvironmentProperty();
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: propVal
 			}));
 			const env1 = new Environment(mockEnvironment());
 			const envProp = await env1.addProperty('Foo', 'Bar');
-			verifyRpcCall(
-				mockAxios,
-				0,
-				'Environment.add_property',
-				[1, 'Foo', 'Bar']
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'Environment.add_property',
+				params: [1, 'Foo', 'Bar'],
+			});
 			expect(envProp).toEqual(new EnvironmentProperty(propVal));
 		});
 
 		it('Can remove a specific property value from the Environment',
 			async () => {
 				const propVal = mockEnvironmentProperty();
-				mockAxios.post.mockResolvedValue(mockRpcResponse({
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 					result: null
 				}));
 				const env1 = new Environment(mockEnvironment());
 				await env1.removeProperty(propVal.name, propVal.value);
-				verifyRpcCall(
-					mockAxios,
-					0,
-					'Environment.remove_property',
-					[{
+				assertPostRequestData({
+					mockPostRequest,
+					method: 'Environment.remove_property',
+					params: [{
 						environment: 1,
 						name: propVal.name,
 						value: propVal.value
-					}]
-				);
+					}],
+				});
 			});
 
 		it('Can remove all values for a specific property from the Environment',
 			async () => {
 				const propVal = mockEnvironmentProperty();
-				mockAxios.post.mockResolvedValue(mockRpcResponse({
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 					result: null
 				}));
 				const env1 = new Environment(mockEnvironment());
 				await env1.removeProperty(propVal.name);
-				verifyRpcCall(
-					mockAxios,
-					0,
-					'Environment.remove_property',
-					[{
+				assertPostRequestData({
+					mockPostRequest,
+					method: 'Environment.remove_property',
+					params: [{
 						environment: 1,
-						name: propVal.name,
-					}]
-				);
+						name: propVal.name
+					}],
+				});
 			});
 	});
 });

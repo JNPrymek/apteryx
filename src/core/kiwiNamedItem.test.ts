@@ -1,15 +1,15 @@
-import axios from 'axios';
-
 import KiwiConnector from './kiwiConnector';
-
+import RequestHandler from './requestHandler';
 import { kiwiTestServerInfo } from '../../test/testServerDetails';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import KiwiNamedItem from './kiwiNamedItem';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('./requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('KiwiNamedItem', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -32,9 +32,9 @@ describe('KiwiNamedItem', () => {
 	
 	it('Can get a named item by name', async () => {
 		const serverItems = [{ id: 1, name: 'Bob', b: 'valB' }];
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: serverItems })
-		);
+		mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+			result: serverItems,
+		}));
 		
 		const bob = await KiwiNamedItem.getByName('Bob');
 		expect(bob['serialized']).toEqual(serverItems[0]);
@@ -42,9 +42,9 @@ describe('KiwiNamedItem', () => {
 	
 	it('Throws error when getting non-existent name', async () => {
 		const serverItems: Array<Record<string, unknown>> = [];
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: serverItems })
-		);
+		mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+			result: serverItems,
+		}));
 		
 		expect(KiwiNamedItem.getByName('Bob'))
 			.rejects
@@ -53,9 +53,9 @@ describe('KiwiNamedItem', () => {
 	
 	it('Can get a single KiwiNamedItem by ID', async () => {
 		const serverItems = [{ id: 1, otherKey: 'otherVal' }];
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: serverItems })
-		);
+		mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+			result: serverItems,
+		}));
 		const kbi = await KiwiNamedItem.getById(1);
 		expect(kbi['serialized']).toEqual(serverItems[0]);
 	});
@@ -65,12 +65,11 @@ describe('KiwiNamedItem', () => {
 			{ id: 1, name: 'Bob', otherKey: 'otherVal' }, 
 			{ id: 2, name: 'Stuart', otherKey: 'otherOtherVal' }
 		];
-		mockAxios.post.mockResolvedValue(
-			mockRpcResponse({ result: serverItems })
-		);
+		mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+			result: serverItems,
+		}));
 		const kbi = await KiwiNamedItem.getByIds([1, 2]);
 		expectArrayWithKiwiItem(kbi, serverItems[0]);
 		expectArrayWithKiwiItem(kbi, serverItems[1]);
 	});
-	
 });

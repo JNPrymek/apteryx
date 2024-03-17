@@ -1,15 +1,17 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
 import { 
 	mockTestCaseProperty
 } from '../../test/mockValues/testCases/mockTestCaseValues';
 import TestCaseProperty from './testCaseProperty';
 
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('TestCaseProperty', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -54,17 +56,15 @@ describe('TestCaseProperty', () => {
 
 	describe('Server Lookups', () => {
 		it('Can get a TestCaseProperty by ID (1 match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
-				result: [
-					propVals[0]
-				]
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [ propVals[0] ]
 			}));
 			expect(await TestCaseProperty.getById(1))
 				.toEqual(new TestCaseProperty(propVals[0]));
 		});
 
 		it('Can get a TestCaseProperty by ID (2 matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					propVals[0],
 					propVals[1]
@@ -78,7 +78,7 @@ describe('TestCaseProperty', () => {
 		});
 
 		it('Can get a TestCaseProperty by ID (No match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ 
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: []
 			}));
 			expect(TestCaseProperty.getById(1))

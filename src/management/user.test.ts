@@ -1,13 +1,17 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import User from './user';
 import { mockUser } from '../../test/mockKiwiValues';
-import verifyRpcCall from '../../test/axiosAssertions/verifyRpcCall';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import {
+	assertPostRequestData
+} from '../../test/networkMocks/assertPostRequestData';
 
-// Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('User', () => {
 
@@ -85,17 +89,17 @@ describe('User', () => {
 
 	describe('Server Functions', () => {
 		it('Can get a User via single ID', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [user1Vals] })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [user1Vals]
+			}));
 
 			expect(await User.getById(1)).toEqual(new User(user1Vals));
 		});
 
 		it('Can get Users via a list of IDs', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [user1Vals, user2Vals] })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [user1Vals, user2Vals]
+			}));
 
 			const expectResults = [
 				new User(user1Vals),
@@ -107,12 +111,12 @@ describe('User', () => {
 		});
 
 		it('Can get a User by their username', async () => {
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [user1Vals] })
-			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [user2Vals] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [user1Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [user2Vals]
+			}));
 
 			expect(await User.getByUsername('alice'))
 				.toEqual(new User(user1Vals));
@@ -122,12 +126,12 @@ describe('User', () => {
 		});
 
 		it('Can get a User by their name', async () => {
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [user1Vals] })
-			);
-			mockAxios.post.mockResolvedValueOnce(
-				mockRpcResponse({ result: [user2Vals] })
-			);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [user1Vals]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [user2Vals]
+			}));
 
 			expect(await User.getByName('alice'))
 				.toEqual(new User(user1Vals));
@@ -137,9 +141,9 @@ describe('User', () => {
 		});
 
 		it('Throws error when getting User with invalid username', async () => {
-			mockAxios.post.mockResolvedValue(
-				mockRpcResponse({ result: [] })
-			);
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 
 			expect(User.getByUsername('charlie'))
 				.rejects.toThrowError(
@@ -161,27 +165,26 @@ describe('User', () => {
 		});
 
 		it('Can resolve ID from username', async () => {
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [ user1Vals ]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [ user2Vals ]
 			}));
 
 			expect(await User.resolveUserId('alice')).toEqual(1);
 			expect(await User.resolveUserId('bob')).toEqual(2);
-			verifyRpcCall(
-				mockAxios, 
-				0, 
-				'User.filter', 
-				[ { username: 'alice' }]
-			);
-			verifyRpcCall(
-				mockAxios, 
-				1, 
-				'User.filter', 
-				[ { username: 'bob' }]
-			);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'User.filter',
+				params: [ { username: 'alice' }],
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'User.filter',
+				params: [ { username: 'bob' }],
+				callIndex: 1,
+			});
 		});
 	});
 });

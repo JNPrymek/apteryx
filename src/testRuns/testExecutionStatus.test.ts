@@ -1,12 +1,14 @@
-import axios from 'axios';
 import { describe, it, expect } from '@jest/globals';
-import mockRpcResponse from '../../test/axiosAssertions/mockRpcResponse';
 import { mockTestExecutionStatus } from '../../test/mockKiwiValues';
 import TestExecutionStatus from './testExecutionStatus';
+import RequestHandler from '../core/requestHandler';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
-// Init Mock Axios
-jest.mock('axios');
-const mockAxios = axios as jest.Mocked<typeof axios>;
+// Mock RequestHandler
+jest.mock('../core/requestHandler');
+const mockPostRequest =
+	RequestHandler.sendPostRequest as
+	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Test Execution Status', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -104,18 +106,18 @@ describe('Test Execution Status', () => {
 	describe('Basic Server Functions', () => {
 		// get by id - 0 & 1 matches
 		it('Can get TestExecutionStatus by single ID (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse(
-				{ result: [stat1Vals] }
-			));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [stat1Vals]
+			}));
 			const result = await TestExecutionStatus.getById(1);
 			expect(result).toEqual(tes1);
 		});
 
 		it('Can get TestExecutionStatus by single ID (no matches)', 
 			async () => {
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: []
+				}));
 				expect(TestExecutionStatus.getById(1))
 					.rejects
 					.toThrowError(
@@ -125,9 +127,9 @@ describe('Test Execution Status', () => {
 
 		it('Can get multiple TestExecutionStatus from array of IDs', 
 			async () => {
-				mockAxios.post.mockResolvedValue(mockRpcResponse(
-					{ result: [stat1Vals, stat2Vals] }
-				));
+				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+					result: [stat1Vals, stat2Vals]
+				}));
 				const results = await TestExecutionStatus.getByIds([1, 4]);
 				expect(results).toEqual(expect.arrayContaining([tes1, tes2]));
 				expect(results).not.toEqual(expect.arrayContaining([tes3]));
@@ -135,15 +137,17 @@ describe('Test Execution Status', () => {
 
 		// get by name - 0 & 1 matches
 		it('Can get TestExecutionStatus by name (one match)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse(
-				{ result: [stat1Vals] }
-			));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [stat1Vals]
+			}));
 			const result = await TestExecutionStatus.getByName('IDLE');
 			expect(result).toEqual(tes1);
 		});
 
 		it('Can get TestExecutionStatus by name (no matches)', async () => {
-			mockAxios.post.mockResolvedValue(mockRpcResponse({ result: [] }));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: []
+			}));
 			const name = 'NON-EXISTENT-NAME';
 			expect(TestExecutionStatus.getByName(name))
 				.rejects
@@ -189,7 +193,7 @@ describe('Test Execution Status', () => {
 			const stat5 = 'five';
 			const stat42 = 'fourty-two';
 
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTestExecutionStatus({
 						id: 1,
@@ -197,7 +201,7 @@ describe('Test Execution Status', () => {
 					})
 				]
 			}));
-			mockAxios.post.mockResolvedValueOnce(mockRpcResponse({
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTestExecutionStatus({
 						id: 5,
@@ -205,11 +209,11 @@ describe('Test Execution Status', () => {
 					})
 				]
 			}));
-			mockAxios.post.mockResolvedValue(mockRpcResponse({
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTestExecutionStatus({
 						id: 42,
-						name: 'forty-two'
+						name: 'fourty-two'
 					})
 				]
 			}));

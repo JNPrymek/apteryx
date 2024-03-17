@@ -31,13 +31,13 @@
 		"@types/chai": "^4.3.5",
 		"@types/jest": "^27.0.2",
 		"@types/mocha": "^10.0.1",
+		"@types/node-fetch": "^2.6.11",
 		"@typescript-eslint/eslint-plugin": "^4.32.0",
 		"@typescript-eslint/parser": "^4.32.0",
 		"babel-jest": "^27.2.4",
 		"chai": "^4.3.7",
 		"eslint": "^7.32.0",
 		"jest": "^27.2.4",
-		"jest-mock-axios": "^4.5.0",
 		"mocha": "^10.2.0",
 		"ts-jest": "^27.0.5",
 		"ts-mocha": "^10.0.0",
@@ -45,8 +45,7 @@
 	},
 	"dependencies": {
 		"@types/tough-cookie": "^4.0.1",
-		"axios": "^0.22.0",
-		"axios-cookiejar-support": "^2.0.2",
+		"node-fetch": "^2.7.0",
 		"tough-cookie": "^4.0.0"
 	}
 }
