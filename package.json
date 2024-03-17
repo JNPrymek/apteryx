@@ -25,9 +25,9 @@
 		"build": "rm -r ./dist/* && npx tsc"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.15.5",
-		"@babel/preset-env": "^7.15.6",
-		"@babel/preset-typescript": "^7.15.0",
+		"@babel/core": "^7.24.0",
+		"@babel/preset-env": "^7.24.0",
+		"@babel/preset-typescript": "^7.23.3",
 		"@types/chai": "^4.3.12",
 		"@types/jest": "^27.0.2",
 		"@types/mocha": "^10.0.6",
