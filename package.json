@@ -32,6 +32,7 @@
 		"@types/jest": "^29.5.12",
 		"@types/mocha": "^10.0.6",
 		"@types/node-fetch": "^2.6.11",
+		"@types/tough-cookie": "^4.0.5",
 		"@typescript-eslint/eslint-plugin": "^7.2.0",
 		"@typescript-eslint/parser": "^7.2.0",
 		"babel-jest": "^29.7.0",
@@ -44,7 +45,6 @@
 		"typescript": "^5.4.2"
 	},
 	"dependencies": {
-		"@types/tough-cookie": "^4.0.5",
 		"node-fetch": "^2.7.0",
 		"tough-cookie": "^4.1.3"
 	}
