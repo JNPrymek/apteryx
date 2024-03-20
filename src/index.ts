@@ -3,7 +3,7 @@ import KiwiConnector from './core/kiwiConnector';
 import {
 	RpcResult,
 	RpcParam,
-	IServerDetails
+	ServerDetails
 } from './core/networkTypes';
 
 // Management
@@ -92,7 +92,7 @@ export {
 	KiwiConnector,
 	RpcResult,
 	RpcParam,
-	IServerDetails,
+	ServerDetails,
 	// Management
 	Build,
 	BuildValues,

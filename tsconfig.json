@@ -76,6 +76,7 @@
   "exclude": [
 		"test/**/*",
 		"src/**/*.test.ts",
-    "src/__mocks__/*"
+    "src/__mocks__/*",
+    "src/utils/prettyPrintJson.ts"
   ]
 }
