@@ -169,6 +169,31 @@ export default class TestExecution extends KiwiBaseItem {
 		return rawResults.map( val => new Comment(val));
 	}
 
+	public async addComment(commentText: string): Promise<Comment> {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestExecution.add_comment',
+			[ this.getId(), commentText ]
+		) as CommentValues;
+		return new Comment(result);
+	}
+
+	public async removeComment(comment: Comment | number): Promise<void> {
+		const commentId: number = (comment instanceof Comment)
+			? comment.getId()
+			: comment;
+		await KiwiConnector.sendRPCMethod(
+			'TestExecution.remove_comment',
+			[this.getId(), commentId]
+		);
+	}
+
+	public async removeAllComments(): Promise<void> {
+		await KiwiConnector.sendRPCMethod(
+			'TestExecution.remove_comment',
+			[this.getId(), null]
+		);
+	}
+
 	public async serverUpdate(
 		updateValues: Partial<TestExecutionWriteValues>
 	): Promise<void> {
