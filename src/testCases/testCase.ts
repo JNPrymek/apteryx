@@ -370,6 +370,31 @@ export default class TestCase extends KiwiBaseItem {
 		return rawResults.map( val => new Comment(val));
 	}
 
+	public async addComment(commentText: string): Promise<Comment> {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_comment',
+			[ this.getId(), commentText ]
+		) as CommentValues;
+		return new Comment(result);
+	}
+
+	public async removeComment(comment: Comment | number): Promise<void> {
+		const commentId: number = (comment instanceof Comment)
+			? comment.getId()
+			: comment;
+		await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_comment',
+			[this.getId(), commentId]
+		);
+	}
+
+	public async removeAllComments(): Promise<void> {
+		await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_comment',
+			[this.getId(), null]
+		);
+	}
+
 	public static async getTestCasesWithTag(
 		tag: number | string | Tag
 	): Promise<Array<TestCase>> {
