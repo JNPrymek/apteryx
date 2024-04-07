@@ -16,8 +16,8 @@
 	"author": "Jacob N Prymek",
 	"license": "CC-BY-4.0",
 	"scripts": {
-		"lint": "npx eslint . --cache",
-		"lint:fix": "npx eslint . --cache --fix",
+		"lint": "npx eslint .",
+		"lint:fix": "npx eslint . --fix",
 		"test": "npx jest",
 		"test:coverage": "npx jest --coverage",
 		"test:api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx ts-mocha",
