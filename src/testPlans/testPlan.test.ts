@@ -1682,15 +1682,15 @@ describe('Test Plan', () => {
 		it('Can add Tags to TestPlan by Name', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
-					mockTagServerEntry({ id: 2, name: 'Tag2', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
-					mockTagServerEntry({ id: 2, name: 'Tag2', plan: 2 }),
-					mockTagServerEntry({ id: 3, name: 'Tag3', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
+					mockTag({ id: 3, name: 'Tag3' }),
 				]
 			}));
 			await tp2.addTag('ExampleTag2');
@@ -1712,25 +1712,25 @@ describe('Test Plan', () => {
 		it('Can add Tags to TestPlan by ID', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 2, name: 'ExampleTag2', plan: 2 }),
+					mockTagServerEntry({ id: 2, name: 'ExampleTag2' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
-					mockTagServerEntry({ id: 2, name: 'Tag2', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 3, name: 'ExampleTag3', plan: 2 }),
+					mockTagServerEntry({ id: 3, name: 'ExampleTag3' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
-					mockTagServerEntry({ id: 2, name: 'Tag2', plan: 2 }),
-					mockTagServerEntry({ id: 3, name: 'Tag3', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
+					mockTag({ id: 3, name: 'Tag3' }),
 				]
 			}));
 
@@ -1770,13 +1770,13 @@ describe('Test Plan', () => {
 			const tag3 = new Tag(mockTag({ id: 3, name: 'ExampleTag3' }));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
-					mockTagServerEntry({ id: 3, name: 'Tag3', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
 				]
 			}));
 			await tp2.removeTag(tag2);
@@ -1798,13 +1798,13 @@ describe('Test Plan', () => {
 		it('Can remove Tags from TestPlan by Name', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
-					mockTagServerEntry({ id: 3, name: 'Tag3', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
 				]
 			}));
 			await tp2.removeTag('ExampleTag2');
@@ -1826,13 +1826,13 @@ describe('Test Plan', () => {
 		it('Can remove Tags from TestPlan by ID', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 2, name: 'ExampleTag2', plan: 2 }),
+					mockTagServerEntry({ id: 2, name: 'ExampleTag2' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
-					mockTagServerEntry({ id: 3, name: 'Tag3', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
 				]
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
@@ -1842,7 +1842,7 @@ describe('Test Plan', () => {
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
-					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
+					mockTag({ id: 1, name: 'Tag1' }),
 				]
 			}));
 
