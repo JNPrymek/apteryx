@@ -328,14 +328,7 @@ export default class TestCase extends KiwiBaseItem {
 	}
 
 	public async addTag(tag: number | string | Tag): Promise<void> {
-		let tagName = (typeof tag === 'string') ? tag : '';
-		if (tag instanceof Tag) {
-			tagName = tag.getName();
-		}
-		if (typeof tag === 'number') {
-			const tagObj = await Tag.getById(tag);
-			tagName = tagObj.getName();
-		}
+		const tagName = await Tag.resolveToTagName(tag);
 		await KiwiConnector.sendRPCMethod('TestCase.add_tag', [
 			this.getId(),
 			tagName
@@ -343,14 +336,7 @@ export default class TestCase extends KiwiBaseItem {
 	}
 
 	public async removeTag(tag: number | string | Tag): Promise<void> {
-		let tagName = (typeof tag === 'string') ? tag : '';
-		if (tag instanceof Tag) {
-			tagName = tag.getName();
-		}
-		if (typeof tag === 'number') {
-			const tagObj = await Tag.getById(tag);
-			tagName = tagObj.getName();
-		}
+		const tagName = await Tag.resolveToTagName(tag);
 		await KiwiConnector.sendRPCMethod('TestCase.remove_tag', [
 			this.getId(),
 			tagName
