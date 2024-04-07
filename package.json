@@ -22,7 +22,7 @@
 		"test:coverage": "npx jest --coverage",
 		"test:api": "NODE_TLS_REJECT_UNAUTHORIZED=0 npx ts-mocha",
 		"coverage": "npx jest --coverage",
-		"build": "rm -r ./dist/* && npx tsc"
+		"build": "rm -r ./dist/*; npx tsc"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.24.0",
