@@ -166,6 +166,20 @@ export default class Tag extends KiwiBaseItem {
 	public static async getTagsForTestRun(runId: number): Promise<Array<Tag>> {
 		return this.getUniqueTags({ run: runId });
 	}
+
+	public static async resolveToTagName(
+		tag: number | string | Tag
+	): Promise<string> {
+		let tagName = (typeof tag === 'string') ? tag : '';
+		if (tag instanceof Tag) {
+			tagName = tag.getName();
+		}
+		if (typeof tag === 'number') {
+			const tagObj = await Tag.getById(tag);
+			tagName = tagObj.getName();
+		}
+		return tagName;
+	}
 	
 	// Inherited methods
 	// ------------------------------------------------------------------------
