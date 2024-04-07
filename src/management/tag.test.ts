@@ -189,6 +189,39 @@ describe('Tag', () => {
 				);
 		});
 	});
+
+	describe('Tag Name resolution', () => {
+		it('Can resolve Tag name from string - returns input', async () => {
+			const name = await Tag.resolveToTagName('tag name');
+			expect(name).toEqual('tag name');
+			expect(mockPostRequest).not.toBeCalled();
+		});
+
+		it('Can resolve Tag name from Tag object', async () => {
+			const tag = new Tag(mockTag({ name: 'ExampleTag' }));
+			const name = await Tag.resolveToTagName(tag);
+			expect(name).toEqual('ExampleTag');
+			expect(mockPostRequest).not.toBeCalled();
+		});
+
+		it('Can resolve Tag name from ID - uses Tag lookup', async () => {
+			const id = 4;
+			const tagVal = mockTagServerEntry({ id: 4, name: 'ExampleTag4' });
+
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [ tagVal ]
+			}));
+			const name = await Tag.resolveToTagName(id);
+
+			expect(name).toEqual('ExampleTag4');
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'Tag.filter',
+				params: [{ id__in: [ id ] }],
+			});
+		});
+	});
 	
 	describe('Server Lookups of Associated Objects', () => {
 		it('Can get IDs of TestCases with Tag - Multiple matches', async () => {

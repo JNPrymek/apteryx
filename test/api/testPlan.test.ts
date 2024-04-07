@@ -243,4 +243,20 @@ describe('Kiwi RPC API - TestPlan', () => {
 		);
 		expect(response).to.be.null;
 	});
+
+	it('TestPlan.add_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestPlan.add_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.null;
+	});
+
+	it('TestPlan.remove_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestPlan.remove_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.null;
+	});
 });

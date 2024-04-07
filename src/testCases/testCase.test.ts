@@ -2396,6 +2396,70 @@ describe('TestCase', () => {
 				}],
 			});
 		});
+
+		it('Can add a Comment to TestCase', async () => {
+			const tc = new TestCase(mockTestCase());
+			const commentValue = mockTestCaseComment({
+				comment: 'Sample Comment'
+			});
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: commentValue
+			}));
+			const result = await tc.addComment('Sample Comment');
+			expect(result).toEqual(new Comment(commentValue));
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCase.add_comment',
+				params: [1, 'Sample Comment'],
+			});
+		});
+
+		it('Can remove a Comment from TestCase by ID', async () => {
+			const tc = new TestCase(mockTestCase());
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: null
+			}));
+			const result = await tc.removeComment(2);
+			expect(result).toEqual(undefined);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCase.remove_comment',
+				params: [1, 2],
+			});
+		});
+
+		it('Can remove a Comment from TestCase by Comment', async () => {
+			const tc = new TestCase(mockTestCase());
+			const commentValue = mockTestCaseComment({
+				id: 2,
+				comment: 'Sample Comment'
+			});
+			const comment2 = new Comment(commentValue);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: null
+			}));
+			const result = await tc.removeComment(comment2);
+			expect(result).toEqual(undefined);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCase.remove_comment',
+				params: [1, 2],
+			});
+		});
+
+		it('Can remove all Comments from TestCase', async () => {
+			const tc = new TestCase(mockTestCase());
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: null
+			}));
+			const result = await tc.removeAllComments();
+			expect(result).toEqual(undefined);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCase.remove_comment',
+				params: [1, null],
+			});
+		});
 	});
 
 	describe('Creating TestCase', () => {

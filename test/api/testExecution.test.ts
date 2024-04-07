@@ -200,4 +200,38 @@ describe('Kiwi RPC API - TestExecution', () => {
 			expect(item.is_removed).to.be.a('boolean');
 		});
 	});
+
+	it('TestExecution.add_comment returns expected type', async () => {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestExecution.add_comment',
+			[1, 'comment from API Integration test']
+		);
+		expect(result).to.be.an('object').that.has.all.keys([
+			'id',
+			'content_type',
+			'object_pk',
+			'site',
+			'user',
+			'user_name',
+			'user_email',
+			'user_url',
+			'comment',
+			'submit_date',
+			'ip_address',
+			'is_public',
+			'is_removed'
+		]);
+	});
+
+	it('TestExecution.remove_comment returns expected type', async () => {
+		const comment = await KiwiConnector.sendRPCMethod(
+			'TestExecution.add_comment',
+			[1, 'comment pending removal from API Integration test']
+		) as Record<string, number | string>;
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestExecution.remove_comment',
+			[1, comment.id]
+		);
+		expect(result).to.be.null;
+	});
 });

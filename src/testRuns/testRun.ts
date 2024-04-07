@@ -1,6 +1,7 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
 import KiwiConnector from '../core/kiwiConnector';
 import Product from '../management/product';
+import Tag from '../management/tag';
 import User from '../management/user';
 import TestCase from '../testCases/testCase';
 import TestPlan from '../testPlans/testPlan';
@@ -261,6 +262,26 @@ export default class TestRun extends KiwiBaseItem {
 			executionIds.push(item.id);
 		});
 		return TestExecution.getByIds(executionIds);
+	}
+
+	public async addTag(tag: number | string | Tag): Promise<void> {
+		const tagName = await Tag.resolveToTagName(tag);
+		await KiwiConnector.sendRPCMethod('TestRun.add_tag', [
+			this.getId(),
+			tagName
+		]);
+	}
+
+	public async removeTag(tag: number | string | Tag): Promise<void> {
+		const tagName = await Tag.resolveToTagName(tag);
+		await KiwiConnector.sendRPCMethod('TestRun.remove_tag', [
+			this.getId(),
+			tagName
+		]);
+	}
+
+	public async getTags(): Promise<Array<Tag>> {
+		return await Tag.getTagsForTestRun(this.getId());
 	}
 
 	// Inherited methods

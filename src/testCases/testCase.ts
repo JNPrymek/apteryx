@@ -328,14 +328,7 @@ export default class TestCase extends KiwiBaseItem {
 	}
 
 	public async addTag(tag: number | string | Tag): Promise<void> {
-		let tagName = (typeof tag === 'string') ? tag : '';
-		if (tag instanceof Tag) {
-			tagName = tag.getName();
-		}
-		if (typeof tag === 'number') {
-			const tagObj = await Tag.getById(tag);
-			tagName = tagObj.getName();
-		}
+		const tagName = await Tag.resolveToTagName(tag);
 		await KiwiConnector.sendRPCMethod('TestCase.add_tag', [
 			this.getId(),
 			tagName
@@ -343,14 +336,7 @@ export default class TestCase extends KiwiBaseItem {
 	}
 
 	public async removeTag(tag: number | string | Tag): Promise<void> {
-		let tagName = (typeof tag === 'string') ? tag : '';
-		if (tag instanceof Tag) {
-			tagName = tag.getName();
-		}
-		if (typeof tag === 'number') {
-			const tagObj = await Tag.getById(tag);
-			tagName = tagObj.getName();
-		}
+		const tagName = await Tag.resolveToTagName(tag);
 		await KiwiConnector.sendRPCMethod('TestCase.remove_tag', [
 			this.getId(),
 			tagName
@@ -368,6 +354,31 @@ export default class TestCase extends KiwiBaseItem {
 				[this.getId()]
 			) as Array<CommentValues>;
 		return rawResults.map( val => new Comment(val));
+	}
+
+	public async addComment(commentText: string): Promise<Comment> {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_comment',
+			[ this.getId(), commentText ]
+		) as CommentValues;
+		return new Comment(result);
+	}
+
+	public async removeComment(comment: Comment | number): Promise<void> {
+		const commentId: number = (comment instanceof Comment)
+			? comment.getId()
+			: comment;
+		await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_comment',
+			[this.getId(), commentId]
+		);
+	}
+
+	public async removeAllComments(): Promise<void> {
+		await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_comment',
+			[this.getId(), null]
+		);
 	}
 
 	public static async getTestCasesWithTag(

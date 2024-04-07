@@ -1040,6 +1040,70 @@ describe('Test Execution', () => {
 			}));
 			expect(await te1.getComments()).toEqual([new Comment(commentVal)]);
 		});
+
+		it('Can add a Comment to TestExecution', async () => {
+			const te = new TestExecution(mockTestExecution());
+			const commentValue = mockTestExecutionComment({
+				comment: 'Sample Comment'
+			});
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: commentValue
+			}));
+			const result = await te.addComment('Sample Comment');
+			expect(result).toEqual(new Comment(commentValue));
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.add_comment',
+				params: [1, 'Sample Comment'],
+			});
+		});
+
+		it('Can remove a Comment from TestExecution by ID', async () => {
+			const te = new TestExecution(mockTestExecution());
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: null
+			}));
+			const result = await te.removeComment(2);
+			expect(result).toEqual(undefined);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.remove_comment',
+				params: [1, 2],
+			});
+		});
+
+		it('Can remove a Comment from TestExecution by Comment', async () => {
+			const te = new TestExecution(mockTestExecution());
+			const commentValue = mockTestExecutionComment({
+				id: 2,
+				comment: 'Sample Comment'
+			});
+			const comment2 = new Comment(commentValue);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: null
+			}));
+			const result = await te.removeComment(comment2);
+			expect(result).toEqual(undefined);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.remove_comment',
+				params: [1, 2],
+			});
+		});
+
+		it('Can remove all Comments from TestCase', async () => {
+			const te = new TestExecution(mockTestExecution());
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: null
+			}));
+			const result = await te.removeAllComments();
+			expect(result).toEqual(undefined);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.remove_comment',
+				params: [1, null],
+			});
+		});
 	});
 
 	describe('Fetch values from server', () => {

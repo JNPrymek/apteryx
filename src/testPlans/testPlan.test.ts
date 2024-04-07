@@ -5,7 +5,9 @@ import {
 	mockTestPlan,
 	mockVersion,
 	mockTestPlanType,
-	mockTestPlanUpdateResponse
+	mockTestPlanUpdateResponse,
+	mockTagServerEntry,
+	mockTag
 } from '../../test/mockKiwiValues';
 import Product from '../management/product';
 import Version from '../management/version';
@@ -27,6 +29,7 @@ import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 import {
 	assertPostRequestData
 } from '../../test/networkMocks/assertPostRequestData';
+import Tag from '../management/tag';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
@@ -1128,7 +1131,7 @@ describe('Test Plan', () => {
 		});
 	});
 
-	describe('TestPlan -> TestCase relations', () => {
+	describe('TestPlan - TestCase relations', () => {
 		const plan1 = new TestPlan(plan1Vals);
 		const plan3 = new TestPlan(plan3Vals);
 		
@@ -1626,5 +1629,252 @@ describe('Test Plan', () => {
 				expect(tp3Children)
 					.not.toEqual(expect.arrayContaining([plan1, plan2, plan3]));
 			});
+	});
+
+	describe('TestPlan - Tag Relations', () => {
+		const tp2 = new TestPlan(plan2Vals);
+		it('Can get Tags related to TestPlan', async () => {
+			const tagVals = [
+				mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
+				mockTagServerEntry({ id: 2, name: 'Tag2', plan: 2 }),
+			];
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: tagVals,
+			}));
+			const tpTags = await tp2.getTags();
+			expect(tpTags.length).toEqual(2);
+			expect(tpTags[0]).toEqual(new Tag({ id: 1, name: 'Tag1' }));
+			expect(tpTags[1]).toEqual(new Tag({ id: 2, name: 'Tag2' }));
+		});
+
+		it('Can add Tags to TestPlan by Tag object', async () => {
+			const tag2 = new Tag(mockTag({ id: 2, name: 'ExampleTag2' }));
+			const tag3 = new Tag(mockTag({ id: 3, name: 'ExampleTag3' }));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
+					mockTagServerEntry({ id: 2, name: 'Tag2', plan: 2 }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 1, name: 'Tag1', plan: 2 }),
+					mockTagServerEntry({ id: 2, name: 'Tag2', plan: 2 }),
+					mockTagServerEntry({ id: 3, name: 'Tag3', plan: 2 }),
+				]
+			}));
+			await tp2.addTag(tag2);
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'TestPlan.add_tag',
+				params: [2, 'ExampleTag2']
+			});
+			await tp2.addTag(tag3);
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestPlan.add_tag',
+				params: [2, 'ExampleTag3']
+			});
+		});
+
+		it('Can add Tags to TestPlan by Name', async () => {
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+			await tp2.addTag('ExampleTag2');
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'TestPlan.add_tag',
+				params: [2, 'ExampleTag2']
+			});
+			await tp2.addTag('ExampleTag3');
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestPlan.add_tag',
+				params: [2, 'ExampleTag3']
+			});
+		});
+
+		it('Can add Tags to TestPlan by ID', async () => {
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 2, name: 'ExampleTag2' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 3, name: 'ExampleTag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 2, name: 'Tag2' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+
+			await tp2.addTag(2);
+
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'Tag.filter',
+				params: [{ id__in: [ 2 ] }]
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestPlan.add_tag',
+				params: [2, 'ExampleTag2']
+			});
+
+			await tp2.addTag(3);
+
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 2,
+				method: 'Tag.filter',
+				params: [{ id__in: [ 3 ] }]
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 3,
+				method: 'TestPlan.add_tag',
+				params: [2, 'ExampleTag3']
+			});
+		});
+
+		it('Can remove Tags from TestPlan by Tag object', async () => {
+			const tag2 = new Tag(mockTag({ id: 2, name: 'ExampleTag2' }));
+			const tag3 = new Tag(mockTag({ id: 3, name: 'ExampleTag3' }));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+				]
+			}));
+			await tp2.removeTag(tag2);
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'TestPlan.remove_tag',
+				params: [2, 'ExampleTag2']
+			});
+			await tp2.removeTag(tag3);
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestPlan.remove_tag',
+				params: [2, 'ExampleTag3']
+			});
+		});
+
+		it('Can remove Tags from TestPlan by Name', async () => {
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+				]
+			}));
+			await tp2.removeTag('ExampleTag2');
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'TestPlan.remove_tag',
+				params: [2, 'ExampleTag2']
+			});
+			await tp2.removeTag('ExampleTag3');
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestPlan.remove_tag',
+				params: [2, 'ExampleTag3']
+			});
+		});
+
+		it('Can remove Tags from TestPlan by ID', async () => {
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 2, name: 'ExampleTag2' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 3, name: 'ExampleTag3', plan: 2 }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+				]
+			}));
+
+			await tp2.removeTag(2);
+
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'Tag.filter',
+				params: [{ id__in: [ 2 ] }]
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestPlan.remove_tag',
+				params: [2, 'ExampleTag2']
+			});
+
+			await tp2.removeTag(3);
+
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 2,
+				method: 'Tag.filter',
+				params: [{ id__in: [ 3 ] }]
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 3,
+				method: 'TestPlan.remove_tag',
+				params: [2, 'ExampleTag3']
+			});
+		});
 	});
 });

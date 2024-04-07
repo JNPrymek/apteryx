@@ -10,6 +10,7 @@ import {
 	TestPlanCreateValues,
 	TestPlanWriteValues
 } from './testPlan.type';
+import Tag from '../management/tag';
 
 export default class TestPlan extends KiwiNamedItem {
 	// Constructor for all classes
@@ -208,6 +209,26 @@ export default class TestPlan extends KiwiNamedItem {
 				[this.getId(), tcId]
 			);
 		}
+	}
+
+	public async addTag(tag: number | string | Tag): Promise<void> {
+		const tagName = await Tag.resolveToTagName(tag);
+		await KiwiConnector.sendRPCMethod('TestPlan.add_tag', [
+			this.getId(),
+			tagName
+		]);
+	}
+
+	public async removeTag(tag: number | string | Tag): Promise<void> {
+		const tagName = await Tag.resolveToTagName(tag);
+		await KiwiConnector.sendRPCMethod('TestPlan.remove_tag', [
+			this.getId(),
+			tagName
+		]);
+	}
+
+	public async getTags(): Promise<Array<Tag>> {
+		return await Tag.getTagsForTestPlan(this.getId());
 	}
 
 	/**

@@ -398,5 +398,55 @@ describe('Kiwi RPC API - TestCase', () => {
 			expect(item.is_removed).to.be.a('boolean');
 		});
 	});
+
+	it('TestCase.add_comment returns expected type', async () => {
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_comment',
+			[1, 'comment from API Integration test']
+		);
+		expect(result).to.be.an('object').that.has.all.keys([
+			'id',
+			'content_type',
+			'object_pk',
+			'site',
+			'user',
+			'user_name',
+			'user_email',
+			'user_url',
+			'comment',
+			'submit_date',
+			'ip_address',
+			'is_public',
+			'is_removed'
+		]);
+	});
+
+	it('TestCase.remove_comment returns expected type', async () => {
+		const comment = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_comment',
+			[1, 'comment pending removal from API Integration test']
+		) as Record<string, number | string>;
+		const result = await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_comment',
+			[1, comment.id]
+		);
+		expect(result).to.be.null;
+	});
+
+	it('TestCase.add_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.null;
+	});
+
+	it('TestCase.remove_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.null;
+	});
 	
 });

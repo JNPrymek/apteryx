@@ -17,7 +17,7 @@ export type RpcError = {
 	message: string;
 }
 
-export type RpcParam = Array<string | number | Record<string, unknown>>;
+export type RpcParam = Array<string | number | null | Record<string, unknown>>;
 
 export type RpcResponseBody = {
 	id: string;
