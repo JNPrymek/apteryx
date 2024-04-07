@@ -1721,5 +1721,120 @@ describe('Test Run', () => {
 				params: [1, 'ExampleTag3']
 			});
 		});
+
+		it('Can remove Tags from TestRun by Tag object', async () => {
+			const tr = new TestRun(run1Vals);
+			const tag2 = new Tag(mockTag({ id: 2, name: 'ExampleTag2' }));
+			const tag3 = new Tag(mockTag({ id: 3, name: 'ExampleTag3' }));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+				]
+			}));
+			await tr.removeTag(tag2);
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'TestRun.remove_tag',
+				params: [1, 'ExampleTag2']
+			});
+			await tr.removeTag(tag3);
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestRun.remove_tag',
+				params: [1, 'ExampleTag3']
+			});
+		});
+
+		it('Can remove Tags from TestRun by Name', async () => {
+			const tr = new TestRun(run1Vals);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+				]
+			}));
+			await tr.removeTag('ExampleTag2');
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'TestRun.remove_tag',
+				params: [1, 'ExampleTag2']
+			});
+			await tr.removeTag('ExampleTag3');
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestRun.remove_tag',
+				params: [1, 'ExampleTag3']
+			});
+		});
+
+		it('Can remove Tags from TestRun by ID', async () => {
+			const tr = new TestRun(run1Vals);
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 2, name: 'ExampleTag2' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+					mockTag({ id: 3, name: 'Tag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [
+					mockTagServerEntry({ id: 3, name: 'ExampleTag3' }),
+				]
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					mockTag({ id: 1, name: 'Tag1' }),
+				]
+			}));
+
+			await tr.removeTag(2);
+
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 0,
+				method: 'Tag.filter',
+				params: [{ id__in: [ 2 ] }]
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 1,
+				method: 'TestRun.remove_tag',
+				params: [1, 'ExampleTag2']
+			});
+
+			await tr.removeTag(3);
+
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 2,
+				method: 'Tag.filter',
+				params: [{ id__in: [ 3 ] }]
+			});
+			assertPostRequestData({
+				mockPostRequest,
+				callIndex: 3,
+				method: 'TestRun.remove_tag',
+				params: [1, 'ExampleTag3']
+			});
+		});
 	});
 });
