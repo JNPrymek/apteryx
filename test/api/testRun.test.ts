@@ -338,4 +338,35 @@ describe('Kiwi RPC API - TestRun', () => {
 			});
 		});
 	});
+
+	it('TestRun.add_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestRun.add_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.an('array');
+		const responseArray = response as Array<Record<string, unknown>>;
+		expect(responseArray.length).to.be.greaterThanOrEqual(1);
+		for (const item of responseArray) {
+			expect(item).to.be.an('object').that.has.all.keys([
+				'id',
+				'name',
+			]);
+		}
+	});
+
+	it('TestRun.remove_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestRun.remove_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.an('array');
+		const responseArray = response as Array<Record<string, unknown>>;
+		for (const item of responseArray) {
+			expect(item).to.be.an('object').that.has.all.keys([
+				'id',
+				'name',
+			]);
+		}
+	});
 });

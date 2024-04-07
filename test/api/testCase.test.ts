@@ -398,5 +398,21 @@ describe('Kiwi RPC API - TestCase', () => {
 			expect(item.is_removed).to.be.a('boolean');
 		});
 	});
+
+	it('TestCase.add_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.add_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.null;
+	});
+
+	it('TestCase.remove_tag returns expected type', async () => {
+		const response = await KiwiConnector.sendRPCMethod(
+			'TestCase.remove_tag',
+			[1, 'Tag1']
+		);
+		expect(response).to.be.null;
+	});
 	
 });
