@@ -28,7 +28,8 @@ export default class RequestHandler {
 		url: string, 
 		body: Record<string, unknown>, 
 		headers: Record<string, string> = {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'User-Agent': 'Node-Fetch'
 		}
 	): Promise<Record<string, unknown>> {
 		// Add cookies to request headers
