@@ -28,8 +28,6 @@ describe('Kiwi RPC API - TestRun', () => {
 		const item = arr[0];
 		expect(item).to.be.an('object').that.has.all.keys(
 			'id',
-			'plan__product_version',
-			'plan__product_version__value',
 			'start_date',
 			'stop_date',
 			'planned_start',
@@ -37,10 +35,12 @@ describe('Kiwi RPC API - TestRun', () => {
 			'summary',
 			'notes',
 			'plan',
-			'plan__product',
 			'plan__name',
 			'build',
 			'build__name',
+			'build__version',
+			'build__version__product',
+			'build__version__value',
 			'manager',
 			'manager__username',
 			'default_tester',
@@ -48,8 +48,6 @@ describe('Kiwi RPC API - TestRun', () => {
 		);
 
 		expect(item.id).to.be.a('number').that.equals(1);
-		expect(item.plan__product_version).to.be.a('number');
-		expect(item.plan__product_version__value).to.be.a('string');
 		
 		expect(
 			(item.start_date === null) ||
@@ -70,10 +68,15 @@ describe('Kiwi RPC API - TestRun', () => {
 		expect(item.summary).to.be.a('string');
 		expect(item.notes).to.be.a('string');
 		expect(item.plan).to.be.a('number');
-		expect(item.plan__product).to.be.a('number');
 		expect(item.plan__name).to.be.a('string');
 		expect(item.build).to.be.a('number');
 		expect(item.build__name).to.be.a('string');
+		expect(item.build__version).to.be.a('number');
+		expect(item.build__version__product).to.be.a('number');
+		expect(
+			(item.build__version__value === null) ||
+			(typeof item.build__version__value === 'string')
+		).to.be.true;
 		expect(
 			(item.manager === null) ||
 			(typeof item.manager === 'number')

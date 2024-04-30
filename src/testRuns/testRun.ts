@@ -3,6 +3,7 @@ import KiwiConnector from '../core/kiwiConnector';
 import Product from '../management/product';
 import Tag from '../management/tag';
 import User from '../management/user';
+import Version from '../management/version';
 import TestCase from '../testCases/testCase';
 import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
@@ -74,20 +75,32 @@ export default class TestRun extends KiwiBaseItem {
 		return await TestPlan.getById(this.getPlanId());
 	}
 
-	public getProductVersionId(): number {
-		return this.serialized['plan__product_version'] as number;
+	public getBuildId(): number {
+		return this.serialized['build'] as number;
 	}
 
-	public getProductVersionValue(): string {
-		return this.serialized['plan__product_version__value'] as string;
+	public getBuildName(): string {
+		return this.serialized['build__name'] as string;
 	}
 
-	public getProductVersionName(): string {
-		return this.getProductVersionValue();
+	public getVersionId(): number {
+		return this.serialized['build__version'] as number;
+	}
+
+	public getVersionValue(): string {
+		return this.serialized['build__version__value'] as string;
+	}
+
+	public getVersionName(): string {
+		return this.getVersionValue();
+	}
+
+	public async getVersion(): Promise<Version> {
+		return Version.getById(this.getVersionId());
 	}
 
 	public getProductId(): number {
-		return this.serialized['plan__product'] as number;
+		return this.serialized['build__version__product'] as number;
 	}
 
 	public async getProduct(): Promise<Product> {

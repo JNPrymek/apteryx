@@ -166,24 +166,24 @@ describe('Test Run', () => {
 			expect(tr2.getPlanId()).toEqual(3);
 		});
 
-		it('Can get TestRun Plan Product', () => {
+		it('Can get TestRun Plan Product ID', () => {
 			expect(tr1.getProductId()).toEqual(1);
 			expect(tr2.getProductId()).toEqual(1);
 		});
 
-		it('Can get TestRun Plan Product Version', () => {
-			expect(tr1.getProductVersionId()).toEqual(1);
-			expect(tr2.getProductVersionId()).toEqual(1);
+		it('Can get TestRun Version ID', () => {
+			expect(tr1.getVersionId()).toEqual(1);
+			expect(tr2.getVersionId()).toEqual(1);
 		});
 
-		it('Can get TestRun Plan Product Version Value', () => {
-			expect(tr1.getProductVersionValue()).toEqual('unspecified');
-			expect(tr2.getProductVersionValue()).toEqual('unspecified');
+		it('Can get TestRun Version Value', () => {
+			expect(tr1.getVersionValue()).toEqual('unspecified');
+			expect(tr2.getVersionValue()).toEqual('unspecified');
 		});
 
-		it('Can get TestRun Plan Product Version Name', () => {
-			expect(tr1.getProductVersionName()).toEqual('unspecified');
-			expect(tr2.getProductVersionName()).toEqual('unspecified');
+		it('Can get TestRun Version Name', () => {
+			expect(tr1.getVersionName()).toEqual('unspecified');
+			expect(tr2.getVersionName()).toEqual('unspecified');
 		});
 
 		it('Can get TestRun TestPlan Name', () => {
