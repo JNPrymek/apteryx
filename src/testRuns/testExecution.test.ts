@@ -1162,5 +1162,70 @@ describe('Test Execution', () => {
 				expect(await TestExecution.serverFilter({ run: 1, case: 1 }))
 					.toEqual([new TestExecution(execution1Vals)]);
 			});
+		
+		it('Can get TestExecutions by a TestCase ID', async () => {
+			const teVals = [
+				mockTestExecution({ id: 3, case: 5, run: 1 }),
+				mockTestExecution({ id: 32, case: 5, run: 2 }),
+				mockTestExecution({ id: 145, case: 5, run: 4 }),
+			];
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: teVals
+			}));
+			const testExecs = await TestExecution.getFromTestCase(5);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.filter',
+				params: [{ case : 5 }],
+				callIndex: 0,
+			});
+			expect(Array.isArray(testExecs)).toBe(true);
+			expect(testExecs.length).toBe(3);
+
+			expect(testExecs[0].getId()).toBe(3);
+			expect(testExecs[0].getTestCaseId()).toBe(5);
+			expect(testExecs[0].getTestRunId()).toBe(1);
+
+			expect(testExecs[1].getId()).toBe(32);
+			expect(testExecs[1].getTestCaseId()).toBe(5);
+			expect(testExecs[1].getTestRunId()).toBe(2);
+
+			expect(testExecs[2].getId()).toBe(145);
+			expect(testExecs[2].getTestCaseId()).toBe(5);
+			expect(testExecs[2].getTestRunId()).toBe(4);
+		});
+		
+		it('Can get TestExecutions by a TestCase object', async () => {
+			const teVals = [
+				mockTestExecution({ id: 3, case: 5, run: 1 }),
+				mockTestExecution({ id: 32, case: 5, run: 2 }),
+				mockTestExecution({ id: 145, case: 5, run: 4 }),
+			];
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: teVals
+			}));
+			const tc = new TestCase(mockTestCase({ id: 5 }));
+			const testExecs = await TestExecution.getFromTestCase(tc);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestExecution.filter',
+				params: [{ case : 5 }],
+				callIndex: 0,
+			});
+			expect(Array.isArray(testExecs)).toBe(true);
+			expect(testExecs.length).toBe(3);
+
+			expect(testExecs[0].getId()).toBe(3);
+			expect(testExecs[0].getTestCaseId()).toBe(5);
+			expect(testExecs[0].getTestRunId()).toBe(1);
+
+			expect(testExecs[1].getId()).toBe(32);
+			expect(testExecs[1].getTestCaseId()).toBe(5);
+			expect(testExecs[1].getTestRunId()).toBe(2);
+
+			expect(testExecs[2].getId()).toBe(145);
+			expect(testExecs[2].getTestCaseId()).toBe(5);
+			expect(testExecs[2].getTestRunId()).toBe(4);
+		});
 	});
 });

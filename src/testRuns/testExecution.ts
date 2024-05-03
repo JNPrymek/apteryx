@@ -205,6 +205,18 @@ export default class TestExecution extends KiwiBaseItem {
 		this.serialized = result as TestExecutionValues;
 	}
 
+	public static async getFromTestCase(
+		testCase: TestCase | number
+	):Promise<Array<TestExecution>> {
+		const tcId: number =
+			testCase instanceof TestCase
+				? testCase.getId()
+				: testCase;
+		return this.serverFilter({
+			case: tcId
+		});
+	}
+
 	// Inherited methods
 	// ------------------------------------------------------------------------
 	
