@@ -1,5 +1,6 @@
 import KiwiBaseItem from '../core/kiwiBaseItem';
 import KiwiConnector from '../core/kiwiConnector';
+import Build from '../management/build';
 import Product from '../management/product';
 import Tag from '../management/tag';
 import User from '../management/user';
@@ -81,6 +82,10 @@ export default class TestRun extends KiwiBaseItem {
 
 	public getBuildName(): string {
 		return this.serialized['build__name'] as string;
+	}
+
+	public async getBuild(): Promise<Build> {
+		return Build.getById(this.getBuildId());
 	}
 
 	public getVersionId(): number {

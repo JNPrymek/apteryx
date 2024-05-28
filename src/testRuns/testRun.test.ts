@@ -4,6 +4,7 @@ import TestPlan from '../testPlans/testPlan';
 import Product from '../management/product';
 import User from '../management/user';
 import { 
+	mockBuild,
 	mockProduct,
 	mockTag,
 	mockTagServerEntry,
@@ -31,6 +32,7 @@ import {
 } from '../../test/networkMocks/assertPostRequestData';
 import Tag from '../management/tag';
 import Version from '../management/version';
+import Build from '../management/build';
 
 
 // Mock RequestHandler
@@ -287,6 +289,26 @@ describe('Test Run', () => {
 		it('Can get TestRun Build Name', () => {
 			expect(tr1.getBuildName()).toEqual('unspecified');
 			expect(tr2.getBuildName()).toEqual('Build 2');
+		});
+
+		it('Can get Testrun Build', async () => {
+			const build1Vals = mockBuild({
+				// Default values
+			});
+			const build2Vals = mockBuild({
+				id: 2,
+				name: 'Build 2',
+				version: 2,
+				version__value: 'Version 2',
+			});
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [build1Vals],
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [build2Vals],
+			}));
+			expect(await tr1.getBuild()).toEqual(new Build(build1Vals));
+			expect(await tr2.getBuild()).toEqual(new Build(build2Vals));
 		});
 	});
 
