@@ -205,6 +205,13 @@ export default class TestExecution extends KiwiBaseItem {
 		this.serialized = result as TestExecutionValues;
 	}
 
+	public async delete(): Promise<void> {
+		await KiwiConnector.sendRPCMethod(
+			'TestExecution.remove',
+			[{ id: this.getId() }]
+		);
+	}
+
 	public static async getFromTestCase(
 		testCase: TestCase | number
 	):Promise<Array<TestExecution>> {

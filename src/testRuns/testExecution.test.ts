@@ -1228,4 +1228,22 @@ describe('Test Execution', () => {
 			expect(testExecs[2].getTestRunId()).toBe(4);
 		});
 	});
+
+	it('Can delete a TestExecution from the server', async () => {
+		const te = new TestExecution(mockTestExecution({
+			id: 4,
+			case: 3,
+			case__summary: 'Test removal of TestExecutions',
+		}));
+		mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+			result: null,
+		}));
+		await te.delete();
+		assertPostRequestData({
+			mockPostRequest,
+			method: 'TestExecution.remove',
+			params: [{ id: 4 }],
+			callIndex: 0,
+		});
+	});
 });
