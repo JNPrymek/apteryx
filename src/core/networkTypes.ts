@@ -2,7 +2,7 @@ export type NetworkResponse = {
 	status: number;
 	statusText: string;
 	headers: Record<string, unknown>;
-	body: Record<string, unknown>;
+	body: string;
 }
 
 export type RpcResult = 

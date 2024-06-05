@@ -30,11 +30,11 @@ export default function mockRpcNetworkResponse(
 		status: 200, // RPC errors still return 200 OK status
 		statusText: 'OK',
 		headers: resHeader,
-		body: {
+		body: JSON.stringify({
 			id: 'jsonrpc',
 			jsonrpc: '2.0',
 			...data,
-		}
+		}),
 	};
 
 	return response;

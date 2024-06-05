@@ -62,17 +62,24 @@ export default class KiwiConnector {
 			/* eslint-disable-next-line max-len */
 			throw new Error(`Network Error ${response.status} : ${response.statusText}`);
 		}
+
+		let parsedBody: Record<string, unknown>  | null = null;
+		try {
+			parsedBody = JSON.parse(response.body);
+		} catch (err) {
+			throw new Error('RPC Error:  Response body is not valid JSON');
+		}
 		
 		// Check status of the RPC response
-		if(this.isRpcResponse(response.body)) {
+		if(this.isRpcResponse(parsedBody)) {
 			// If RPC method resulted in error, throw that error
-			if(response.body.error) {
-				const err = response.body.error;
+			if(parsedBody.error) {
+				const err = parsedBody.error;
 				throw new Error(`RPC Error:  ${err.code} - ${err.message}`);
 			}
 			
 			// result is implied to exist if code reaches this point
-			return response.body.result as RpcResult;
+			return parsedBody.result as RpcResult;
 		}
 		else {
 			// Completely wrong data returned
@@ -83,6 +90,7 @@ export default class KiwiConnector {
 	// Type guard HTTP response data into RPC Response
 	private static isRpcResponse(rpcResponse: unknown): 
 	rpcResponse is RpcResponseBody {
+		// TODO - verify is object, and not null
 		const jsonRpcValid = 
 			((rpcResponse as RpcResponseBody).id === 'jsonrpc') &&
 			((rpcResponse as RpcResponseBody).jsonrpc === '2.0');
