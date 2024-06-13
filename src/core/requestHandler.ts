@@ -28,9 +28,10 @@ export default class RequestHandler {
 		url: string, 
 		body: Record<string, unknown>, 
 		headers: Record<string, string> = {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			'User-Agent': 'Node-Fetch'
 		}
-	): Promise<Record<string, unknown>> {
+	): Promise<NetworkResponse> {
 		// Add cookies to request headers
 		const sendHeaders = await this.appendCookiesToHeader(url, headers);
 		
@@ -44,7 +45,7 @@ export default class RequestHandler {
 		// Save new/edited cookies to jar
 		await this.saveCookiesFromHeader(url, response.headers.raw());
 
-		const responseBody = await response.json() as Record<string, unknown>;
+		const responseBody: string = await response.text();
 
 		const result: NetworkResponse = {
 			status: response.status,

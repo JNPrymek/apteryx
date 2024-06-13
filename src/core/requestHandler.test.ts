@@ -77,11 +77,11 @@ describe('HTTP Request Handler', () => {
 			expect(response).toEqual({
 				status: 200,
 				statusText: 'OK',
-				body: {
+				body: JSON.stringify({
 					a: 'a',
 					b: true,
 					c: 3,
-				},
+				}),
 				headers: {
 					'content-type': 'text/plain;charset=UTF-8',
 					'set-cookie': 
@@ -215,11 +215,11 @@ describe('HTTP Request Handler', () => {
 			expect(response).toEqual({
 				status: 200,
 				statusText: 'OK',
-				body: {
+				body: JSON.stringify({
 					a: 'a',
 					b: true,
 					c: 3,
-				},
+				}),
 				headers: {
 					'content-type': 'text/plain;charset=UTF-8',
 					'set-cookie': 

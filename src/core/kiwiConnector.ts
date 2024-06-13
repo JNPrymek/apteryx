@@ -1,3 +1,4 @@
+import debug from 'debug';
 import { 
 	ServerDetails, 
 	RpcResult, 
@@ -12,6 +13,9 @@ const rpcEndpoint = '/json-rpc/';
 export default class KiwiConnector {
 	
 	private static serverUrl: string;
+
+	private static debugConnector = debug('apteryx:kiwiConnector');
+	private static debugMethod = debug('apteryx:RpcMethod');
 	
 	// TODO: Update to handle default SSL for Kiwi 12.5
 	/**
@@ -22,6 +26,8 @@ export default class KiwiConnector {
 	 * @param {number} [serverDetails.port] - Port number.  Default: 80 or 443.
 	 */
 	public static init(serverDetails: ServerDetails): void {
+		// eslint-disable-next-line max-len
+		this.debugConnector('Initializing KiwiConnector with params: %o', serverDetails);
 		const protocol = `http${(serverDetails.useSSL ?? true) ? 's' : ''}://`;
 		let host = serverDetails.hostName;
 		if (host.endsWith('/')) {
@@ -29,6 +35,7 @@ export default class KiwiConnector {
 		}
 		const port = serverDetails.port ? `:${serverDetails.port}` : '';
 		this.serverUrl = `${protocol}${host}${port}`;
+		this.debugConnector('Clearing cookie jar');
 		RequestHandler.clearCookieJar();
 	}
 	
@@ -51,6 +58,21 @@ export default class KiwiConnector {
 			jsonrpc: '2.0'
 		};
 		
+		if (methodName === 'Auth.login'){
+			const outputArgs = '[LOGIN_CREDENTIALS_REDACTED]';
+			this.debugMethod(
+				'Call RPC method "%s" with args %s',
+				methodName,
+				outputArgs
+			);
+		} else {
+			this.debugMethod(
+				'Call RPC method "%s" with args: %O',
+				methodName,
+				methodArgs
+			);
+		}
+
 		// Send request
 		const response = await RequestHandler.sendPostRequest(
 			`${this.serverUrl}${rpcEndpoint}`,
@@ -59,23 +81,39 @@ export default class KiwiConnector {
 		
 		// Check POST request status
 		if (response.status !== 200) {
+			this.debugConnector(
+				'Network Error %d : %s',
+				response.status,
+				response.statusText
+			);
+
 			/* eslint-disable-next-line max-len */
 			throw new Error(`Network Error ${response.status} : ${response.statusText}`);
 		}
+
+		let parsedBody: Record<string, unknown>  | null = null;
+		try {
+			parsedBody = JSON.parse(response.body);
+		} catch (err) {
+			this.debugConnector('RPC Error - invalid JSON %s', response.body);
+			throw new Error('RPC Error:  Response body is not valid JSON');
+		}
 		
 		// Check status of the RPC response
-		if(this.isRpcResponse(response.body)) {
+		if(this.isRpcResponse(parsedBody)) {
 			// If RPC method resulted in error, throw that error
-			if(response.body.error) {
-				const err = response.body.error;
+			if(parsedBody.error) {
+				const err = parsedBody.error;
+				this.debugConnector('RPC Error Response: %O', err);
 				throw new Error(`RPC Error:  ${err.code} - ${err.message}`);
 			}
 			
 			// result is implied to exist if code reaches this point
-			return response.body.result as RpcResult;
+			return parsedBody.result as RpcResult;
 		}
 		else {
 			// Completely wrong data returned
+			this.debugConnector('RPC Error - Malformed JSON-RPC reply');
 			throw new Error('RPC Error:  Malformed JSON-RPC reply.');
 		}
 	}
@@ -83,6 +121,7 @@ export default class KiwiConnector {
 	// Type guard HTTP response data into RPC Response
 	private static isRpcResponse(rpcResponse: unknown): 
 	rpcResponse is RpcResponseBody {
+		// TODO - verify is object, and not null
 		const jsonRpcValid = 
 			((rpcResponse as RpcResponseBody).id === 'jsonrpc') &&
 			((rpcResponse as RpcResponseBody).jsonrpc === '2.0');
@@ -98,6 +137,7 @@ export default class KiwiConnector {
 	
 	public static async login(username: string, password: string): 
 	Promise<string> {
+		this.debugMethod('Logging in as "%s"', username);
 		const sessionId =  await this.sendRPCMethod(
 			'Auth.login', 
 			[username, password]
@@ -106,6 +146,7 @@ export default class KiwiConnector {
 	}
 	
 	public static async logout(): Promise<boolean> {
+		this.debugMethod('Logging out');
 		const result = await this.sendRPCMethod('Auth.logout', []);
 		return (result === '');
 	}

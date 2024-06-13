@@ -153,7 +153,7 @@ describe('Kiwi Connector', () => {
 					status: 400,
 					statusText: 'Bad Request',
 					headers: { 'content-type': 'application/json' },
-					body: {},
+					body: '',
 				});
 				await expect(async () => 
 					KiwiConnector.sendRPCMethod('foo', ['foo']))

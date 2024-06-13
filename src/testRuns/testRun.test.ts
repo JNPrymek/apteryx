@@ -4,6 +4,7 @@ import TestPlan from '../testPlans/testPlan';
 import Product from '../management/product';
 import User from '../management/user';
 import { 
+	mockBuild,
 	mockProduct,
 	mockTag,
 	mockTagServerEntry,
@@ -14,7 +15,8 @@ import {
 	mockTestRun,
 	mockTestRunCaseListItem,
 	mockTestRunUpdateResponse,
-	mockUser
+	mockUser,
+	mockVersion
 } from '../../test/mockKiwiValues';
 import { 
 	TestRunCreateValues,
@@ -29,6 +31,8 @@ import {
 	assertPostRequestData
 } from '../../test/networkMocks/assertPostRequestData';
 import Tag from '../management/tag';
+import Version from '../management/version';
+import Build from '../management/build';
 
 
 // Mock RequestHandler
@@ -51,7 +55,12 @@ describe('Test Run', () => {
 		plan: 3,
 		plan__name: 'The Third Plan',
 		default_tester: null,
-		default_tester__username: null
+		default_tester__username: null,
+		build: 2,
+		build__name: 'Build 2',
+		build__version: 2,
+		build__version__product: 2,
+		build__version__value: 'Version 2',
 	});
 	const run3Vals = mockTestRun({
 		id: 3,
@@ -166,24 +175,44 @@ describe('Test Run', () => {
 			expect(tr2.getPlanId()).toEqual(3);
 		});
 
-		it('Can get TestRun Plan Product', () => {
+		it('Can get TestRun Plan Product ID', () => {
 			expect(tr1.getProductId()).toEqual(1);
-			expect(tr2.getProductId()).toEqual(1);
+			expect(tr2.getProductId()).toEqual(2);
 		});
 
-		it('Can get TestRun Plan Product Version', () => {
-			expect(tr1.getProductVersionId()).toEqual(1);
-			expect(tr2.getProductVersionId()).toEqual(1);
+		it('Can get TestRun Version ID', () => {
+			expect(tr1.getVersionId()).toEqual(1);
+			expect(tr2.getVersionId()).toEqual(2);
 		});
 
-		it('Can get TestRun Plan Product Version Value', () => {
-			expect(tr1.getProductVersionValue()).toEqual('unspecified');
-			expect(tr2.getProductVersionValue()).toEqual('unspecified');
+		it('Can get TestRun Version Value', () => {
+			expect(tr1.getVersionValue()).toEqual('unspecified');
+			expect(tr2.getVersionValue()).toEqual('Version 2');
 		});
 
-		it('Can get TestRun Plan Product Version Name', () => {
-			expect(tr1.getProductVersionName()).toEqual('unspecified');
-			expect(tr2.getProductVersionName()).toEqual('unspecified');
+		it('Can get TestRun Version Name', () => {
+			expect(tr1.getVersionName()).toEqual('unspecified');
+			expect(tr2.getVersionName()).toEqual('Version 2');
+		});
+
+		it('Can get TestRun Version', async () => {
+			const v1Vals = mockVersion();
+			const v2Vals = mockVersion({
+				id: 2,
+				value: 'Version 2',
+			});
+			const v1 = new Version(v1Vals);
+			const v2 = new Version(v2Vals);
+
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [v1Vals],
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [v2Vals],
+			}));
+
+			expect(await tr1.getVersion()).toEqual(v1);
+			expect(await tr2.getVersion()).toEqual(v2);
 		});
 
 		it('Can get TestRun TestPlan Name', () => {
@@ -250,6 +279,36 @@ describe('Test Run', () => {
 				result: [productVals]
 			}));
 			expect(await tr1.getProduct()).toEqual(expectedProduct);
+		});
+
+		it('Can get TestRun Build ID', () => {
+			expect(tr1.getBuildId()).toEqual(1);
+			expect(tr2.getBuildId()).toEqual(2);
+		});
+
+		it('Can get TestRun Build Name', () => {
+			expect(tr1.getBuildName()).toEqual('unspecified');
+			expect(tr2.getBuildName()).toEqual('Build 2');
+		});
+
+		it('Can get Testrun Build', async () => {
+			const build1Vals = mockBuild({
+				// Default values
+			});
+			const build2Vals = mockBuild({
+				id: 2,
+				name: 'Build 2',
+				version: 2,
+				version__value: 'Version 2',
+			});
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [build1Vals],
+			}));
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: [build2Vals],
+			}));
+			expect(await tr1.getBuild()).toEqual(new Build(build1Vals));
+			expect(await tr2.getBuild()).toEqual(new Build(build2Vals));
 		});
 	});
 
