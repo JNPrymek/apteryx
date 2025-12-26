@@ -103,12 +103,14 @@ export default class RequestHandler {
 		// Set single cookie to jar
 		if (typeof setCookieHeader === 'string') {
 			const cookie = Cookie.parse(setCookieHeader);
-			if (cookie) this.saveCookieToJar(cookie, url);
+			if (cookie) {
+				await this.cookieJar.setCookie(cookie, url);
+			}
 		} else if (Array.isArray(setCookieHeader)) {
 			for (const cookieString of setCookieHeader) {
 				const cookie = Cookie.parse(cookieString);
 				if (cookie) {
-					await this.saveCookieToJar(cookie, url);
+					await this.cookieJar.setCookie(cookie, url);
 				};
 			}
 		} else {
@@ -117,18 +119,6 @@ export default class RequestHandler {
 				setCookieHeader
 			);
 		}
-	}
-
-	private static async saveCookieToJar(
-		cookie: Cookie,
-		url: string,
-	): Promise<void> {
-		// Override "secure" flag when using HTTP for local development
-		if (url.includes('http://')) {
-			cookie.secure = false;
-		}
-
-		await this.cookieJar.setCookie(cookie, url);
 	}
 
 	private static getSafeBodyForLogging(
