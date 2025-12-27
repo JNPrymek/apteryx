@@ -57,6 +57,8 @@ export default class RequestHandler {
 
 		const responseBody: string = await response.text();
 
+		this.debugNetworkRequest('Received response: %o', responseBody);
+
 		const result: NetworkResponse = {
 			status: response.status,
 			statusText: response.statusText,
