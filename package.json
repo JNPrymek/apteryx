@@ -47,7 +47,6 @@
 	"dependencies": {
 		"debug": "^4.4.3",
 		"node-fetch": "^2.7.0",
-		"supports-color": "^9.4.0",
 		"tough-cookie": "^6.0.0"
 	}
 }
