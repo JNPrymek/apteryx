@@ -120,7 +120,7 @@ describe('Version', () => {
 			const name = 'Non-used name';
 			expect(Build.getByName(name))
 				.rejects
-				.toThrowError(`Build with name "${name}" could not be found.`);
+				.toThrow(`Build with name "${name}" could not be found.`);
 		});
 		
 		/* eslint-disable-next-line max-len */
@@ -134,7 +134,7 @@ describe('Version', () => {
 				expect(Build.getByName(name))
 					.rejects
 					/* eslint-disable-next-line max-len */
-					.toThrowError(`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`);
+					.toThrow(`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`);
 			
 			});
 		
@@ -181,7 +181,7 @@ describe('Version', () => {
 				expect(Build.getByName(name, versionId))
 					.rejects
 					/* eslint-disable-next-line max-len */
-					.toThrowError(`Build with name "${name}" could not be found.`);
+					.toThrow(`Build with name "${name}" could not be found.`);
 			
 			});
 	});

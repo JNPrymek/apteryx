@@ -83,7 +83,7 @@ describe('TestCaseProperty', () => {
 			}));
 			expect(TestCaseProperty.getById(1))
 				.rejects
-				.toThrowError('Could not find any TestCase Property with ID 1');
+				.toThrow('Could not find any TestCase Property with ID 1');
 		});
 	});
 });

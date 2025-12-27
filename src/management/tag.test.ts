@@ -125,7 +125,7 @@ describe('Tag', () => {
 			const name = 'UnusedName';
 			expect(Tag.getByName(name))
 				.rejects
-				.toThrowError(`Tag with name '${name}' not found.`);
+				.toThrow(`Tag with name '${name}' not found.`);
 		});
 		
 		it('Can get Tag by name - 1 discrete match returns Tag', async () => {
@@ -184,7 +184,7 @@ describe('Tag', () => {
 			}));
 			expect(Tag.getByName('ExampleTag'))
 				.rejects
-				.toThrowError(
+				.toThrow(
 					'Attempted to get Tag with non-unique name \'ExampleTag\''
 				);
 		});
@@ -194,14 +194,14 @@ describe('Tag', () => {
 		it('Can resolve Tag name from string - returns input', async () => {
 			const name = await Tag.resolveToTagName('tag name');
 			expect(name).toEqual('tag name');
-			expect(mockPostRequest).not.toBeCalled();
+			expect(mockPostRequest).not.toHaveBeenCalled();
 		});
 
 		it('Can resolve Tag name from Tag object', async () => {
 			const tag = new Tag(mockTag({ name: 'ExampleTag' }));
 			const name = await Tag.resolveToTagName(tag);
 			expect(name).toEqual('ExampleTag');
-			expect(mockPostRequest).not.toBeCalled();
+			expect(mockPostRequest).not.toHaveBeenCalled();
 		});
 
 		it('Can resolve Tag name from ID - uses Tag lookup', async () => {

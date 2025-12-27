@@ -146,7 +146,7 @@ describe('User', () => {
 			}));
 
 			expect(User.getByUsername('charlie'))
-				.rejects.toThrowError(
+				.rejects.toThrow(
 					'User with username "charlie" could not be found.'
 				);
 		});

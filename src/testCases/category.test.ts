@@ -84,7 +84,7 @@ describe('Category', () => {
 			}));
 			expect(Category.getById(1))
 				.rejects
-				.toThrowError('Could not find any Category with ID 1');
+				.toThrow('Could not find any Category with ID 1');
 		});
 
 		it('Can get Category by Name (one match)', async () => {
@@ -102,7 +102,7 @@ describe('Category', () => {
 			const name = 'Non-used name';
 			expect(Category.getByName(name))
 				.rejects
-				.toThrowError(
+				.toThrow(
 					`Category with name "${name}" could not be found.`
 				);
 		});
