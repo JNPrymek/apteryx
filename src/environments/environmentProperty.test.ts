@@ -83,7 +83,7 @@ describe('EnvironmentProperty', () => {
 			}));
 			expect(EnvironmentProperty.getById(1))
 				.rejects
-				.toThrowError(
+				.toThrow(
 					'Could not find any Environment Property with ID 1'
 				);
 		});

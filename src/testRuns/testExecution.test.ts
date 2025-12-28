@@ -1150,7 +1150,7 @@ describe('Test Execution', () => {
 				}));
 				expect(TestExecution.getById(5000))
 					.rejects
-					.toThrowError('Could not find any TestExecution with ID 5000');
+					.toThrow('Could not find any TestExecution with ID 5000');
 			});
 		/* eslint-enable max-len */
 

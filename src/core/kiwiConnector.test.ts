@@ -82,7 +82,7 @@ describe('Kiwi Connector', () => {
 				KiwiConnector
 					.sendRPCMethod('Test.nonExistentMethod', ['arg', 1]))
 				.rejects
-				.toThrowError(/-32601 .* "Test\.nonExistentMethod"/);
+				.toThrow(/-32601 .* "Test\.nonExistentMethod"/);
 
 			assertPostRequestData({
 				mockPostRequest,
@@ -139,7 +139,7 @@ describe('Kiwi Connector', () => {
 			await expect(async () => 
 				KiwiConnector.login(username, password))
 				.rejects
-				.toThrowError(/-32603.*Wrong username or password/);
+				.toThrow(/-32603.*Wrong username or password/);
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'Auth.login',
@@ -158,7 +158,7 @@ describe('Kiwi Connector', () => {
 				await expect(async () => 
 					KiwiConnector.sendRPCMethod('foo', ['foo']))
 					.rejects
-					.toThrowError(/Network Error 400 : Bad Request/);
+					.toThrow(/Network Error 400 : Bad Request/);
 			});
 
 			// eslint-disable-next-line max-len
@@ -171,7 +171,7 @@ describe('Kiwi Connector', () => {
 					await expect(async () =>
 						KiwiConnector.login('username', 'password'))
 						.rejects
-						.toThrowError(/Malformed JSON-RPC reply/);
+						.toThrow(/Malformed JSON-RPC reply/);
 				});
 		}); 
 	});

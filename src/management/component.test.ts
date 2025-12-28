@@ -245,7 +245,7 @@ describe('Component', () => {
 			expect(Component.getByName('First Component'))
 				.rejects
 				/* eslint-disable-next-line max-len */
-				.toThrowError('Component "First Component" could not be found.');
+				.toThrow('Component "First Component" could not be found.');
 		});
 		
 		it('Can get Component by name - 1 matches', async () => {
@@ -270,7 +270,7 @@ describe('Component', () => {
 				expect(Component.getByName(name))
 					.rejects
 					/* eslint-disable-next-line max-len */
-					.toThrowError(`Component '${name}' exists for multiple products.  The 'product' param must be specified`);
+					.toThrow(`Component '${name}' exists for multiple products.  The 'product' param must be specified`);
 			});
 		
 		/* eslint-disable-next-line max-len */
@@ -285,7 +285,7 @@ describe('Component', () => {
 				expect(Component.getByName(name, 5))
 					.rejects
 					/* eslint-disable-next-line max-len */
-					.toThrowError(`Component "${name}" could not be found for product 5.`);
+					.toThrow(`Component "${name}" could not be found for product 5.`);
 			});
 		
 		/* eslint-disable-next-line max-len */
@@ -300,7 +300,7 @@ describe('Component', () => {
 				expect(Component.getByName(name, 5))
 					.rejects
 					/* eslint-disable-next-line max-len */
-					.toThrowError(`Component "${name}" could not be found for product 5.`);
+					.toThrow(`Component "${name}" could not be found for product 5.`);
 			});
 		
 		/* eslint-disable-next-line max-len */

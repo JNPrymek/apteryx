@@ -120,7 +120,7 @@ describe('Test Execution Status', () => {
 				}));
 				expect(TestExecutionStatus.getById(1))
 					.rejects
-					.toThrowError(
+					.toThrow(
 						'Could not find any TestExecutionStatus with ID 1'
 					);
 			});
@@ -151,7 +151,7 @@ describe('Test Execution Status', () => {
 			const name = 'NON-EXISTENT-NAME';
 			expect(TestExecutionStatus.getByName(name))
 				.rejects
-				.toThrowError(
+				.toThrow(
 					/* eslint-disable-next-line max-len */
 					`TestExecutionStatus with name "${name}" could not be found.`
 				);

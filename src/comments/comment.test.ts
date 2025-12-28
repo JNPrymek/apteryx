@@ -106,7 +106,7 @@ describe('Comment', () => {
 			// Does not catch error
 			expect(() => {
 				invalidComment.getContentType();
-			}).toThrowError('Unknown commentable content type for comment 3');
+			}).toThrow('Unknown commentable content type for comment 3');
 		});
 
 		it('Can get Comment Site ID', () => {

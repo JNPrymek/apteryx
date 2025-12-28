@@ -85,7 +85,7 @@ describe('KiwiBaseItem', () => {
 			}));
 			expect(KiwiBaseItem.getById(1))
 				.rejects
-				.toThrowError('Could not find any KiwiBaseItem with ID 1');
+				.toThrow('Could not find any KiwiBaseItem with ID 1');
 		});
 
 		it('Can update to latest values from server', async () => {

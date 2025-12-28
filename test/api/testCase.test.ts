@@ -8,6 +8,7 @@ import {
 import {
 	TestCasePropertyValues
 } from '../../src/testCases/testCaseProperty.type';
+import { expectTimeValue } from './expectTimeValues';
 
 const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
 
@@ -268,14 +269,15 @@ describe('Kiwi RPC API - TestCase', () => {
 			(result.reviewer__username === null) ||
 			(typeof result.reviewer__username === 'string')
 		).to.be.true;
-		expect(
-			(result.setup_duration === 'None') ||
-			(typeof result.setup_duration === 'number')
-		).to.be.true;
-		expect(
-			(result.testing_duration === 'None') ||
-			(typeof result.testing_duration === 'number')
-		).to.be.true;
+
+		expectTimeValue(
+			result.setup_duration,
+			'setup_duration must be numeric, "None", or "hh:mm:ss" format'
+		);
+		expectTimeValue(
+			result.testing_duration,
+			'setup_duration must be numeric, "None", or "hh:mm:ss" format'
+		);
 		
 	});
 

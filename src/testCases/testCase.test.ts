@@ -293,7 +293,7 @@ describe('TestCase', () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: []
 			}));
-			expect(TestCase.getById(1)).rejects.toThrowError(
+			expect(TestCase.getById(1)).rejects.toThrow(
 				'Could not find any TestCase with ID 1'
 			);
 		});

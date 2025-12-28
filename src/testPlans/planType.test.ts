@@ -64,7 +64,7 @@ describe('PlanType', () => {
 			}));
 			expect(PlanType.getById(1))
 				.rejects
-				.toThrowError('Could not find any PlanType with ID 1');
+				.toThrow('Could not find any PlanType with ID 1');
 		});
 
 		it('Can get PlanType by Name (one match)', async () => {
@@ -82,7 +82,7 @@ describe('PlanType', () => {
 			const name = 'Non-used name';
 			expect(PlanType.getByName(name))
 				.rejects
-				.toThrowError(
+				.toThrow(
 					`PlanType with name "${name}" could not be found.`
 				);
 		});

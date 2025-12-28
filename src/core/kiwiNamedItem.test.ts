@@ -48,7 +48,7 @@ describe('KiwiNamedItem', () => {
 		
 		expect(KiwiNamedItem.getByName('Bob'))
 			.rejects
-			.toThrowError('KiwiNamedItem with name "Bob" could not be found.');
+			.toThrow('KiwiNamedItem with name "Bob" could not be found.');
 	});
 	
 	it('Can get a single KiwiNamedItem by ID', async () => {

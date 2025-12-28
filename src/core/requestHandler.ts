@@ -1,5 +1,6 @@
 
 import fetch from 'node-fetch';
+import debug from 'debug';
 import { CookieJar, Cookie } from 'tough-cookie';
 import { NetworkResponse } from './networkTypes';
 
@@ -7,6 +8,10 @@ import { NetworkResponse } from './networkTypes';
  * Utility Class to handle HTTP requests and manage Cookies
  */
 export default class RequestHandler {
+
+	// Debug logger
+	private static debugNetworkRequest = debug('apteryx:network');
+	private static debugCookieProcess = debug('apteryx:network:cookie');
 	// Create Cookie Jar
 	static cookieJar = new CookieJar();
 	
@@ -35,6 +40,11 @@ export default class RequestHandler {
 		// Add cookies to request headers
 		const sendHeaders = await this.appendCookiesToHeader(url, headers);
 		
+		this.debugNetworkRequest(
+			'Sending POST request to %s with body: %o',
+			url,
+			this.getSafeBodyForLogging(body)
+		);
 		// Send POST request
 		const response = await fetch(url, {
 			method: 'POST',
@@ -46,6 +56,8 @@ export default class RequestHandler {
 		await this.saveCookiesFromHeader(url, response.headers.raw());
 
 		const responseBody: string = await response.text();
+
+		this.debugNetworkRequest('Received response: %o', responseBody);
 
 		const result: NetworkResponse = {
 			status: response.status,
@@ -82,22 +94,44 @@ export default class RequestHandler {
 	 */
 	static async saveCookiesFromHeader(
 		url: string, 
-		headers: Record<string, unknown>
+		headers: Record<string, unknown>,
 	): Promise<void> {
 		const setCookieHeader = headers['set-cookie'];
+		this.debugCookieProcess(
+			'Processing Set-Cookie header(s): %O',
+			setCookieHeader
+		);
 		
 		// Set single cookie to jar
 		if (typeof setCookieHeader === 'string') {
 			const cookie = Cookie.parse(setCookieHeader);
-			if (cookie) this.cookieJar.setCookie(cookie, url);
-		}
-		
-		// Split array, then set each to jar
-		if (Array.isArray(setCookieHeader)) {
-			setCookieHeader.forEach( (cookieString: string) => {
+			if (cookie) {
+				await this.cookieJar.setCookie(cookie, url);
+			}
+		} else if (Array.isArray(setCookieHeader)) {
+			for (const cookieString of setCookieHeader) {
 				const cookie = Cookie.parse(cookieString);
-				if (cookie) this.cookieJar.setCookie(cookie, url);
-			});
+				if (cookie) {
+					await this.cookieJar.setCookie(cookie, url);
+				};
+			}
+		} else {
+			this.debugCookieProcess(
+				'Set-Cookie header in unrecognized format: %O',
+				setCookieHeader
+			);
+		}
+	}
+
+	private static getSafeBodyForLogging(
+		body: Record<string, unknown>
+	): string {
+		if (body.method === 'Auth.login') {
+			const safeBody = { ... body };
+			safeBody.params = ['USERNAME_REDACTED', 'PASSWORD_REDACTED'];
+			return JSON.stringify(safeBody);
+		} else {
+			return JSON.stringify(body);
 		}
 	}
 }

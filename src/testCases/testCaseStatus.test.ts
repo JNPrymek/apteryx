@@ -84,7 +84,7 @@ describe('Test Case Status', () => {
 			}));
 			expect(TestCaseStatus.getById(1))
 				.rejects
-				.toThrowError('Could not find any TestCaseStatus with ID 1');
+				.toThrow('Could not find any TestCaseStatus with ID 1');
 		});
 
 		it('Can get TestCaseStatus by Name (one match)', async () => {
@@ -102,7 +102,7 @@ describe('Test Case Status', () => {
 			const name = 'Non-used name';
 			expect(TestCaseStatus.getByName(name))
 				.rejects
-				.toThrowError(
+				.toThrow(
 					`TestCaseStatus with name "${name}" could not be found.`
 				);
 		});

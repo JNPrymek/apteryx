@@ -95,7 +95,7 @@ describe('Priority', () => {
 			const value = 'Bad Priority';
 			expect(Priority.getByValue(value))
 				.rejects
-				.toThrowError(`Priority with value "${value}" was not found.`);
+				.toThrow(`Priority with value "${value}" was not found.`);
 		});
 	});
 });
