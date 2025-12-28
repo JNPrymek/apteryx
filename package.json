@@ -1,6 +1,6 @@
 {
 	"name": "apteryx",
-	"version": "0.13.0",
+	"version": "0.13.1",
 	"description": "Utility library for interacting with the RPC API of Kiwi TCMS",
 	"main": "dist/index.js",
 	"files": [
@@ -11,7 +11,7 @@
 	"typings": "dist/index",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/JNPrymek/apteryx"
+		"url": "git+https://github.com/JNPrymek/apteryx.git"
 	},
 	"author": "Jacob N Prymek",
 	"license": "CC-BY-4.0",
