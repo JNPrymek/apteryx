@@ -26,7 +26,7 @@ export default class TestCaseStatus extends KiwiNamedItem {
 	}
 
 	public static async resolveStatusId(
-		status: number | string | TestCaseStatus
+		status: number | string | TestCaseStatus,
 	): Promise<number> {
 		if (typeof status === 'number') return status;
 		if (status instanceof TestCaseStatus) return status.getId();
@@ -36,33 +36,33 @@ export default class TestCaseStatus extends KiwiNamedItem {
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
-	
+
 	// Kiwi Named
 	// --------------------------------
-	
+
 	public static async getByName(
-		name: string
+		name: string,
 	): Promise<TestCaseStatus> {
 		return await super.getByName(name) as TestCaseStatus;
 	}
-	
+
 	public static async serverFilter(
-		filterObj: Record<string, unknown>
+		filterObj: Record<string, unknown>,
 	): Promise<Array<TestCaseStatus>> {
 		return await super.serverFilter(filterObj) as Array<TestCaseStatus>;
 	}
-	
+
 	public static async getByIds(
-		id: number | Array<number>
+		id: number | Array<number>,
 	): Promise<Array<TestCaseStatus>> {
 		return await super.getByIds(id) as Array<TestCaseStatus>;
 	}
-	
+
 	public static async getById(
-		id: number
+		id: number,
 	): Promise<TestCaseStatus> {
 		return await super.getById(id) as TestCaseStatus;
 	}
-	
+
 	// ------------------------------------------------------------------------
 }

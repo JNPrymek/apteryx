@@ -1,84 +1,73 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import expectArrayWithKiwiItem from '../../test/expectArrayWithKiwiItem';
+import { mockComponent, mockComponentServerEntry, mockProduct, mockUser } from '../../test/mockKiwiValues';
+import { assertPostRequestData } from '../../test/networkMocks/assertPostRequestData';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import RequestHandler from '../core/requestHandler';
 import Component from './component';
 import Product from './product';
-import { 
-	mockComponent, 
-	mockComponentServerEntry, 
-	mockProduct, 
-	mockUser
-} from '../../test/mockKiwiValues';
 import User from './user';
-import RequestHandler from '../core/requestHandler';
-import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
-import {
-	assertPostRequestData
-} from '../../test/networkMocks/assertPostRequestData';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Component', () => {
-	
 	// Clear mock calls between tests - required to verify RPC calls
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
-	
+
 	const component1Vals = mockComponent();
 	const component2Vals = mockComponent({
 		id: 2,
 		name: 'Example About page',
 		description: 'About page of Example.com',
 		initial_owner: 2,
-		initial_qa_contact: 1
+		initial_qa_contact: 1,
 	});
 	const component3Vals = mockComponent({
 		id: 3,
 		product: 2,
-		/* eslint-disable-next-line max-len */
-		description: 'First component of the Product 2.  Has same name as a Product1 component'
+
+		description: 'First component of the Product 2.  Has same name as a Product1 component',
 	});
-	
+
 	// Entries returned by RPC API - includes `cases` property
 	const component1ServerVals = mockComponentServerEntry(component1Vals);
 	const component2ServerVals = mockComponentServerEntry({
 		...component2Vals,
-		cases: 2
+		cases: 2,
 	});
 	const component3ServerVals = mockComponentServerEntry(component3Vals);
-	
+
 	it('Can instantiate a Component', () => {
 		const component1 = new Component(component1ServerVals);
 		const component2 = new Component(component2ServerVals);
 		const component3 = new Component(component3ServerVals);
-		
+
 		expect(component1['serialized']).toEqual(component1Vals);
 		expect(component2['serialized']).toEqual(component2Vals);
 		expect(component3['serialized']).toEqual(component3Vals);
 	});
-	
+
 	describe('Local Properties', () => {
-		
 		const component1 = new Component(component1Vals);
 		const component2 = new Component(component2Vals);
 		const component3 = new Component(component3Vals);
-		
+
 		it('Can get ID of Component', () => {
 			expect(component1.getId()).toEqual(1);
 			expect(component2.getId()).toEqual(2);
 			expect(component3.getId()).toEqual(3);
 		});
-	
+
 		it('Can get ID of Component Initial Owner', () => {
 			expect(component1.getInitialOwnerId()).toEqual(1);
 			expect(component2.getInitialOwnerId()).toEqual(2);
 			expect(component3.getInitialOwnerId()).toEqual(1);
 		});
-	
+
 		it('Can get Component Initial Owner', async () => {
 			const user1Vals = mockUser();
 			const user2Vals = mockUser({
@@ -86,19 +75,19 @@ describe('Component', () => {
 				username: 'bob',
 				email: 'bob@example.com',
 				first_name: 'Bob',
-				last_name: 'Bar'
+				last_name: 'Bar',
 			});
-			
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user1Vals]
+				result: [user1Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user2Vals]
+				result: [user2Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user1Vals]
+				result: [user1Vals],
 			}));
-			
+
 			expect(await component1.getInitialOwner())
 				.toEqual(new User(user1Vals));
 			expect(await component2.getInitialOwner())
@@ -106,13 +95,13 @@ describe('Component', () => {
 			expect(await component3.getInitialOwner())
 				.toEqual(new User(user1Vals));
 		});
-	
+
 		it('Can get ID of Component Initial QA Contact', () => {
 			expect(component1.getInitialQaContactId()).toEqual(2);
 			expect(component2.getInitialQaContactId()).toEqual(1);
 			expect(component3.getInitialQaContactId()).toEqual(2);
 		});
-		
+
 		it('Can get Component Initial QA Contact', async () => {
 			const user1Vals = mockUser();
 			const user2Vals = mockUser({
@@ -120,19 +109,19 @@ describe('Component', () => {
 				username: 'bob',
 				email: 'bob@example.com',
 				first_name: 'Bob',
-				last_name: 'Bar'
+				last_name: 'Bar',
 			});
-			
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user2Vals]
+				result: [user2Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user1Vals]
+				result: [user1Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user2Vals]
+				result: [user2Vals],
 			}));
-			
+
 			expect(await component1.getInitialQaContact())
 				.toEqual(new User(user2Vals));
 			expect(await component2.getInitialQaContact())
@@ -140,230 +129,217 @@ describe('Component', () => {
 			expect(await component3.getInitialQaContact())
 				.toEqual(new User(user2Vals));
 		});
-	
+
 		it('Can get ID of Component Product', () => {
 			expect(component1.getProductId()).toEqual(1);
 			expect(component2.getProductId()).toEqual(1);
 			expect(component3.getProductId()).toEqual(2);
 		});
-	
+
 		it('Can get Component Product', async () => {
 			const product1Vals = mockProduct();
-		
+
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ product1Vals ]
+				result: [product1Vals],
 			}));
-		
+
 			const compProd = await component1.getProduct();
-		
+
 			expect(compProd['serialized']).toEqual(product1Vals);
 		});
-	
+
 		it('Can get Component description', () => {
 			expect(component1.getDescription())
 				.toEqual('Homepage of the Example.com website');
 			expect(component2.getDescription())
 				.toEqual('About page of Example.com');
 			expect(component3.getDescription())
-				/* eslint-disable-next-line max-len */
 				.toEqual('First component of the Product 2.  Has same name as a Product1 component');
 		});
-	
+
 		it('Can get Component name', () => {
 			expect(component1.getName()).toEqual('Example Homepage');
 			expect(component2.getName()).toEqual('Example About page');
 			expect(component3.getName()).toEqual('Example Homepage');
 		});
-	
+
 		it('Can get IDs of TestCases linked to Component', async () => {
 			// Mock distinct entries
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ 
+				result: [
 					{ ...component1Vals, cases: 1 },
 					{ ...component1Vals, cases: 2 },
-					{ ...component1Vals, cases: 5 }
-				]
+					{ ...component1Vals, cases: 5 },
+				],
 			}));
 			const compTCs = await component1.getLinkedTestCaseIds();
 			expect(compTCs).toEqual([1, 2, 5]);
 		});
 	});
-	
+
 	describe('Server Lookups', () => {
 		it('Can get by single ID - 0 TCs linked', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ component1ServerVals ]
+				result: [component1ServerVals],
 			}));
-			
+
 			const comp = await Component.getById(1);
 			expect(comp['serialized']).toEqual(component1Vals);
 		});
-		
+
 		it('Can get by single ID - 1 TC linked', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [component2ServerVals]
+				result: [component2ServerVals],
 			}));
-			
+
 			const comp = await Component.getById(2);
 			expect(comp['serialized']).toEqual(component2Vals);
 		});
-		
+
 		it('Can get by single ID - 2 TCs linked', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ 
-					{ ...component1ServerVals, cases: 1 },
-					{ ...component1ServerVals, cases: 2 }
-				]
-			}));
-			
-			const comp = await Component.getById(1);
-			expect(comp['serialized']).toEqual(component1Vals);
-			
-		});
-		
-		it('Can get by multiple IDs - mix of TCs linked', async () => {
-			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ 
+				result: [
 					{ ...component1ServerVals, cases: 1 },
 					{ ...component1ServerVals, cases: 2 },
-					component3ServerVals
-				]
+				],
 			}));
-			
+
+			const comp = await Component.getById(1);
+			expect(comp['serialized']).toEqual(component1Vals);
+		});
+
+		it('Can get by multiple IDs - mix of TCs linked', async () => {
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [
+					{ ...component1ServerVals, cases: 1 },
+					{ ...component1ServerVals, cases: 2 },
+					component3ServerVals,
+				],
+			}));
+
 			const comps = await Component.getByIds([1, 3]);
-			
+
 			expectArrayWithKiwiItem(comps, component1Vals);
 			expectArrayWithKiwiItem(comps, component3Vals);
 		});
-		
+
 		it('Can get Component by name - 0 matches', async () => {
-		
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
-		
+
 			expect(Component.getByName('First Component'))
 				.rejects
-				/* eslint-disable-next-line max-len */
 				.toThrow('Component "First Component" could not be found.');
 		});
-		
+
 		it('Can get Component by name - 1 matches', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [component1ServerVals]
+				result: [component1ServerVals],
 			}));
-			
+
 			const comp = await Component.getByName('Example Homepage');
-			
+
 			expect(comp['serialized']).toEqual(component1Vals);
-			
 		});
-		
-		/* eslint-disable-next-line max-len */
-		it('Can get Component by name - multiple matches without product filter throws Error', 
-			async () => {
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [ component1ServerVals, component3ServerVals]
-				}));
-			
-				const name = 'Example Homepage';
-				expect(Component.getByName(name))
-					.rejects
-					/* eslint-disable-next-line max-len */
-					.toThrow(`Component '${name}' exists for multiple products.  The 'product' param must be specified`);
-			});
-		
-		/* eslint-disable-next-line max-len */
-		it('Can get Component by name - single match with non-matching Product results in error', 
-			async () => {
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [component1ServerVals]
-				}));
-			
-				const name = 'Example Homepage';
-			
-				expect(Component.getByName(name, 5))
-					.rejects
-					/* eslint-disable-next-line max-len */
-					.toThrow(`Component "${name}" could not be found for product 5.`);
-			});
-		
-		/* eslint-disable-next-line max-len */
-		it('Can get Component by name - multiple matches with non-matching Product results in error', 
-			async () => {
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [ component1ServerVals, component3ServerVals]
-				}));
-			
-				const name = 'Example Homepage';
-			
-				expect(Component.getByName(name, 5))
-					.rejects
-					/* eslint-disable-next-line max-len */
-					.toThrow(`Component "${name}" could not be found for product 5.`);
-			});
-		
-		/* eslint-disable-next-line max-len */
-		it('Can get Component by name - multiple matches filtered by product ID', 
-			async () => {
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [component1ServerVals, component3ServerVals]
-				}));
-			
-				const name = 'Example Homepage';
-				const comp = await Component.getByName(name, 2);
-			
-				expect(comp['serialized']).toEqual(component3Vals);
-			
-			});
-		
-		it('Can get Component by name - multiple matches filtered by Product', 
-			async () => {
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [component1ServerVals, component3ServerVals]
-				}));
-			
-				const name = 'Example Homepage';
-				const prod = new Product(mockProduct());
-				const comp = await Component.getByName(name, prod);
-			
-				expect(comp['serialized']).toEqual(component1Vals);
-			
-			});
-		
+
+		it('Can get Component by name - multiple matches without product filter throws Error', async () => {
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [component1ServerVals, component3ServerVals],
+			}));
+
+			const name = 'Example Homepage';
+			expect(Component.getByName(name))
+				.rejects
+				.toThrow(`Component '${name}' exists for multiple products.  The 'product' param must be specified`);
+		});
+
+		it('Can get Component by name - single match with non-matching Product results in error', async () => {
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [component1ServerVals],
+			}));
+
+			const name = 'Example Homepage';
+
+			expect(Component.getByName(name, 5))
+				.rejects
+				.toThrow(`Component "${name}" could not be found for product 5.`);
+		});
+
+		it('Can get Component by name - multiple matches with non-matching Product results in error', async () => {
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [component1ServerVals, component3ServerVals],
+			}));
+
+			const name = 'Example Homepage';
+
+			expect(Component.getByName(name, 5))
+				.rejects
+				.toThrow(`Component "${name}" could not be found for product 5.`);
+		});
+
+		it('Can get Component by name - multiple matches filtered by product ID', async () => {
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [component1ServerVals, component3ServerVals],
+			}));
+
+			const name = 'Example Homepage';
+			const comp = await Component.getByName(name, 2);
+
+			expect(comp['serialized']).toEqual(component3Vals);
+		});
+
+		it('Can get Component by name - multiple matches filtered by Product', async () => {
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [component1ServerVals, component3ServerVals],
+			}));
+
+			const name = 'Example Homepage';
+			const prod = new Product(mockProduct());
+			const comp = await Component.getByName(name, prod);
+
+			expect(comp['serialized']).toEqual(component1Vals);
+		});
+
 		it('Can get Component list for given TestCase ID', async () => {
 			const tcId = 3;
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockComponentServerEntry({ name: 'Comp1', cases: tcId }),
 					mockComponentServerEntry(
-						{ id: 8, name: 'Comp8', cases: tcId }
+						{ id: 8, name: 'Comp8', cases: tcId },
 					),
 					mockComponentServerEntry(
-						{ id: 14, name: 'Comp14', cases: tcId }
+						{ id: 14, name: 'Comp14', cases: tcId },
 					),
-				]
+				],
 			}));
 
 			const compoents = await Component.getComponentsForTestCase(tcId);
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'Component.filter',
-				params: [ { cases: tcId }],
+				params: [{ cases: tcId }],
 			});
 
 			expect(compoents)
-				.toContainEqual(new Component(
-					mockComponent({ id: 1, name: 'Comp1' })
-				));
+				.toContainEqual(
+					new Component(
+						mockComponent({ id: 1, name: 'Comp1' }),
+					),
+				);
 			expect(compoents)
-				.toContainEqual(new Component(
-					mockComponent({ id: 8, name: 'Comp8' })
-				));
+				.toContainEqual(
+					new Component(
+						mockComponent({ id: 8, name: 'Comp8' }),
+					),
+				);
 			expect(compoents)
-				.toContainEqual(new Component(
-					mockComponent({ id: 14, name: 'Comp14' })
-				));
+				.toContainEqual(
+					new Component(
+						mockComponent({ id: 14, name: 'Comp14' }),
+					),
+				);
 		});
 
 		it('Can reload values from server', async () => {
@@ -371,29 +347,29 @@ describe('Component', () => {
 			const origLocalVal = mockComponent();
 			const updatedVal = mockComponent({
 				name: 'New and improved',
-				description: 'Updated for unit testing'
+				description: 'Updated for unit testing',
 			});
 			const updatedServerVal = [
 				mockComponentServerEntry(updatedVal),
 				mockComponentServerEntry({
 					...updatedVal,
-					cases: 1
+					cases: 1,
 				}),
 				mockComponentServerEntry({
 					...updatedVal,
-					cases: 2
+					cases: 2,
 				}),
 				mockComponentServerEntry({
 					...updatedVal,
-					cases: 3
+					cases: 3,
 				}),
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ origServerVal ]
+				result: [origServerVal],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: updatedServerVal
+				result: updatedServerVal,
 			}));
 
 			const comp1 = await Component.getById(1);

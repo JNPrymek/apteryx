@@ -10,18 +10,18 @@ module.exports = {
 		'<rootDir>/tmp/',
 		'<rootDir>/temp/',
 		'<rootDir>/test/api/',
-		'<rootDir>/src/index.ts'
+		'<rootDir>/src/index.ts',
 	],
 	collectCoverageFrom: [
 		'<rootDir>/src/**/*.{js,ts}',
-		'!<rootDir>/src/**/*.test.{js,ts}'
+		'!<rootDir>/src/**/*.test.{js,ts}',
 	],
 	coverageThreshold: {
 		'global': {
 			'branches': 80,
 			'functions': 80,
 			'lines': 80,
-			'statements': -10
-		}
-	}
+			'statements': -10,
+		},
+	},
 };

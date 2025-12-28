@@ -44,7 +44,7 @@ export default class User extends KiwiNamedItem {
 	}
 
 	public static async resolveUserId(
-		identifier: number | string | User
+		identifier: number | string | User,
 	): Promise<number> {
 		let result = 0;
 		if (typeof identifier === 'number') {
@@ -75,13 +75,13 @@ export default class User extends KiwiNamedItem {
 	}
 
 	public static async serverFilter(
-		filterObj: Partial<UserValues>
+		filterObj: Partial<UserValues>,
 	): Promise<Array<User>> {
 		return (await super.serverFilter(filterObj)) as Array<User>;
 	}
 
 	public static async getByIds(
-		id: number | Array<number>
+		id: number | Array<number>,
 	): Promise<Array<User>> {
 		return (await super.getByIds(id)) as Array<User>;
 	}

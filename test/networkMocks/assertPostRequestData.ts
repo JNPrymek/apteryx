@@ -1,4 +1,3 @@
-
 import { RpcParam } from '../../src/core/networkTypes';
 import RequestHandler from '../../src/core/requestHandler';
 
@@ -14,7 +13,7 @@ export function assertPostRequestData({
 	callIndex?: number;
 }): void {
 	const call = mockPostRequest.mock.calls[callIndex];
-	expect(typeof call[0]).toBe('string'); // URL 
+	expect(typeof call[0]).toBe('string'); // URL
 	expect(call[1]).toEqual({
 		method,
 		params,

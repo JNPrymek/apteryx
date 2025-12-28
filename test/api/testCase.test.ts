@@ -1,34 +1,29 @@
-import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { before, describe, it } from 'mocha';
 import KiwiConnector from '../../src/core/kiwiConnector';
+import { TestCaseCreateValues } from '../../src/testCases/testCase.type';
+import { TestCasePropertyValues } from '../../src/testCases/testCaseProperty.type';
 import { kiwiTestServerInfo } from '../testServerDetails';
-import {
-	TestCaseCreateValues
-} from '../../src/testCases/testCase.type';
-import {
-	TestCasePropertyValues
-} from '../../src/testCases/testCaseProperty.type';
 import { expectTimeValue } from './expectTimeValues';
 
 const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
 
 describe('Kiwi RPC API - TestCase', () => {
-
 	before(async () => {
 		KiwiConnector.init(kiwiTestServerInfo);
 		await KiwiConnector.login(
 			kiwiTestServerInfo.username,
-			kiwiTestServerInfo.password
+			kiwiTestServerInfo.password,
 		);
 	});
 
 	it('TestCase.filter returns expected type', async () => {
 		const result = await KiwiConnector.sendRPCMethod(
 			'TestCase.filter',
-			[{ id: 1 }]
+			[{ id: 1 }],
 		);
 		expect(result).to.be.an('array');
-		const arr = (result as Array<Record<string, unknown>>);
+		const arr = result as Array<Record<string, unknown>>;
 		expect(arr.length).to.be.equal(1);
 		const tc1 = arr[0];
 		expect(tc1).to.be.an('object').that.has.all.keys(
@@ -65,13 +60,13 @@ describe('Kiwi RPC API - TestCase', () => {
 		expect(tc1.script).to.be.a('string');
 		expect(tc1.arguments).to.be.a('string');
 		expect(
-			(tc1.extra_link === null) ||
-			(typeof tc1.extra_link === 'string')
+			(tc1.extra_link === null)
+				|| (typeof tc1.extra_link === 'string'),
 		).to.be.true;
 		expect(tc1.summary).to.be.a('string');
 		expect(
-			(tc1.requirement === null) ||
-			(typeof tc1.requirement === 'string')
+			(tc1.requirement === null)
+				|| (typeof tc1.requirement === 'string'),
 		).to.be.true;
 		expect(tc1.notes).to.be.a('string');
 		expect(tc1.text).to.be.a('string');
@@ -84,28 +79,28 @@ describe('Kiwi RPC API - TestCase', () => {
 		expect(tc1.author).to.be.a('number');
 		expect(tc1.author__username).to.be.a('string');
 		expect(
-			(tc1.default_tester === null) ||
-			(typeof tc1.default_tester === 'number')
+			(tc1.default_tester === null)
+				|| (typeof tc1.default_tester === 'number'),
 		).to.be.true;
 		expect(
-			(tc1.default_tester__username === null) ||
-			(typeof tc1.default_tester__username === 'string')
+			(tc1.default_tester__username === null)
+				|| (typeof tc1.default_tester__username === 'string'),
 		).to.be.true;
 		expect(
-			(tc1.reviewer === null) ||
-			(typeof tc1.reviewer === 'number')
+			(tc1.reviewer === null)
+				|| (typeof tc1.reviewer === 'number'),
 		).to.be.true;
 		expect(
-			(tc1.reviewer__username === null) ||
-			(typeof tc1.reviewer__username === 'string')
+			(tc1.reviewer__username === null)
+				|| (typeof tc1.reviewer__username === 'string'),
 		).to.be.true;
 		expect(
-			(tc1.setup_duration === null) ||
-			(typeof tc1.setup_duration === 'number')
+			(tc1.setup_duration === null)
+				|| (typeof tc1.setup_duration === 'number'),
 		).to.be.true;
 		expect(
-			(tc1.testing_duration === null) ||
-			(typeof tc1.testing_duration === 'number')
+			(tc1.testing_duration === null)
+				|| (typeof tc1.testing_duration === 'number'),
 		).to.be.true;
 		expect(tc1.expected_duration).to.be.a('number');
 	});
@@ -117,13 +112,13 @@ describe('Kiwi RPC API - TestCase', () => {
 			category: 1,
 			priority: 1,
 			case_status: 1,
-			summary: `API Integration Testing ${rndNum}`
+			summary: `API Integration Testing ${rndNum}`,
 		};
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestCase.create',
-			[tcVals]
+			[tcVals],
 		);
-		
+
 		expect(response).to.be.an('object').that.has.all.keys(
 			'id',
 			'create_date',
@@ -153,13 +148,13 @@ describe('Kiwi RPC API - TestCase', () => {
 		expect(result.script).to.be.a('string');
 		expect(result.arguments).to.be.a('string');
 		expect(
-			(result.extra_link === null) ||
-			(typeof result.extra_link === 'string')
+			(result.extra_link === null)
+				|| (typeof result.extra_link === 'string'),
 		).to.be.true;
 		expect(result.summary).to.be.a('string');
 		expect(
-			(result.requirement === null) ||
-			(typeof result.requirement === 'string')
+			(result.requirement === null)
+				|| (typeof result.requirement === 'string'),
 		).to.be.true;
 		expect(result.notes).to.be.a('string');
 		expect(result.text).to.be.a('string');
@@ -168,27 +163,27 @@ describe('Kiwi RPC API - TestCase', () => {
 		expect(result.priority).to.be.a('number');
 		expect(result.author).to.be.a('number');
 		expect(
-			(result.default_tester === null) ||
-			(typeof result.default_tester === 'number')
+			(result.default_tester === null)
+				|| (typeof result.default_tester === 'number'),
 		).to.be.true;
 		expect(
-			(result.reviewer === null) ||
-			(typeof result.reviewer === 'number')
+			(result.reviewer === null)
+				|| (typeof result.reviewer === 'number'),
 		).to.be.true;
 		expect(
-			(result.setup_duration === 'None') ||
-			(typeof result.setup_duration === 'number')
+			(result.setup_duration === 'None')
+				|| (typeof result.setup_duration === 'number'),
 		).to.be.true;
 		expect(
-			(result.testing_duration === 'None') ||
-			(typeof result.testing_duration === 'number')
+			(result.testing_duration === 'None')
+				|| (typeof result.testing_duration === 'number'),
 		).to.be.true;
 	});
 
 	it('TestCase.update returns expected type', async () => {
 		const filterResponse = await KiwiConnector.sendRPCMethod(
 			'TestCase.filter',
-			[{ id: 1 }]
+			[{ id: 1 }],
 		);
 		const original = (filterResponse as Array<Record<string, unknown>>)[0];
 
@@ -197,9 +192,9 @@ describe('Kiwi RPC API - TestCase', () => {
 			[
 				1,
 				{
-					summary: original.summary
-				}
-			]
+					summary: original.summary,
+				},
+			],
 		);
 
 		expect(updateResponse).to.be.an('object').that.has.all.keys(
@@ -228,20 +223,20 @@ describe('Kiwi RPC API - TestCase', () => {
 			'setup_duration',
 			'testing_duration',
 		);
-		const result = (updateResponse) as Record<string, unknown>;
+		const result = updateResponse as Record<string, unknown>;
 		expect(result.id).to.be.a('number').that.equals(1);
 		expect(result.create_date).to.be.a('string').that.matches(dateRegex);
 		expect(result.is_automated).to.be.a('boolean');
 		expect(result.script).to.be.a('string');
 		expect(result.arguments).to.be.a('string');
 		expect(
-			(result.extra_link === null) ||
-			(typeof result.extra_link === 'string')
+			(result.extra_link === null)
+				|| (typeof result.extra_link === 'string'),
 		).to.be.true;
 		expect(result.summary).to.be.a('string');
 		expect(
-			(result.requirement === null) ||
-			(typeof result.requirement === 'string')
+			(result.requirement === null)
+				|| (typeof result.requirement === 'string'),
 		).to.be.true;
 		expect(result.notes).to.be.a('string');
 		expect(result.text).to.be.a('string');
@@ -254,31 +249,30 @@ describe('Kiwi RPC API - TestCase', () => {
 		expect(result.author).to.be.a('number');
 		expect(result.author__username).to.be.a('string');
 		expect(
-			(result.default_tester === null) ||
-			(typeof result.default_tester === 'number')
+			(result.default_tester === null)
+				|| (typeof result.default_tester === 'number'),
 		).to.be.true;
 		expect(
-			(result.default_tester__username === null) ||
-			(typeof result.default_tester__username === 'string')
+			(result.default_tester__username === null)
+				|| (typeof result.default_tester__username === 'string'),
 		).to.be.true;
 		expect(
-			(result.reviewer === null) ||
-			(typeof result.reviewer === 'number')
+			(result.reviewer === null)
+				|| (typeof result.reviewer === 'number'),
 		).to.be.true;
 		expect(
-			(result.reviewer__username === null) ||
-			(typeof result.reviewer__username === 'string')
+			(result.reviewer__username === null)
+				|| (typeof result.reviewer__username === 'string'),
 		).to.be.true;
 
 		expectTimeValue(
 			result.setup_duration,
-			'setup_duration must be numeric, "None", or "hh:mm:ss" format'
+			'setup_duration must be numeric, "None", or "hh:mm:ss" format',
 		);
 		expectTimeValue(
 			result.testing_duration,
-			'setup_duration must be numeric, "None", or "hh:mm:ss" format'
+			'setup_duration must be numeric, "None", or "hh:mm:ss" format',
 		);
-		
 	});
 
 	describe('TestCase Properties', () => {
@@ -288,11 +282,11 @@ describe('Kiwi RPC API - TestCase', () => {
 		it('TestCase.sortkeys returns expected type', async () => {
 			const response = await KiwiConnector.sendRPCMethod(
 				'TestCase.sortkeys',
-				[{ plan: 1 }]
+				[{ plan: 1 }],
 			);
 			expect(response).is.an('object');
-			const result = (response as Record<string, unknown>);
-			
+			const result = response as Record<string, unknown>;
+
 			for (const key in result) {
 				expect(key).is.a('string');
 				expect(key).to.match(/\d+/);
@@ -301,22 +295,22 @@ describe('Kiwi RPC API - TestCase', () => {
 					.that.is.greaterThanOrEqual(0);
 			}
 		});
-	
+
 		it('TestCase.properties returns expected type', async () => {
 			const response = await KiwiConnector.sendRPCMethod(
 				'TestCase.properties',
-				[{}]
+				[{}],
 			);
-			
+
 			expect(response).is.an('array');
 			const result = response as Array<TestCasePropertyValues>;
-	
-			result.forEach( item => {
+
+			result.forEach(item => {
 				expect(item).is.an('object').that.has.all.keys([
 					'id',
 					'case',
 					'name',
-					'value'
+					'value',
 				]);
 				expect(item.id).is.a('number');
 				expect(item.case).is.a('number');
@@ -324,21 +318,21 @@ describe('Kiwi RPC API - TestCase', () => {
 				expect(item.value).is.a('string');
 			});
 		});
-	
+
 		it('TestCase.add_property returns expected type', async () => {
 			const response = await KiwiConnector.sendRPCMethod(
 				'TestCase.add_property',
 				[
 					1, // Test Case ID
 					testPropName,
-					testPropValue
-				]
+					testPropValue,
+				],
 			);
 			expect(response).is.an('object').that.has.all.keys([
 				'id',
 				'case',
 				'name',
-				'value'
+				'value',
 			]);
 			const result = response as Record<string, unknown>;
 			expect(result.id).is.a('number');
@@ -354,7 +348,7 @@ describe('Kiwi RPC API - TestCase', () => {
 					case: 1,
 					name: testPropName,
 					value: testPropValue,
-				}]
+				}],
 			);
 			expect(response).is.null;
 		});
@@ -363,13 +357,13 @@ describe('Kiwi RPC API - TestCase', () => {
 	it('TestCase.comments returns expected type', async () => {
 		const result = await KiwiConnector.sendRPCMethod(
 			'TestCase.comments',
-			[1]
+			[1],
 		);
 
 		expect(result).to.be.an('array');
 		const arr = result as Array<Record<string, unknown>>;
 		expect(arr.length).to.be.greaterThan(0);
-		arr.forEach( item => {
+		arr.forEach(item => {
 			expect(item).to.be.an('object').that.has.all.keys([
 				'id',
 				'content_type',
@@ -404,7 +398,7 @@ describe('Kiwi RPC API - TestCase', () => {
 	it('TestCase.add_comment returns expected type', async () => {
 		const result = await KiwiConnector.sendRPCMethod(
 			'TestCase.add_comment',
-			[1, 'comment from API Integration test']
+			[1, 'comment from API Integration test'],
 		);
 		expect(result).to.be.an('object').that.has.all.keys([
 			'id',
@@ -419,18 +413,18 @@ describe('Kiwi RPC API - TestCase', () => {
 			'submit_date',
 			'ip_address',
 			'is_public',
-			'is_removed'
+			'is_removed',
 		]);
 	});
 
 	it('TestCase.remove_comment returns expected type', async () => {
 		const comment = await KiwiConnector.sendRPCMethod(
 			'TestCase.add_comment',
-			[1, 'comment pending removal from API Integration test']
+			[1, 'comment pending removal from API Integration test'],
 		) as Record<string, number | string>;
 		const result = await KiwiConnector.sendRPCMethod(
 			'TestCase.remove_comment',
-			[1, comment.id]
+			[1, comment.id],
 		);
 		expect(result).to.be.null;
 	});
@@ -438,7 +432,7 @@ describe('Kiwi RPC API - TestCase', () => {
 	it('TestCase.add_tag returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestCase.add_tag',
-			[1, 'Tag1']
+			[1, 'Tag1'],
 		);
 		expect(response).to.be.null;
 	});
@@ -446,9 +440,8 @@ describe('Kiwi RPC API - TestCase', () => {
 	it('TestCase.remove_tag returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestCase.remove_tag',
-			[1, 'Tag1']
+			[1, 'Tag1'],
 		);
 		expect(response).to.be.null;
 	});
-	
 });

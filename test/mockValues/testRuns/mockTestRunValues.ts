@@ -1,73 +1,68 @@
-
 import { TestExecutionValues } from '../../../src/testRuns/testExecution.type';
 import testExecutionDefaults from './testExecution.json';
 
 export function mockTestExecution(
-	overrideValues?: Partial<TestExecutionValues>
+	overrideValues?: Partial<TestExecutionValues>,
 ): TestExecutionValues {
 	return {
 		...testExecutionDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
-import { TestExecutionStatusValues } 
-	from '../../../src/testRuns/testExecutionStatus.type';
+import { TestExecutionStatusValues } from '../../../src/testRuns/testExecutionStatus.type';
 import testExecutionStatusDefaults from './testExecutionStatus.json';
 
 export function mockTestExecutionStatus(
-	overrideValues?: Partial<TestExecutionStatusValues>
+	overrideValues?: Partial<TestExecutionStatusValues>,
 ): TestExecutionStatusValues {
 	return {
 		...testExecutionStatusDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
-import { TestRunValues } 
-	from '../../../src/testRuns/testRun.type';
+import { TestRunValues } from '../../../src/testRuns/testRun.type';
 import testRunDefaults from './testRun.json';
 
 export function mockTestRun(
-	overrideValues?: Partial<TestRunValues>
+	overrideValues?: Partial<TestRunValues>,
 ): TestRunValues {
 	return {
 		...testRunDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
 import { TestRunUpdateResponse } from '../../../src/testRuns/testRun.type';
 import testRunUpdateResponseDefaults from './testRun_update.json';
 export function mockTestRunUpdateResponse(
-	overrideValues?: Partial<TestRunUpdateResponse>
+	overrideValues?: Partial<TestRunUpdateResponse>,
 ): TestRunUpdateResponse {
 	return {
 		...testRunUpdateResponseDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
 import { TestRunCaseEntry } from '../../../src/testRuns/testRun.type';
 import testRunCaseListDefaults from './testRun_caseList.json';
 export function mockTestRunCaseListItem(
-	overrideValues?: Partial<TestRunCaseEntry>
+	overrideValues?: Partial<TestRunCaseEntry>,
 ): TestRunCaseEntry {
 	return {
 		...testRunCaseListDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
+import { TestExecutionCreateResponse } from '../../../src/testRuns/testExecution.type';
 import testExecutionCreateDefaults from './testExecution_create.json';
-import {
-	TestExecutionCreateResponse
-} from '../../../src/testRuns/testExecution.type';
 export function mockTestExecutionCreateResponse(
-	overrideValues?: Partial<TestExecutionCreateResponse>
+	overrideValues?: Partial<TestExecutionCreateResponse>,
 ): TestExecutionCreateResponse {
 	return {
 		...testExecutionCreateDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }

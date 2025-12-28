@@ -4,4 +4,4 @@ export type TestExecutionStatusValues = {
 	weight: number;
 	icon: string;
 	color: string;
-}
+};

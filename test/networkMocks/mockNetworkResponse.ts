@@ -4,7 +4,7 @@ const { Response } = jest.requireActual('node-fetch');
 // Mock value for fetch() response
 export function mockNetworkSuccessResponse(
 	body: Record<string, unknown>,
-	setCookieString?: string
+	setCookieString?: string,
 ): fetch.Response {
 	const bodyString = JSON.stringify(body);
 	return new Response(bodyString, {
@@ -17,10 +17,10 @@ export function mockNetworkSuccessResponse(
 }
 
 export function mockNetworkForbiddenResponse(
-	body: Record<string, unknown>
+	body: Record<string, unknown>,
 ): Response {
 	return new Response(JSON.stringify(body), {
 		status: 403,
-		statusText: 'Forbidden'
+		statusText: 'Forbidden',
 	});
 }

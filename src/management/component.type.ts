@@ -5,9 +5,8 @@ export type ComponentValues = {
 	initial_owner: number;
 	initial_qa_contact: number;
 	description: string;
-}
+};
 
-export type ComponentServerValues = 
-	ComponentValues & {
-		cases: number | null;
-	}
+export type ComponentServerValues = ComponentValues & {
+	cases: number | null;
+};

@@ -19,7 +19,7 @@ export type TestExecutionValues = {
 	status__name: string;
 	status__icon: string;
 	status__color: string;
-}
+};
 
 export type TestExecutionCalculatedValues = {
 	id: number;
@@ -32,18 +32,16 @@ export type TestExecutionCalculatedValues = {
 	status__color: string;
 	expected_duration: number;
 	actual_duration: number | null;
-}
+};
 
-export type TestExecutionWriteValues =
-	Omit<TestExecutionValues, keyof TestExecutionCalculatedValues>;
+export type TestExecutionWriteValues = Omit<TestExecutionValues, keyof TestExecutionCalculatedValues>;
 
 type Property = {
 	name: string;
 	value: string;
-}
+};
 
-export type TestExecutionCreateResponse = 
-	TestExecutionWriteValues & {
-		id: number;
-		properties: Array<Property>;
-	}
+export type TestExecutionCreateResponse = TestExecutionWriteValues & {
+	id: number;
+	properties: Array<Property>;
+};

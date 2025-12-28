@@ -1,4 +1,3 @@
-
 export type CommentValues = {
 	id: number;
 	content_type?: number; // Used by TC comment

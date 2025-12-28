@@ -3,4 +3,4 @@ export type TestCaseStatusValues = {
 	name: string;
 	description: string;
 	is_confirmed: boolean;
-}
+};

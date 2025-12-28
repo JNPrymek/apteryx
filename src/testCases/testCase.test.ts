@@ -1,14 +1,8 @@
-import { describe, it, expect } from '@jest/globals';
-import RequestHandler from '../core/requestHandler';
+import { describe, expect, it } from '@jest/globals';
+import { assertPostRequestData } from '../../test/networkMocks/assertPostRequestData';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
-import {
-	assertPostRequestData
-} from '../../test/networkMocks/assertPostRequestData';
+import RequestHandler from '../core/requestHandler';
 
-import TestCase from './testCase';
-import Priority from '../management/priority';
-import Category from './category';
-import TestCaseStatus from './testCaseStatus';
 import {
 	mockComponent,
 	mockComponentServerEntry,
@@ -19,29 +13,23 @@ import {
 	mockTestCaseStatus,
 	mockUser,
 } from '../../test/mockKiwiValues';
-import User from '../management/user';
-import {
-	TestCaseCreateValues,
-	TestCaseWriteValues
-} from './testCase.type';
-import { TestCasePropertyValues } from './testCaseProperty.type';
-import { 
-	mockTestCaseProperty,
-	mockTestCaseUpdateResponse 
-} from '../../test/mockValues/testCases/mockTestCaseValues';
-import Component from '../management/component';
-import Tag from '../management/tag';
-import TestCaseProperty from './testCaseProperty';
-import {
-	mockTestCaseComment
-} from '../../test/mockValues/comments/mockComment';
+import { mockTestCaseComment } from '../../test/mockValues/comments/mockComment';
+import { mockTestCaseProperty, mockTestCaseUpdateResponse } from '../../test/mockValues/testCases/mockTestCaseValues';
 import Comment from '../comments/comment';
+import Component from '../management/component';
+import Priority from '../management/priority';
+import Tag from '../management/tag';
+import User from '../management/user';
+import Category from './category';
+import TestCase from './testCase';
+import { TestCaseCreateValues, TestCaseWriteValues } from './testCase.type';
+import TestCaseProperty from './testCaseProperty';
+import { TestCasePropertyValues } from './testCaseProperty.type';
+import TestCaseStatus from './testCaseStatus';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('TestCase', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -153,7 +141,7 @@ describe('TestCase', () => {
 			});
 			const confirmedStatus = new TestCaseStatus(tcStatus2Vals);
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [tcStatus2Vals]
+				result: [tcStatus2Vals],
 			}));
 
 			const tc1Status = await tc1.getCaseStatus();
@@ -291,10 +279,10 @@ describe('TestCase', () => {
 
 		it('Can get TC by a single ID (no match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			expect(TestCase.getById(1)).rejects.toThrow(
-				'Could not find any TestCase with ID 1'
+				'Could not find any TestCase with ID 1',
 			);
 		});
 	});
@@ -308,11 +296,11 @@ describe('TestCase', () => {
 					mockTagServerEntry({ id: 2, name: 'Tag2', case: 1 }),
 					mockTagServerEntry({ id: 3, name: 'Tag3', case: 1 }),
 					mockTagServerEntry({ id: 4, name: 'Tag4', case: 1 }),
-				]
+				],
 			}));
 
 			const tags = await tc1.getTags();
-			
+
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'Tag.filter',
@@ -328,11 +316,11 @@ describe('TestCase', () => {
 			const tc1 = new TestCase(mockTestCase());
 
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 
 			const tags = await tc1.getTags();
-			
+
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'Tag.filter',
@@ -350,12 +338,12 @@ describe('TestCase', () => {
 				result: [
 					mockComponentServerEntry({ name: 'Comp1', cases: tcId }),
 					mockComponentServerEntry(
-						{ id: 8, name: 'Comp8', cases: tcId }
+						{ id: 8, name: 'Comp8', cases: tcId },
 					),
 					mockComponentServerEntry(
-						{ id: 14, name: 'Comp14', cases: tcId }
+						{ id: 14, name: 'Comp14', cases: tcId },
 					),
-				]
+				],
 			}));
 
 			const compoents = await tc8.getComponents();
@@ -367,17 +355,23 @@ describe('TestCase', () => {
 			});
 
 			expect(compoents)
-				.toContainEqual(new Component(
-					mockComponent({ id: 1, name: 'Comp1' })
-				));
+				.toContainEqual(
+					new Component(
+						mockComponent({ id: 1, name: 'Comp1' }),
+					),
+				);
 			expect(compoents)
-				.toContainEqual(new Component(
-					mockComponent({ id: 8, name: 'Comp8' })
-				));
+				.toContainEqual(
+					new Component(
+						mockComponent({ id: 8, name: 'Comp8' }),
+					),
+				);
 			expect(compoents)
-				.toContainEqual(new Component(
-					mockComponent({ id: 14, name: 'Comp14' })
-				));
+				.toContainEqual(
+					new Component(
+						mockComponent({ id: 14, name: 'Comp14' }),
+					),
+				);
 		});
 
 		it('Can get Components linked to TestCase - 0 results', async () => {
@@ -385,7 +379,7 @@ describe('TestCase', () => {
 			const tc8 = new TestCase(mockTestCase({ id: 8 }));
 
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 
 			const compoents = await tc8.getComponents();
@@ -404,7 +398,7 @@ describe('TestCase', () => {
 			const compVals = [
 				mockComponentServerEntry({ cases: 1 }),
 				mockComponentServerEntry({ cases: 2 }),
-				mockComponentServerEntry({ cases: 3 })
+				mockComponentServerEntry({ cases: 3 }),
 			];
 			const tcVals = [
 				mockTestCase({ id: 1, summary: 'TC1' }),
@@ -413,10 +407,10 @@ describe('TestCase', () => {
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: compVals
+				result: compVals,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: tcVals
+				result: tcVals,
 			}));
 
 			const tcList = await TestCase.getTestCasesWithComponent(comp);
@@ -429,7 +423,7 @@ describe('TestCase', () => {
 			const compVals = [
 				mockComponentServerEntry({ cases: 1 }),
 				mockComponentServerEntry({ cases: 2 }),
-				mockComponentServerEntry({ cases: 3 })
+				mockComponentServerEntry({ cases: 3 }),
 			];
 			const tcVals = [
 				mockTestCase({ id: 1, summary: 'TC1' }),
@@ -438,10 +432,10 @@ describe('TestCase', () => {
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: compVals
+				result: compVals,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: tcVals
+				result: tcVals,
 			}));
 
 			const tcList = await TestCase.getTestCasesWithComponent(1);
@@ -464,10 +458,10 @@ describe('TestCase', () => {
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: tagVals
+				result: tagVals,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: tcVals
+				result: tcVals,
 			}));
 
 			const tcList = await TestCase.getTestCasesWithTag(tag1);
@@ -489,10 +483,10 @@ describe('TestCase', () => {
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: tagVals
+				result: tagVals,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: tcVals
+				result: tcVals,
 			}));
 
 			const tcList = await TestCase.getTestCasesWithTag(1);
@@ -514,10 +508,10 @@ describe('TestCase', () => {
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: tagVals
+				result: tagVals,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: tcVals
+				result: tcVals,
 			}));
 
 			const tcList = await TestCase.getTestCasesWithTag('TestTag');
@@ -533,15 +527,15 @@ describe('TestCase', () => {
 					id: 2,
 					name: 'fizz',
 					value: 'buzz',
-				})
+				}),
 			];
 			const props = [
 				new TestCaseProperty(propVals[0]),
-				new TestCaseProperty(propVals[1])
+				new TestCaseProperty(propVals[1]),
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: propVals 
+				result: propVals,
 			}));
 
 			const tc1 = new TestCase(case1Vals);
@@ -568,14 +562,14 @@ describe('TestCase', () => {
 				mockTestCaseProperty({
 					id: 3,
 					name: 'foo',
-					value: 'foo2'
-				})
+					value: 'foo2',
+				}),
 			];
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [propVals[0], propVals[2]]
+				result: [propVals[0], propVals[2]],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [propVals[1]]
+				result: [propVals[1]],
 			}));
 			const tc1 = new TestCase(mockTestCase());
 			expect(await tc1.getPropertyValues('foo'))
@@ -594,11 +588,11 @@ describe('TestCase', () => {
 				mockTestCaseProperty({
 					id: 3,
 					name: 'foo',
-					value: 'foo2'
-				})
+					value: 'foo2',
+				}),
 			];
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: propVals
+				result: propVals,
 			}));
 			const tc1 = new TestCase(mockTestCase());
 			expect(await tc1.getPropertyKeys()).toEqual(['foo', 'fizz']);
@@ -662,13 +656,13 @@ describe('TestCase', () => {
 				author: 2,
 				author__username: 'bob',
 				text: 'New and improved test case',
-				notes: 'This test has been updated'
+				notes: 'This test has been updated',
 			});
 			const newTestVals = mockTestCase({
 				author: 2,
 				author__username: 'bob',
 				text: 'New and improved test case',
-				notes: 'This test has been updated'
+				notes: 'This test has been updated',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
@@ -699,15 +693,15 @@ describe('TestCase', () => {
 		it('Can update automation flag with .setAutomation()', async () => {
 			const tc1 = new TestCase(mockTestCase());
 			const updateResponse = mockTestCaseUpdateResponse({
-				is_automated: true
+				is_automated: true,
 			});
 			const updateVal = mockTestCase({ is_automated: true });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.isAutomated()).toEqual(false);
@@ -727,15 +721,15 @@ describe('TestCase', () => {
 		it('Can enable automation flag with .setIsAutomated()', async () => {
 			const tc1 = new TestCase(mockTestCase());
 			const updateResponse = mockTestCaseUpdateResponse({
-				is_automated: true
+				is_automated: true,
 			});
 			const updateVal = mockTestCase({ is_automated: true });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.isAutomated()).toEqual(false);
@@ -755,15 +749,15 @@ describe('TestCase', () => {
 		it('Can disable automation flag with .setIsManual()', async () => {
 			const tc1 = new TestCase(mockTestCase({ is_automated: true }));
 			const updateResponse = mockTestCaseUpdateResponse({
-				is_automated: false
+				is_automated: false,
 			});
 			const updateVal = mockTestCase({ is_automated: false });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.isAutomated()).toEqual(true);
@@ -781,19 +775,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new script value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				script: 'original script' 
+			const tc1 = new TestCase(mockTestCase({
+				script: 'original script',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				script: 'new script'
+				script: 'new script',
 			});
 			const updateVal = mockTestCase({ script: 'new script' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getScript()).toEqual('original script');
@@ -809,19 +803,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can erase existing script value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				script: 'original script' 
+			const tc1 = new TestCase(mockTestCase({
+				script: 'original script',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				script: ''
+				script: '',
 			});
 			const updateVal = mockTestCase({ script: '' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getScript()).toEqual('original script');
@@ -837,19 +831,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new arguments value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				arguments: 'original args' 
+			const tc1 = new TestCase(mockTestCase({
+				arguments: 'original args',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				arguments: 'new args'
+				arguments: 'new args',
 			});
 			const updateVal = mockTestCase({ arguments: 'new args' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getArguments()).toEqual('original args');
@@ -865,19 +859,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can erase existing arguments value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				arguments: 'original args' 
+			const tc1 = new TestCase(mockTestCase({
+				arguments: 'original args',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				arguments: ''
+				arguments: '',
 			});
 			const updateVal = mockTestCase({ arguments: '' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getArguments()).toEqual('original args');
@@ -893,19 +887,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new requirements value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				requirement: 'original reqs' 
+			const tc1 = new TestCase(mockTestCase({
+				requirement: 'original reqs',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				requirement: 'new reqs'
+				requirement: 'new reqs',
 			});
 			const updateVal = mockTestCase({ requirement: 'new reqs' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getRequirements()).toEqual('original reqs');
@@ -921,19 +915,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can erase existing requirements value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				requirement: 'original reqs' 
+			const tc1 = new TestCase(mockTestCase({
+				requirement: 'original reqs',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				requirement: ''
+				requirement: '',
 			});
 			const updateVal = mockTestCase({ requirement: '' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getRequirements()).toEqual('original reqs');
@@ -949,19 +943,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new extra link value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				extra_link: 'original link' 
+			const tc1 = new TestCase(mockTestCase({
+				extra_link: 'original link',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				extra_link: 'new link'
+				extra_link: 'new link',
 			});
 			const updateVal = mockTestCase({ extra_link: 'new link' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getExtraLink()).toEqual('original link');
@@ -977,19 +971,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can erase existing extra link value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				extra_link: 'original link' 
+			const tc1 = new TestCase(mockTestCase({
+				extra_link: 'original link',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				extra_link: ''
+				extra_link: '',
 			});
 			const updateVal = mockTestCase({ extra_link: '' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getExtraLink()).toEqual('original link');
@@ -1005,19 +999,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new reference link value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				extra_link: 'original link' 
+			const tc1 = new TestCase(mockTestCase({
+				extra_link: 'original link',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				extra_link: 'new link'
+				extra_link: 'new link',
 			});
 			const updateVal = mockTestCase({ extra_link: 'new link' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getReferenceLink()).toEqual('original link');
@@ -1033,19 +1027,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can erase existing reference link value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				extra_link: 'original link' 
+			const tc1 = new TestCase(mockTestCase({
+				extra_link: 'original link',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				extra_link: ''
+				extra_link: '',
 			});
 			const updateVal = mockTestCase({ extra_link: '' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getReferenceLink()).toEqual('original link');
@@ -1061,19 +1055,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new summary value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				summary: 'original test case name' 
+			const tc1 = new TestCase(mockTestCase({
+				summary: 'original test case name',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				summary: 'new name'
+				summary: 'new name',
 			});
 			const updateVal = mockTestCase({ summary: 'new name' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getSummary()).toEqual('original test case name');
@@ -1089,19 +1083,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new title value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				summary: 'original test case name' 
+			const tc1 = new TestCase(mockTestCase({
+				summary: 'original test case name',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				summary: 'new name'
+				summary: 'new name',
 			});
 			const updateVal = mockTestCase({ summary: 'new name' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getTitle()).toEqual('original test case name');
@@ -1117,19 +1111,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new text value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				text: 'original test case text' 
+			const tc1 = new TestCase(mockTestCase({
+				text: 'original test case text',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				text: 'new text'
+				text: 'new text',
 			});
 			const updateVal = mockTestCase({ text: 'new text' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getText()).toEqual('original test case text');
@@ -1145,19 +1139,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new description value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				text: 'original test case text' 
+			const tc1 = new TestCase(mockTestCase({
+				text: 'original test case text',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				text: 'new text'
+				text: 'new text',
 			});
 			const updateVal = mockTestCase({ text: 'new text' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getDescription()).toEqual('original test case text');
@@ -1173,19 +1167,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can delete text value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				text: 'original test case text' 
+			const tc1 = new TestCase(mockTestCase({
+				text: 'original test case text',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				text: ''
+				text: '',
 			});
 			const updateVal = mockTestCase({ text: '' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getText()).toEqual('original test case text');
@@ -1201,19 +1195,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new notes value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				notes: 'original test case notes' 
+			const tc1 = new TestCase(mockTestCase({
+				notes: 'original test case notes',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				notes: 'new notes'
+				notes: 'new notes',
 			});
 			const updateVal = mockTestCase({ notes: 'new notes' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getNotes()).toEqual('original test case notes');
@@ -1229,19 +1223,19 @@ describe('TestCase', () => {
 		});
 
 		it('Can delete notes value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
-				notes: 'original test case notes' 
+			const tc1 = new TestCase(mockTestCase({
+				notes: 'original test case notes',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
-				notes: ''
+				notes: '',
 			});
 			const updateVal = mockTestCase({ notes: '' });
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getNotes()).toEqual('original test case notes');
@@ -1257,26 +1251,26 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new setup duration value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				setup_duration: 124,
 				testing_duration: 8,
-				expected_duration: 132
+				expected_duration: 132,
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				setup_duration: '0:07:03',
-				testing_duration: '0:00:08'
+				testing_duration: '0:00:08',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				setup_duration: 423,
 				testing_duration: 8,
-				expected_duration: 431
+				expected_duration: 431,
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getSetupDuration()).toEqual(124);
@@ -1296,26 +1290,26 @@ describe('TestCase', () => {
 		});
 
 		it('Can delete setup duration value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				setup_duration: 124,
 				testing_duration: 8,
-				expected_duration: 132
+				expected_duration: 132,
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				setup_duration: '0:00:00',
-				testing_duration: '0:00:08'
+				testing_duration: '0:00:08',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				setup_duration: 0,
 				testing_duration: 8,
-				expected_duration: 8
+				expected_duration: 8,
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getSetupDuration()).toEqual(124);
@@ -1335,26 +1329,26 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new testing duration value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				setup_duration: 124,
 				testing_duration: 8,
-				expected_duration: 132
+				expected_duration: 132,
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				setup_duration: '0:07:03',
-				testing_duration: '1:00:08'
+				testing_duration: '1:00:08',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				setup_duration: 124,
 				testing_duration: 3608,
-				expected_duration: 3732
+				expected_duration: 3732,
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getSetupDuration()).toEqual(124);
@@ -1374,26 +1368,26 @@ describe('TestCase', () => {
 		});
 
 		it('Can delete testing duration value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				setup_duration: 124,
 				testing_duration: 8,
-				expected_duration: 132
+				expected_duration: 132,
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				setup_duration: '0:07:03',
-				testing_duration: '0:00:00'
+				testing_duration: '0:00:00',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				setup_duration: 124,
 				testing_duration: 0,
-				expected_duration: 124
+				expected_duration: 124,
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getSetupDuration()).toEqual(124);
@@ -1415,22 +1409,22 @@ describe('TestCase', () => {
 		it('Can set a new priority from id', async () => {
 			const tc1 = new TestCase(mockTestCase({
 				priority: 1,
-				priority__value: 'P1'
+				priority__value: 'P1',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				priority: 2,
-				priority__value: 'P2'
+				priority__value: 'P2',
 			});
 			const updateVal = mockTestCase({
 				priority: 2,
-				priority__value: 'P2'
+				priority__value: 'P2',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getPriorityId()).toEqual(1);
@@ -1450,22 +1444,22 @@ describe('TestCase', () => {
 		it('Can set a new priority from Priority', async () => {
 			const tc1 = new TestCase(mockTestCase({
 				priority: 1,
-				priority__value: 'P1'
+				priority__value: 'P1',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				priority: 2,
-				priority__value: 'P2'
+				priority__value: 'P2',
 			});
 			const updateVal = mockTestCase({
 				priority: 2,
-				priority__value: 'P2'
+				priority__value: 'P2',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getPriorityId()).toEqual(1);
@@ -1473,7 +1467,7 @@ describe('TestCase', () => {
 
 			const p2 = new Priority(mockPriority({
 				id: 2,
-				value: 'P2'
+				value: 'P2',
 			}));
 			await tc1.setPriority(p2);
 			assertPostRequestData({
@@ -1489,29 +1483,29 @@ describe('TestCase', () => {
 		it('Can set a new priority from Priority Name', async () => {
 			const tc1 = new TestCase(mockTestCase({
 				priority: 1,
-				priority__value: 'P1'
+				priority__value: 'P1',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				priority: 2,
-				priority__value: 'P2'
+				priority__value: 'P2',
 			});
 			const updateVal = mockTestCase({
 				priority: 2,
-				priority__value: 'P2'
+				priority__value: 'P2',
 			});
 			const p2Vals = mockPriority({
 				id: 2,
-				value: 'P2'
+				value: 'P2',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ p2Vals ]
+				result: [p2Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getPriorityId()).toEqual(1);
@@ -1527,7 +1521,7 @@ describe('TestCase', () => {
 				mockPostRequest,
 				method: 'TestCase.update',
 				params: [1, { priority: 2 }],
-				callIndex: 1
+				callIndex: 1,
 			});
 
 			expect(tc1.getPriorityId()).toEqual(2);
@@ -1535,24 +1529,24 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new Author by ID', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				author: 1,
-				author__username: 'alice' 
+				author__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				author: 2,
-				author__username: 'bob'
+				author__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				author: 2,
-				author__username: 'bob'
+				author__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getAuthorId()).toEqual(1);
@@ -1570,24 +1564,24 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new Author by User', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				author: 1,
-				author__username: 'alice' 
+				author__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				author: 2,
-				author__username: 'bob'
+				author__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				author: 2,
-				author__username: 'bob'
+				author__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getAuthorId()).toEqual(1);
@@ -1606,17 +1600,17 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new Author by username', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				author: 1,
-				author__username: 'alice' 
+				author__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				author: 2,
-				author__username: 'bob'
+				author__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				author: 2,
-				author__username: 'bob'
+				author__username: 'bob',
 			});
 
 			const user2Vals = mockUser({
@@ -1624,17 +1618,17 @@ describe('TestCase', () => {
 				username: 'bob',
 				email: 'bob@example.com',
 				first_name: 'Bob',
-				last_name: 'Bar'
+				last_name: 'Bar',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ user2Vals ]
+				result: [user2Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getAuthorId()).toEqual(1);
@@ -1658,24 +1652,24 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new Reviewer by ID', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				reviewer: 1,
-				reviewer__username: 'alice' 
+				reviewer__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				reviewer: 2,
-				reviewer__username: 'bob'
+				reviewer__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				reviewer: 2,
-				reviewer__username: 'bob'
+				reviewer__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getReviewerId()).toEqual(1);
@@ -1693,24 +1687,24 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new Reviewer by User', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				reviewer: 1,
-				reviewer__username: 'alice' 
+				reviewer__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				reviewer: 2,
-				reviewer__username: 'bob'
+				reviewer__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				reviewer: 2,
-				reviewer__username: 'bob'
+				reviewer__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getReviewerId()).toEqual(1);
@@ -1729,17 +1723,17 @@ describe('TestCase', () => {
 		});
 
 		it('Can set a new Reviewer by username', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				reviewer: 1,
-				reviewer__username: 'alice' 
+				reviewer__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				reviewer: 2,
-				reviewer__username: 'bob'
+				reviewer__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				reviewer: 2,
-				reviewer__username: 'bob'
+				reviewer__username: 'bob',
 			});
 
 			const user2Vals = mockUser({
@@ -1747,17 +1741,17 @@ describe('TestCase', () => {
 				username: 'bob',
 				email: 'bob@example.com',
 				first_name: 'Bob',
-				last_name: 'Bar'
+				last_name: 'Bar',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ user2Vals ]
+				result: [user2Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getReviewerId()).toEqual(1);
@@ -1781,24 +1775,24 @@ describe('TestCase', () => {
 		});
 
 		it('Can remove Reviewer by omitting new Reviewer value', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				reviewer: 1,
-				reviewer__username: 'alice' 
+				reviewer__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				reviewer: null,
-				reviewer__username: null
+				reviewer__username: null,
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				reviewer: null,
-				reviewer__username: null
+				reviewer__username: null,
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getReviewerId()).toEqual(1);
@@ -1815,101 +1809,100 @@ describe('TestCase', () => {
 			expect(tc1.getReviewerName()).toBeNull();
 		});
 
-		it('Can remove Reviewer by using null as new Reviewer value', 
-			async () => {
-				const tc1 = new TestCase(mockTestCase({ 
-					reviewer: 1,
-					reviewer__username: 'alice' 
-				}));
-				const updateResponse = mockTestCaseUpdateResponse({
-					reviewer: null,
-					reviewer__username: null
-				});
-				const updateVal = mockTestCase({ 
-					reviewer: null,
-					reviewer__username: null
-				});
-
-				mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-					result: updateResponse
-				}));
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [ updateVal ]
-				}));
-
-				expect(tc1.getReviewerId()).toEqual(1);
-				expect(tc1.getReviewerName()).toEqual('alice');
-
-				await tc1.setReviewer(null);
-				assertPostRequestData({
-					mockPostRequest,
-					method: 'TestCase.update',
-					params: [1, { reviewer: null }],
-				});
-
-				expect(tc1.getReviewerId()).toBeNull();
-				expect(tc1.getReviewerName()).toBeNull();
+		it('Can remove Reviewer by using null as new Reviewer value', async () => {
+			const tc1 = new TestCase(mockTestCase({
+				reviewer: 1,
+				reviewer__username: 'alice',
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				reviewer: null,
+				reviewer__username: null,
+			});
+			const updateVal = mockTestCase({
+				reviewer: null,
+				reviewer__username: null,
 			});
 
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: updateResponse,
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [updateVal],
+			}));
+
+			expect(tc1.getReviewerId()).toEqual(1);
+			expect(tc1.getReviewerName()).toEqual('alice');
+
+			await tc1.setReviewer(null);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCase.update',
+				params: [1, { reviewer: null }],
+			});
+
+			expect(tc1.getReviewerId()).toBeNull();
+			expect(tc1.getReviewerName()).toBeNull();
+		});
+
 		it('Can set a new DefaultTester by ID', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				default_tester: 1,
-				default_tester__username: 'alice' 
+				default_tester__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
-	
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-	
+
 			expect(tc1.getDefaultTesterId()).toEqual(1);
 			expect(tc1.getDefaultTesterName()).toEqual('alice');
-	
+
 			await tc1.setDefaultTester(2);
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestCase.update',
 				params: [1, { default_tester: 2 }],
 			});
-	
+
 			expect(tc1.getDefaultTesterId()).toEqual(2);
 			expect(tc1.getDefaultTesterName()).toEqual('bob');
 		});
-	
+
 		it('Can set a new DefaultTester by User', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				default_tester: 1,
-				default_tester__username: 'alice' 
+				default_tester__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
-	
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-	
+
 			expect(tc1.getDefaultTesterId()).toEqual(1);
 			expect(tc1.getDefaultTesterName()).toEqual('alice');
-	
+
 			const bob = new User(mockUser({ id: 2, username: 'bob' }));
 			await tc1.setDefaultTester(bob);
 			assertPostRequestData({
@@ -1917,46 +1910,46 @@ describe('TestCase', () => {
 				method: 'TestCase.update',
 				params: [1, { default_tester: 2 }],
 			});
-	
+
 			expect(tc1.getDefaultTesterId()).toEqual(2);
 			expect(tc1.getDefaultTesterName()).toEqual('bob');
 		});
-	
+
 		it('Can set a new DefaultTester by username', async () => {
-			const tc1 = new TestCase(mockTestCase({ 
+			const tc1 = new TestCase(mockTestCase({
 				default_tester: 1,
-				default_tester__username: 'alice' 
+				default_tester__username: 'alice',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
-			const updateVal = mockTestCase({ 
+			const updateVal = mockTestCase({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
-	
+
 			const user2Vals = mockUser({
 				id: 2,
 				username: 'bob',
 				email: 'bob@example.com',
 				first_name: 'Bob',
-				last_name: 'Bar'
+				last_name: 'Bar',
 			});
-	
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ user2Vals ]
+				result: [user2Vals],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-	
+
 			expect(tc1.getDefaultTesterId()).toEqual(1);
 			expect(tc1.getDefaultTesterName()).toEqual('alice');
-	
+
 			await tc1.setDefaultTester('bob');
 			assertPostRequestData({
 				mockPostRequest,
@@ -1969,102 +1962,100 @@ describe('TestCase', () => {
 				params: [1, { default_tester: 2 }],
 				callIndex: 1,
 			});
-	
+
 			expect(tc1.getDefaultTesterId()).toEqual(2);
 			expect(tc1.getDefaultTesterName()).toEqual('bob');
 		});
-	
-		it('Can remove DefaultTester by omitting new DefaultTester value', 
-			async () => {
-				const tc1 = new TestCase(mockTestCase({ 
-					default_tester: 1,
-					default_tester__username: 'alice' 
-				}));
-				const updateResponse = mockTestCaseUpdateResponse({
-					default_tester: null,
-					default_tester__username: null
-				});
-				const updateVal = mockTestCase({ 
-					default_tester: null,
-					default_tester__username: null
-				});
-	
-				mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-					result: updateResponse
-				}));
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [ updateVal ]
-				}));
-	
-				expect(tc1.getDefaultTesterId()).toEqual(1);
-				expect(tc1.getDefaultTesterName()).toEqual('alice');
-	
-				await tc1.setDefaultTester();
-				assertPostRequestData({
-					mockPostRequest,
-					method: 'TestCase.update',
-					params: [1, { default_tester: null }],
-				});
-	
-				expect(tc1.getDefaultTesterId()).toBeNull();
-				expect(tc1.getDefaultTesterName()).toBeNull();
+
+		it('Can remove DefaultTester by omitting new DefaultTester value', async () => {
+			const tc1 = new TestCase(mockTestCase({
+				default_tester: 1,
+				default_tester__username: 'alice',
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				default_tester: null,
+				default_tester__username: null,
 			});
-	
-		it('Can remove DefaultTester by using null as new DefaultTester value', 
-			async () => {
-				const tc1 = new TestCase(mockTestCase({ 
-					default_tester: 1,
-					default_tester__username: 'alice' 
-				}));
-				const updateResponse = mockTestCaseUpdateResponse({
-					default_tester: null,
-					default_tester__username: null
-				});
-				const updateVal = mockTestCase({ 
-					default_tester: null,
-					default_tester__username: null
-				});
-	
-				mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-					result: updateResponse
-				}));
-				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-					result: [ updateVal ]
-				}));
-	
-				expect(tc1.getDefaultTesterId()).toEqual(1);
-				expect(tc1.getDefaultTesterName()).toEqual('alice');
-	
-				await tc1.setDefaultTester(null);
-				assertPostRequestData({
-					mockPostRequest,
-					method: 'TestCase.update',
-					params: [1, { default_tester: null }],
-				});
-	
-				expect(tc1.getDefaultTesterId()).toBeNull();
-				expect(tc1.getDefaultTesterName()).toBeNull();
+			const updateVal = mockTestCase({
+				default_tester: null,
+				default_tester__username: null,
 			});
+
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: updateResponse,
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [updateVal],
+			}));
+
+			expect(tc1.getDefaultTesterId()).toEqual(1);
+			expect(tc1.getDefaultTesterName()).toEqual('alice');
+
+			await tc1.setDefaultTester();
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCase.update',
+				params: [1, { default_tester: null }],
+			});
+
+			expect(tc1.getDefaultTesterId()).toBeNull();
+			expect(tc1.getDefaultTesterName()).toBeNull();
+		});
+
+		it('Can remove DefaultTester by using null as new DefaultTester value', async () => {
+			const tc1 = new TestCase(mockTestCase({
+				default_tester: 1,
+				default_tester__username: 'alice',
+			}));
+			const updateResponse = mockTestCaseUpdateResponse({
+				default_tester: null,
+				default_tester__username: null,
+			});
+			const updateVal = mockTestCase({
+				default_tester: null,
+				default_tester__username: null,
+			});
+
+			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
+				result: updateResponse,
+			}));
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [updateVal],
+			}));
+
+			expect(tc1.getDefaultTesterId()).toEqual(1);
+			expect(tc1.getDefaultTesterName()).toEqual('alice');
+
+			await tc1.setDefaultTester(null);
+			assertPostRequestData({
+				mockPostRequest,
+				method: 'TestCase.update',
+				params: [1, { default_tester: null }],
+			});
+
+			expect(tc1.getDefaultTesterId()).toBeNull();
+			expect(tc1.getDefaultTesterName()).toBeNull();
+		});
 
 		it('Can set a new value for Category', async () => {
 			const tc1 = new TestCase(mockTestCase({
 				category: 1,
-				category__name: '--default--'
+				category__name: '--default--',
 			}));
 			const updateResponse = mockTestCaseUpdateResponse({
 				category: 4,
-				category__name: 'Regression'
+				category__name: 'Regression',
 			});
 			const updateVal = mockTestCase({
 				category: 4,
-				category__name: 'Regression'
+				category__name: 'Regression',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: updateResponse
+				result: updateResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getCategoryId()).toEqual(1);
@@ -2086,7 +2077,7 @@ describe('TestCase', () => {
 				id: 2,
 				name: 'CONFIRMED',
 				is_confirmed: true,
-				description: 'Ready to test'
+				description: 'Ready to test',
 			}));
 			const tc1 = new TestCase(mockTestCase({
 				case_status: 1,
@@ -2103,10 +2094,10 @@ describe('TestCase', () => {
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ updateResponse ]
+				result: [updateResponse],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tc1.getCaseStatusId()).toEqual(1);
@@ -2121,7 +2112,6 @@ describe('TestCase', () => {
 
 			expect(tc1.getCaseStatusId()).toEqual(2);
 			expect(tc1.getCaseStatusName()).toEqual('CONFIRMED');
-
 		});
 
 		it('Can add a Component by ID', async () => {
@@ -2129,14 +2119,14 @@ describe('TestCase', () => {
 			const tc1 = new TestCase(mockTestCase());
 			// Resolve component from ID
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ componentVals ]
+				result: [componentVals],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ componentVals ]
+				result: [componentVals],
 			}));
 
 			await tc1.addComponent(componentVals.id);
-			
+
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'Component.filter',
@@ -2155,11 +2145,11 @@ describe('TestCase', () => {
 			const tc1 = new TestCase(mockTestCase());
 			// Add component to TC
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ componentVals ]
+				result: [componentVals],
 			}));
 
 			await tc1.addComponent(componentVals.name);
-			
+
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestCase.add_component',
@@ -2172,11 +2162,11 @@ describe('TestCase', () => {
 			const tc1 = new TestCase(mockTestCase());
 			// Add component to TC
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ componentVals ]
+				result: [componentVals],
 			}));
 
 			await tc1.addComponent(new Component(componentVals));
-			
+
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestCase.add_component',
@@ -2186,16 +2176,16 @@ describe('TestCase', () => {
 
 		it('Can remove a Component by ID', async () => {
 			const componentVals = mockComponent({
-				id: 54
+				id: 54,
 			});
 			const tc1 = new TestCase(mockTestCase());
 			// Add component to TC
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			await tc1.removeComponent(componentVals.id);
-			
+
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestCase.remove_component',
@@ -2205,17 +2195,17 @@ describe('TestCase', () => {
 
 		it('Can remove a Component by Component object', async () => {
 			const componentVals = mockComponent({
-				id: 54
+				id: 54,
 			});
 			const tc1 = new TestCase(mockTestCase());
 			// Add component to TC
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			const component = new Component(componentVals);
 			await tc1.removeComponent(component);
-			
+
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestCase.remove_component',
@@ -2228,7 +2218,7 @@ describe('TestCase', () => {
 			const tag1 = new Tag(mockTag());
 
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			await tc1.addTag(tag1.getName());
@@ -2245,7 +2235,7 @@ describe('TestCase', () => {
 			const tag1 = new Tag(mockTag());
 
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			await tc1.removeTag(tag1.getName());
@@ -2262,7 +2252,7 @@ describe('TestCase', () => {
 			const tag1 = new Tag(mockTag());
 
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			await tc1.addTag(tag1);
@@ -2279,7 +2269,7 @@ describe('TestCase', () => {
 			const tag1 = new Tag(mockTag());
 
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			await tc1.removeTag(tag1);
@@ -2296,10 +2286,10 @@ describe('TestCase', () => {
 			const tag1 = new Tag(mockTag());
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [mockTag()]
+				result: [mockTag()],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			await tc1.addTag(tag1.getId());
@@ -2322,10 +2312,10 @@ describe('TestCase', () => {
 			const tag1 = new Tag(mockTag());
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [mockTag()]
+				result: [mockTag()],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 
 			await tc1.removeTag(tag1.getId());
@@ -2350,7 +2340,7 @@ describe('TestCase', () => {
 				value: 'propVal',
 			});
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: propVals
+				result: propVals,
 			}));
 
 			expect(await tc.addProperty('propName', 'propVal'))
@@ -2365,9 +2355,9 @@ describe('TestCase', () => {
 		it('Can remove TestCase Property by specific value', async () => {
 			const tc = new TestCase(mockTestCase({ id: 3 }));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
-			
+
 			await tc.removeProperty('propName', 'propVal');
 			assertPostRequestData({
 				mockPostRequest,
@@ -2375,7 +2365,7 @@ describe('TestCase', () => {
 				params: [{
 					case: 3,
 					name: 'propName',
-					value: 'propVal'
+					value: 'propVal',
 				}],
 			});
 		});
@@ -2383,9 +2373,9 @@ describe('TestCase', () => {
 		it('Can remove TestCase Property (all values)', async () => {
 			const tc = new TestCase(mockTestCase({ id: 3 }));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
-			
+
 			await tc.removeProperty('propName');
 			assertPostRequestData({
 				mockPostRequest,
@@ -2400,10 +2390,10 @@ describe('TestCase', () => {
 		it('Can add a Comment to TestCase', async () => {
 			const tc = new TestCase(mockTestCase());
 			const commentValue = mockTestCaseComment({
-				comment: 'Sample Comment'
+				comment: 'Sample Comment',
 			});
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: commentValue
+				result: commentValue,
 			}));
 			const result = await tc.addComment('Sample Comment');
 			expect(result).toEqual(new Comment(commentValue));
@@ -2417,7 +2407,7 @@ describe('TestCase', () => {
 		it('Can remove a Comment from TestCase by ID', async () => {
 			const tc = new TestCase(mockTestCase());
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 			const result = await tc.removeComment(2);
 			expect(result).toEqual(undefined);
@@ -2432,11 +2422,11 @@ describe('TestCase', () => {
 			const tc = new TestCase(mockTestCase());
 			const commentValue = mockTestCaseComment({
 				id: 2,
-				comment: 'Sample Comment'
+				comment: 'Sample Comment',
 			});
 			const comment2 = new Comment(commentValue);
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 			const result = await tc.removeComment(comment2);
 			expect(result).toEqual(undefined);
@@ -2450,7 +2440,7 @@ describe('TestCase', () => {
 		it('Can remove all Comments from TestCase', async () => {
 			const tc = new TestCase(mockTestCase());
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: null
+				result: null,
 			}));
 			const result = await tc.removeAllComments();
 			expect(result).toEqual(undefined);
@@ -2469,10 +2459,10 @@ describe('TestCase', () => {
 				product: 1,
 				category: 1,
 				priority: 1,
-				case_status: 1
+				case_status: 1,
 			};
 			const newTCVals = mockTestCase({
-				summary: 'TestCase from unit tests'
+				summary: 'TestCase from unit tests',
 			});
 
 			// Create response - non-calculated TC fields
@@ -2495,11 +2485,11 @@ describe('TestCase', () => {
 					author: newTCVals.author,
 					default_tester: newTCVals.default_tester,
 					reviewer: newTCVals.reviewer,
-					create_date: newTCVals.create_date
-				}
+					create_date: newTCVals.create_date,
+				},
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [newTCVals]
+				result: [newTCVals],
 			}));
 
 			const result = await TestCase.create(createVals);
@@ -2527,7 +2517,7 @@ describe('TestCase', () => {
 				notes: 'Custom notes',
 				default_tester: 2,
 				setup_duration: 30,
-				testing_duration: 90
+				testing_duration: 90,
 			};
 			const newTCVals = mockTestCase({
 				summary: 'TestCase from unit tests',
@@ -2536,7 +2526,7 @@ describe('TestCase', () => {
 				default_tester__username: 'bob',
 				setup_duration: 30,
 				testing_duration: 90,
-				expected_duration: 120
+				expected_duration: 120,
 			});
 
 			// Create response - non-calculated TC fields
@@ -2559,11 +2549,11 @@ describe('TestCase', () => {
 					author: newTCVals.author,
 					default_tester: newTCVals.default_tester,
 					reviewer: newTCVals.reviewer,
-					create_date: newTCVals.create_date
-				}
+					create_date: newTCVals.create_date,
+				},
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [newTCVals]
+				result: [newTCVals],
 			}));
 
 			const result = await TestCase.create(createVals);
@@ -2591,10 +2581,10 @@ describe('TestCase', () => {
 
 	it('Can resolve TestCase ID from TestCase', () => {
 		const tc5 = new TestCase(mockTestCase({
-			id: 5
+			id: 5,
 		}));
 		const tc10 = new TestCase(mockTestCase({
-			id: 10
+			id: 10,
 		}));
 		expect(TestCase.resolveTestCaseId(tc5)).toEqual(5);
 		expect(TestCase.resolveTestCaseId(tc10)).toEqual(10);

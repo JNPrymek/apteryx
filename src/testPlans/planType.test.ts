@@ -1,22 +1,19 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { mockPlanType } from '../../test/mockKiwiValues';
-import PlanType from './planType';
-import RequestHandler from '../core/requestHandler';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import RequestHandler from '../core/requestHandler';
+import PlanType from './planType';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('PlanType', () => {
-	
 	const type1Vals = mockPlanType();
 	const type2Vals = mockPlanType({
 		id: 2,
 		name: 'Regression',
-		description: 'Test Description'
+		description: 'Test Description',
 	});
 
 	it('Can instantiate a new PlanType', () => {
@@ -52,7 +49,7 @@ describe('PlanType', () => {
 
 		it('Can get PlanType by a single ID (one match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [type1Vals]
+				result: [type1Vals],
 			}));
 			const result = await PlanType.getById(1);
 			expect(result).toEqual(type1);
@@ -60,7 +57,7 @@ describe('PlanType', () => {
 
 		it('Can get PlanType by single ID (no match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			expect(PlanType.getById(1))
 				.rejects
@@ -69,7 +66,7 @@ describe('PlanType', () => {
 
 		it('Can get PlanType by Name (one match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [type1Vals]
+				result: [type1Vals],
 			}));
 			const cat = await PlanType.getByName('Unit');
 			expect(cat).toEqual(type1);
@@ -77,13 +74,13 @@ describe('PlanType', () => {
 
 		it('Can get PlanType by Name (0 matches)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			const name = 'Non-used name';
 			expect(PlanType.getByName(name))
 				.rejects
 				.toThrow(
-					`PlanType with name "${name}" could not be found.`
+					`PlanType with name "${name}" could not be found.`,
 				);
 		});
 	});

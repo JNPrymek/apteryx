@@ -1,17 +1,13 @@
-import { describe, it, expect } from '@jest/globals';
-import RequestHandler from '../core/requestHandler';
+import { describe, expect, it } from '@jest/globals';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import RequestHandler from '../core/requestHandler';
 
-import { 
-	mockTestCaseProperty
-} from '../../test/mockValues/testCases/mockTestCaseValues';
+import { mockTestCaseProperty } from '../../test/mockValues/testCases/mockTestCaseValues';
 import TestCaseProperty from './testCaseProperty';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('TestCaseProperty', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -57,7 +53,7 @@ describe('TestCaseProperty', () => {
 	describe('Server Lookups', () => {
 		it('Can get a TestCaseProperty by ID (1 match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ propVals[0] ]
+				result: [propVals[0]],
 			}));
 			expect(await TestCaseProperty.getById(1))
 				.toEqual(new TestCaseProperty(propVals[0]));
@@ -67,19 +63,19 @@ describe('TestCaseProperty', () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					propVals[0],
-					propVals[1]
-				]
+					propVals[1],
+				],
 			}));
 			const result = await TestCaseProperty.getByIds([1, 2]);
 			expect(result).toEqual(expect.arrayContaining([
 				new TestCaseProperty(propVals[0]),
-				new TestCaseProperty(propVals[1])
+				new TestCaseProperty(propVals[1]),
 			]));
 		});
 
 		it('Can get a TestCaseProperty by ID (No match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			expect(TestCaseProperty.getById(1))
 				.rejects

@@ -3,4 +3,4 @@ export type ProductValues = {
 	name: string;
 	description: string;
 	classification: number;
-}
+};

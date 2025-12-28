@@ -1,17 +1,14 @@
+import Comment from '../comments/comment';
+import { CommentValues } from '../comments/comment.type';
 import KiwiBaseItem from '../core/kiwiBaseItem';
 import KiwiConnector from '../core/kiwiConnector';
 import Build from '../management/build';
 import User from '../management/user';
 import TestCase from '../testCases/testCase';
 import TimeUtils from '../utils/timeUtils';
-import {
-	TestExecutionValues,
-	TestExecutionWriteValues
-} from './testExecution.type';
+import { TestExecutionValues, TestExecutionWriteValues } from './testExecution.type';
 import TestExecutionStatus from './testExecutionStatus';
 import TestRun from './testRun';
-import { CommentValues } from '../comments/comment.type';
-import Comment from '../comments/comment';
 
 export default class TestExecution extends KiwiBaseItem {
 	// Constructor for all classes
@@ -22,7 +19,7 @@ export default class TestExecution extends KiwiBaseItem {
 	public getAssigneeId(): number {
 		return this.serialized['assignee'] as number;
 	}
-	
+
 	public getAssigneeUsername(): string {
 		return this.serialized['assignee__username'] as string;
 	}
@@ -33,9 +30,9 @@ export default class TestExecution extends KiwiBaseItem {
 	}
 
 	public async setAssignee(assignee?: User | number): Promise<void> {
-		const assigneeId = assignee ?
-			(await User.resolveUserId(assignee)) :
-			null;
+		const assigneeId = assignee
+			? (await User.resolveUserId(assignee))
+			: null;
 		await this.serverUpdate({ assignee: assigneeId });
 	}
 
@@ -53,7 +50,7 @@ export default class TestExecution extends KiwiBaseItem {
 	}
 
 	public async setLastTester(tester?: User | number | null): Promise<void> {
-		const userId = (tester) ? (await User.resolveUserId(tester)) : null;
+		const userId = tester ? (await User.resolveUserId(tester)) : null;
 		await this.serverUpdate({ tested_by: userId });
 	}
 
@@ -154,25 +151,24 @@ export default class TestExecution extends KiwiBaseItem {
 	}
 
 	public async setStatus(
-		status: TestExecutionStatus | number | string
+		status: TestExecutionStatus | number | string,
 	): Promise<void> {
 		const statusId = await TestExecutionStatus.resolveId(status);
 		await this.serverUpdate({ status: statusId });
 	}
 
 	public async getComments(): Promise<Array<Comment>> {
-		const rawResults: Array<CommentValues> = 
-			await KiwiConnector.sendRPCMethod(
-				'TestExecution.get_comments',
-				[this.getId()]
-			) as Array<CommentValues>;
-		return rawResults.map( val => new Comment(val));
+		const rawResults: Array<CommentValues> = await KiwiConnector.sendRPCMethod(
+			'TestExecution.get_comments',
+			[this.getId()],
+		) as Array<CommentValues>;
+		return rawResults.map(val => new Comment(val));
 	}
 
 	public async addComment(commentText: string): Promise<Comment> {
 		const result = await KiwiConnector.sendRPCMethod(
 			'TestExecution.add_comment',
-			[ this.getId(), commentText ]
+			[this.getId(), commentText],
 		) as CommentValues;
 		return new Comment(result);
 	}
@@ -183,70 +179,71 @@ export default class TestExecution extends KiwiBaseItem {
 			: comment;
 		await KiwiConnector.sendRPCMethod(
 			'TestExecution.remove_comment',
-			[this.getId(), commentId]
+			[this.getId(), commentId],
 		);
 	}
 
 	public async removeAllComments(): Promise<void> {
 		await KiwiConnector.sendRPCMethod(
 			'TestExecution.remove_comment',
-			[this.getId(), null]
+			[this.getId(), null],
 		);
 	}
 
 	public async serverUpdate(
-		updateValues: Partial<TestExecutionWriteValues>
+		updateValues: Partial<TestExecutionWriteValues>,
 	): Promise<void> {
 		const result = await KiwiConnector.sendRPCMethod(
-			'TestExecution.update', [
+			'TestExecution.update',
+			[
 				this.getId(),
-				updateValues
-			]);
+				updateValues,
+			],
+		);
 		this.serialized = result as TestExecutionValues;
 	}
 
 	public async delete(): Promise<void> {
 		await KiwiConnector.sendRPCMethod(
 			'TestExecution.remove',
-			[{ id: this.getId() }]
+			[{ id: this.getId() }],
 		);
 	}
 
 	public static async getFromTestCase(
-		testCase: TestCase | number
-	):Promise<Array<TestExecution>> {
-		const tcId: number =
-			testCase instanceof TestCase
-				? testCase.getId()
-				: testCase;
+		testCase: TestCase | number,
+	): Promise<Array<TestExecution>> {
+		const tcId: number = testCase instanceof TestCase
+			? testCase.getId()
+			: testCase;
 		return this.serverFilter({
-			case: tcId
+			case: tcId,
 		});
 	}
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
-	
+
 	// Kiwi Base
 	// --------------------------------
-	
+
 	public static async serverFilter(
-		filterObj: Record<string, unknown>
+		filterObj: Record<string, unknown>,
 	): Promise<Array<TestExecution>> {
 		return await super.serverFilter(filterObj) as Array<TestExecution>;
 	}
-	
+
 	public static async getByIds(
-		id: number | Array<number>
+		id: number | Array<number>,
 	): Promise<Array<TestExecution>> {
 		return await super.getByIds(id) as Array<TestExecution>;
 	}
-	
+
 	public static async getById(
-		id: number
+		id: number,
 	): Promise<TestExecution> {
 		return await super.getById(id) as TestExecution;
 	}
-	
+
 	// ------------------------------------------------------------------------
 }

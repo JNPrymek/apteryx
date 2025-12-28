@@ -27,7 +27,7 @@ export type TestCaseValues = {
 	setup_duration: number | null;
 	testing_duration: number | null;
 	expected_duration: number;
-}
+};
 
 /**
  * Computed fields depend on values of other fields.
@@ -42,22 +42,21 @@ export type TestCaseComputedFields = {
 	default_tester__username: string;
 	reviewer__username: string;
 	expected_duration: number;
-}
+};
 
 /**
  * TestCase values that can be directly set by the client.
- * Some values allow `null` to be written, 
+ * Some values allow `null` to be written,
  * despite using other types in TestCase.filter().
  */
-export type TestCaseWriteValues = 
-	Omit<TestCaseValues, keyof TestCaseComputedFields> & {
-		script: string | null;
-		arguments: string | null;
-		notes: string | null;
-		text: string | null;
-		// Kiwi technically allows `summary` to be null / ""
-		// But there is no good reason to do that
-	};
+export type TestCaseWriteValues = Omit<TestCaseValues, keyof TestCaseComputedFields> & {
+	script: string | null;
+	arguments: string | null;
+	notes: string | null;
+	text: string | null;
+	// Kiwi technically allows `summary` to be null / ""
+	// But there is no good reason to do that
+};
 
 export type TestCaseUpdateResponseValues = {
 	id: number;
@@ -86,16 +85,14 @@ export type TestCaseUpdateResponseValues = {
 	reviewer__username: string | null;
 };
 
-export type TestCaseCreateValues = 
-	Partial<Omit<TestCaseValues, keyof TestCaseComputedFields>> & {
-		product: number;
-		category: number;
-		priority: number;
-		case_status: number;
-		summary: string;
-	}
+export type TestCaseCreateValues = Partial<Omit<TestCaseValues, keyof TestCaseComputedFields>> & {
+	product: number;
+	category: number;
+	priority: number;
+	case_status: number;
+	summary: string;
+};
 
-export type TestCaseCreateResponseValues = 
-	Omit<TestCaseValues, keyof TestCaseComputedFields> & {
-		id: number;
-	}
+export type TestCaseCreateResponseValues = Omit<TestCaseValues, keyof TestCaseComputedFields> & {
+	id: number;
+};

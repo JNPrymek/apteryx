@@ -1,17 +1,13 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { mockTestCaseStatus } from '../../test/mockKiwiValues';
-import TestCaseStatus from './testCaseStatus';
-import RequestHandler from '../core/requestHandler';
+import { assertPostRequestData } from '../../test/networkMocks/assertPostRequestData';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
-import {
-	assertPostRequestData
-} from '../../test/networkMocks/assertPostRequestData';
+import RequestHandler from '../core/requestHandler';
+import TestCaseStatus from './testCaseStatus';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Test Case Status', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -24,7 +20,7 @@ describe('Test Case Status', () => {
 		id: 2,
 		name: 'CONFIRMED',
 		description: 'Test case is fully approved and usable',
-		'is_confirmed': true
+		'is_confirmed': true,
 	});
 
 	it('Can instantiate a TestCaseStatus', () => {
@@ -72,15 +68,15 @@ describe('Test Case Status', () => {
 
 		it('Can get TestCaseStatus by a single ID (one match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [stat1Vals] 
+				result: [stat1Vals],
 			}));
 			const result = await TestCaseStatus.getById(1);
 			expect(result).toEqual(stat1);
-		});	
-		
+		});
+
 		it('Can get TestCaseStatus by single ID (no match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [] 
+				result: [],
 			}));
 			expect(TestCaseStatus.getById(1))
 				.rejects
@@ -89,7 +85,7 @@ describe('Test Case Status', () => {
 
 		it('Can get TestCaseStatus by Name (one match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [stat1Vals] 
+				result: [stat1Vals],
 			}));
 			const result = await TestCaseStatus.getByName('PROPOSED');
 			expect(result).toEqual(stat1);
@@ -97,13 +93,13 @@ describe('Test Case Status', () => {
 
 		it('Can get TestCaseStatus by Name (0 matches)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			const name = 'Non-used name';
 			expect(TestCaseStatus.getByName(name))
 				.rejects
 				.toThrow(
-					`TestCaseStatus with name "${name}" could not be found.`
+					`TestCaseStatus with name "${name}" could not be found.`,
 				);
 		});
 
@@ -128,18 +124,18 @@ describe('Test Case Status', () => {
 
 		it('Can resolve TestCaseStatus ID from Name', async () => {
 			const stat1Vals = mockTestCaseStatus({
-				name: 'First Status'
+				name: 'First Status',
 			});
 			const stat2Vals = mockTestCaseStatus({
 				id: 2,
-				name: 'Second Status'
+				name: 'Second Status',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [stat1Vals]
+				result: [stat1Vals],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [stat2Vals]
+				result: [stat2Vals],
 			}));
 
 			expect(await TestCaseStatus.resolveStatusId('First Status'))
@@ -160,5 +156,4 @@ describe('Test Case Status', () => {
 			});
 		});
 	});
-	
 });

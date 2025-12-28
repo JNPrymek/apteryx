@@ -1,29 +1,26 @@
-import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { before, describe, it } from 'mocha';
 import KiwiConnector from '../../src/core/kiwiConnector';
+import { TestExecutionCreateResponse } from '../../src/testRuns/testExecution.type';
 import { TestRunCaseEntry } from '../../src/testRuns/testRun.type';
-import {
-	TestExecutionCreateResponse
-} from '../../src/testRuns/testExecution.type';
 import { kiwiTestServerInfo } from '../testServerDetails';
 
 describe('Kiwi RPC API - TestRun', () => {
-
 	before(async () => {
 		KiwiConnector.init(kiwiTestServerInfo);
 		await KiwiConnector.login(
 			kiwiTestServerInfo.username,
-			kiwiTestServerInfo.password
+			kiwiTestServerInfo.password,
 		);
 	});
 
 	it('TestRun.filter returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestRun.filter',
-			[{ id: 1 }]
+			[{ id: 1 }],
 		);
 		expect(response).to.be.an('array');
-		const arr = (response as Array<Record<string, unknown>>);
+		const arr = response as Array<Record<string, unknown>>;
 		expect(arr.length).to.be.equal(1);
 		const item = arr[0];
 		expect(item).to.be.an('object').that.has.all.keys(
@@ -44,26 +41,26 @@ describe('Kiwi RPC API - TestRun', () => {
 			'manager',
 			'manager__username',
 			'default_tester',
-			'default_tester__username'
+			'default_tester__username',
 		);
 
 		expect(item.id).to.be.a('number').that.equals(1);
-		
+
 		expect(
-			(item.start_date === null) ||
-			(typeof item.start_date === 'string')
+			(item.start_date === null)
+				|| (typeof item.start_date === 'string'),
 		).to.be.true;
 		expect(
-			(item.stop_date === null) ||
-			(typeof item.stop_date === 'string')
+			(item.stop_date === null)
+				|| (typeof item.stop_date === 'string'),
 		).to.be.true;
 		expect(
-			(item.planned_start === null) ||
-			(typeof item.planned_start === 'string')
+			(item.planned_start === null)
+				|| (typeof item.planned_start === 'string'),
 		).to.be.true;
 		expect(
-			(item.planned_stop === null) ||
-			(typeof item.planned_stop === 'string')
+			(item.planned_stop === null)
+				|| (typeof item.planned_stop === 'string'),
 		).to.be.true;
 		expect(item.summary).to.be.a('string');
 		expect(item.notes).to.be.a('string');
@@ -74,31 +71,31 @@ describe('Kiwi RPC API - TestRun', () => {
 		expect(item.build__version).to.be.a('number');
 		expect(item.build__version__product).to.be.a('number');
 		expect(
-			(item.build__version__value === null) ||
-			(typeof item.build__version__value === 'string')
+			(item.build__version__value === null)
+				|| (typeof item.build__version__value === 'string'),
 		).to.be.true;
 		expect(
-			(item.manager === null) ||
-			(typeof item.manager === 'number')
+			(item.manager === null)
+				|| (typeof item.manager === 'number'),
 		).to.be.true;
 		expect(
-			(item.manager__username === null) ||
-			(typeof item.manager__username === 'string')
+			(item.manager__username === null)
+				|| (typeof item.manager__username === 'string'),
 		).to.be.true;
 		expect(
-			(item.default_tester === null) ||
-			(typeof item.default_tester === 'number')
+			(item.default_tester === null)
+				|| (typeof item.default_tester === 'number'),
 		).to.be.true;
 		expect(
-			(item.default_tester__username === null) ||
-			(typeof item.default_tester__username === 'string')
+			(item.default_tester__username === null)
+				|| (typeof item.default_tester__username === 'string'),
 		).to.be.true;
 	});
 
 	it('TestRun.update returns expected type', async () => {
 		const runResponse = await KiwiConnector.sendRPCMethod(
 			'TestRun.filter',
-			[{ id: 1 }]
+			[{ id: 1 }],
 		);
 		const run1 = (runResponse as Array<Record<string, unknown>>)[0];
 
@@ -106,12 +103,12 @@ describe('Kiwi RPC API - TestRun', () => {
 			'TestRun.update',
 			[
 				1,
-				{ summary: run1.summary }
-			]
+				{ summary: run1.summary },
+			],
 		);
 		expect(response).to.be.an('object');
-		const item = (response as Record<string, unknown>);
-		
+		const item = response as Record<string, unknown>;
+
 		expect(item).to.be.an('object').that.has.all.keys(
 			'id',
 			'start_date',
@@ -128,32 +125,32 @@ describe('Kiwi RPC API - TestRun', () => {
 
 		expect(item.id).to.be.a('number').that.equals(1);
 		expect(
-			(item.start_date === null) ||
-			(typeof item.start_date === 'string')
+			(item.start_date === null)
+				|| (typeof item.start_date === 'string'),
 		).to.be.true;
 		expect(
-			(item.stop_date === null) ||
-			(typeof item.stop_date === 'string')
+			(item.stop_date === null)
+				|| (typeof item.stop_date === 'string'),
 		).to.be.true;
 		expect(
-			(item.planned_start === null) ||
-			(typeof item.planned_start === 'string')
+			(item.planned_start === null)
+				|| (typeof item.planned_start === 'string'),
 		).to.be.true;
 		expect(
-			(item.planned_stop === null) ||
-			(typeof item.planned_stop === 'string')
+			(item.planned_stop === null)
+				|| (typeof item.planned_stop === 'string'),
 		).to.be.true;
 		expect(item.summary).to.be.a('string');
 		expect(item.notes).to.be.a('string');
 		expect(item.plan).to.be.a('number');
 		expect(item.build).to.be.a('number');
 		expect(
-			(item.manager === null) ||
-			(typeof item.manager === 'number')
+			(item.manager === null)
+				|| (typeof item.manager === 'number'),
 		).to.be.true;
 		expect(
-			(item.default_tester === null) ||
-			(typeof item.default_tester === 'number')
+			(item.default_tester === null)
+				|| (typeof item.default_tester === 'number'),
 		).to.be.true;
 	});
 
@@ -169,12 +166,12 @@ describe('Kiwi RPC API - TestRun', () => {
 				summary,
 				plan,
 				build,
-				manager
-			}]
+				manager,
+			}],
 		);
 		expect(response).to.be.an('object');
-		const item = (response as Record<string, unknown>);
-		
+		const item = response as Record<string, unknown>;
+
 		expect(item).to.be.an('object').that.has.all.keys(
 			'id',
 			'start_date',
@@ -191,20 +188,20 @@ describe('Kiwi RPC API - TestRun', () => {
 
 		expect(item.id).to.be.a('number').that.is.greaterThanOrEqual(1);
 		expect(
-			(item.start_date === null) ||
-			(typeof item.start_date === 'string')
+			(item.start_date === null)
+				|| (typeof item.start_date === 'string'),
 		).to.be.true;
 		expect(
-			(item.stop_date === null) ||
-			(typeof item.stop_date === 'string')
+			(item.stop_date === null)
+				|| (typeof item.stop_date === 'string'),
 		).to.be.true;
 		expect(
-			(item.planned_start === null) ||
-			(typeof item.planned_start === 'string')
+			(item.planned_start === null)
+				|| (typeof item.planned_start === 'string'),
 		).to.be.true;
 		expect(
-			(item.planned_stop === null) ||
-			(typeof item.planned_stop === 'string')
+			(item.planned_stop === null)
+				|| (typeof item.planned_stop === 'string'),
 		).to.be.true;
 		expect(item.summary).to.be.a('string').that.equals(summary);
 		expect(item.notes).to.be.a('string');
@@ -212,15 +209,15 @@ describe('Kiwi RPC API - TestRun', () => {
 		expect(item.build).to.be.a('number').that.equals(plan);
 		expect(item.manager).to.be.a('number').that.equals(manager);
 		expect(
-			(item.default_tester === null) ||
-			(typeof item.default_tester === 'number')
+			(item.default_tester === null)
+				|| (typeof item.default_tester === 'number'),
 		).to.be.true;
 	});
-	
+
 	it('TestRun.get_cases returns expected type', async () => {
 		const result = await KiwiConnector.sendRPCMethod(
 			'TestRun.get_cases',
-			[ 1 ] // Test Run ID
+			[1], // Test Run ID
 		);
 		expect(result).to.be.an('array');
 		const arr = result as Array<TestRunCaseEntry>;
@@ -244,22 +241,22 @@ describe('Kiwi RPC API - TestRun', () => {
 			'default_tester',
 			'reviewer',
 			'execution_id',
-			'status'
+			'status',
 		]);
-		
+
 		expect(item.id).to.be.a('number');
 		expect(item.create_date).to.be.a('string');
 		expect(item.is_automated).to.be.a('boolean');
 		expect(item.script).to.be.a('string');
 		expect(item.arguments).to.be.a('string');
 		expect(
-			(item.extra_link === null) ||
-			(typeof item.extra_link === 'string')
+			(item.extra_link === null)
+				|| (typeof item.extra_link === 'string'),
 		).to.be.true;
 		expect(item.summary).to.be.a('string');
 		expect(
-			(item.requirement === null) ||
-			(typeof item.requirement === 'string')
+			(item.requirement === null)
+				|| (typeof item.requirement === 'string'),
 		).to.be.true;
 		expect(item.notes).to.be.a('string');
 		expect(item.text).to.be.a('string');
@@ -268,12 +265,12 @@ describe('Kiwi RPC API - TestRun', () => {
 		expect(item.priority).to.be.a('number');
 		expect(item.author).to.be.a('number');
 		expect(
-			(item.default_tester === null) ||
-			(typeof item.default_tester === 'number')
+			(item.default_tester === null)
+				|| (typeof item.default_tester === 'number'),
 		).to.be.true;
 		expect(
-			(item.reviewer === null) ||
-			(typeof item.reviewer === 'number')
+			(item.reviewer === null)
+				|| (typeof item.reviewer === 'number'),
 		).to.be.true;
 		expect(item.execution_id).to.be.a('number');
 		expect(item.status).to.be.a('string');
@@ -284,13 +281,13 @@ describe('Kiwi RPC API - TestRun', () => {
 			'TestRun.add_case',
 			[
 				1, // TestRun ID
-				2 // TestCase ID
-			]
+				2, // TestCase ID
+			],
 		);
 		expect(result).to.be.an('array');
 		const executions = result as Array<TestExecutionCreateResponse>;
 
-		executions.forEach( item => {
+		executions.forEach(item => {
 			expect(item).to.be.an('object').that.has.all.keys([
 				'id',
 				'assignee',
@@ -303,25 +300,25 @@ describe('Kiwi RPC API - TestRun', () => {
 				'case',
 				'build',
 				'status',
-				'properties'
+				'properties',
 			]);
 			expect(item.id).is.a('number');
 			expect(
-				(item.assignee === null) ||
-			(typeof item.assignee === 'number')
+				(item.assignee === null)
+					|| (typeof item.assignee === 'number'),
 			).to.be.true;
 			expect(
-				(item.tested_by === null) ||
-			(typeof item.tested_by === 'number')
+				(item.tested_by === null)
+					|| (typeof item.tested_by === 'number'),
 			).to.be.true;
 			expect(item.case_text_version).is.a('number');
 			expect(
-				(item.start_date === null) ||
-			(typeof item.start_date === 'string')
+				(item.start_date === null)
+					|| (typeof item.start_date === 'string'),
 			).to.be.true;
 			expect(
-				(item.stop_date === null) ||
-			(typeof item.stop_date === 'string')
+				(item.stop_date === null)
+					|| (typeof item.stop_date === 'string'),
 			).to.be.true;
 			expect(item.sortkey).is.a('number');
 			expect(item.build).is.a('number');
@@ -331,7 +328,7 @@ describe('Kiwi RPC API - TestRun', () => {
 			expect(item.case).is.a('number').that.equals(2);
 
 			expect(item.properties).to.be.an('array');
-			item.properties.forEach( property => {
+			item.properties.forEach(property => {
 				expect(property).to.be.an('object').that.has.all.keys([
 					'name',
 					'value',
@@ -345,7 +342,7 @@ describe('Kiwi RPC API - TestRun', () => {
 	it('TestRun.add_tag returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestRun.add_tag',
-			[1, 'Tag1']
+			[1, 'Tag1'],
 		);
 		expect(response).to.be.an('array');
 		const responseArray = response as Array<Record<string, unknown>>;
@@ -361,7 +358,7 @@ describe('Kiwi RPC API - TestRun', () => {
 	it('TestRun.remove_tag returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestRun.remove_tag',
-			[1, 'Tag1']
+			[1, 'Tag1'],
 		);
 		expect(response).to.be.an('array');
 		const responseArray = response as Array<Record<string, unknown>>;

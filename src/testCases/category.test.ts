@@ -1,19 +1,15 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 import { mockCategory, mockProduct } from '../../test/mockKiwiValues';
-import Product from '../management/product';
-import RequestHandler from '../core/requestHandler';
+import { assertPostRequestData } from '../../test/networkMocks/assertPostRequestData';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
-import {
-	assertPostRequestData
-} from '../../test/networkMocks/assertPostRequestData';
+import RequestHandler from '../core/requestHandler';
+import Product from '../management/product';
 
 import Category from './category';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Category', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -37,7 +33,6 @@ describe('Category', () => {
 	});
 
 	describe('Can access local properties', () => {
-		
 		const category1 = new Category(cat1Vals);
 		const category2 = new Category(cat2Vals);
 
@@ -49,7 +44,7 @@ describe('Category', () => {
 		it('Can get Category Product', async () => {
 			const product1Vals = mockProduct();
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [product1Vals]
+				result: [product1Vals],
 			}));
 			const categoryProduct = await category1.getProduct();
 			expect(categoryProduct).toEqual(new Product(product1Vals));
@@ -67,17 +62,16 @@ describe('Category', () => {
 	});
 
 	describe('Basic Server Functions', () => {
-
 		const cat1 = new Category(cat1Vals);
 
 		it('Can get Category by a single ID (one match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [cat1Vals] 
+				result: [cat1Vals],
 			}));
 			const result = await Category.getById(1);
 			expect(result).toEqual(cat1);
 		});
-		
+
 		it('Can get Category by single ID (no match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [],
@@ -89,7 +83,7 @@ describe('Category', () => {
 
 		it('Can get Category by Name (one match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [cat1Vals]
+				result: [cat1Vals],
 			}));
 			const cat = await Category.getByName('Regression');
 			expect(cat).toEqual(cat1);
@@ -103,14 +97,13 @@ describe('Category', () => {
 			expect(Category.getByName(name))
 				.rejects
 				.toThrow(
-					`Category with name "${name}" could not be found.`
+					`Category with name "${name}" could not be found.`,
 				);
 		});
-
 	});
 
 	describe('Resolve Category IDs', () => {
-		it('Can resolve a Category ID from a number',  async () => {
+		it('Can resolve a Category ID from a number', async () => {
 			expect(Category.resolveCategoryId(1)).resolves.toEqual(1);
 			expect(Category.resolveCategoryId(100)).resolves.toEqual(100);
 			expect(Category.resolveCategoryId(245)).resolves.toEqual(245);
@@ -125,7 +118,7 @@ describe('Category', () => {
 
 		it('Can resolve Category ID from a name', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ cat2Vals ]
+				result: [cat2Vals],
 			}));
 			expect(await Category.resolveCategoryId('Sanity')).toEqual(2);
 			assertPostRequestData({
@@ -135,5 +128,4 @@ describe('Category', () => {
 			});
 		});
 	});
-
 });
