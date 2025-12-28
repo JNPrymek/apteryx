@@ -24,7 +24,8 @@
 		"test:coverage": "jest --coverage",
 		"test:api": "NODE_TLS_REJECT_UNAUTHORIZED=0 ts-mocha",
 		"coverage": "jest --coverage",
-		"build": "rm -r ./dist/*; tsc"
+		"build": "rm -r ./dist/*; tsc",
+		"prepare": "node .husky/init.mjs"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.28.5",
@@ -39,6 +40,7 @@
 		"chai": "^4.5.0",
 		"dprint": "^0.51.0",
 		"eslint": "^9.39.2",
+		"husky": "^9.1.7",
 		"jest": "^30.2.0",
 		"mocha": "^11.7.5",
 		"ts-jest": "^29.4.6",

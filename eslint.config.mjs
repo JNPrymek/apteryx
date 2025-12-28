@@ -19,8 +19,6 @@ export default defineConfig([
 		},
 
 		rules: {
-			quotes: ['error', 'single'],
-			semi: ['error', 'always'],
 			'comma-spacing': ['error', {
 				before: false,
 				after: true,
