@@ -32,7 +32,7 @@ describe('HTTP Request Handler', () => {
 			b: true,
 			c: 3,
 		},
-		/* eslint-disable-next-line max-len */
+		 
 		`resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=${serverDomain}`
 		);
 	}
@@ -85,7 +85,7 @@ describe('HTTP Request Handler', () => {
 				headers: {
 					'content-type': 'text/plain;charset=UTF-8',
 					'set-cookie': 
-						// eslint-disable-next-line max-len
+						 
 						'resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=example.com'
 				}
 			});
@@ -223,7 +223,7 @@ describe('HTTP Request Handler', () => {
 				headers: {
 					'content-type': 'text/plain;charset=UTF-8',
 					'set-cookie': 
-						// eslint-disable-next-line max-len
+						 
 						'resCustomCookie=abcdefg; expires=Sat, 30-Dec-2221 06:12:11 GMT; path=/; domain=example.com'
 				}
 			});

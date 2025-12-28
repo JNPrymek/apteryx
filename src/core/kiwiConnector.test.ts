@@ -161,7 +161,7 @@ describe('Kiwi Connector', () => {
 					.toThrow(/Network Error 400 : Bad Request/);
 			});
 
-			// eslint-disable-next-line max-len
+			 
 			it('Errors when RPC reply is missing both "data" and "error" values', 
 				async () => {
 					mockPostRequest.mockResolvedValue(

@@ -905,7 +905,7 @@ describe('Test Execution', () => {
 			expect(te1.getStatusName()).toEqual('PASSED');
 		});
 
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can update TestExecution Status by TestExecutionStatus', async () => {
 			const te1 = new TestExecution(mockTestExecution({
 				status: 1,
@@ -1142,7 +1142,7 @@ describe('Test Execution', () => {
 				]));
 		});
 
-		/* eslint-disable max-len */
+		 
 		it('Throws an error when fetching a TestExecution by ID that does not exist', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -1152,7 +1152,7 @@ describe('Test Execution', () => {
 					.rejects
 					.toThrow('Could not find any TestExecution with ID 5000');
 			});
-		/* eslint-enable max-len */
+		 
 
 		it('Can get TestExecution by filtering arbitrary data', 
 			async () => {

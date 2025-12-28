@@ -152,7 +152,7 @@ describe('Test Execution Status', () => {
 			expect(TestExecutionStatus.getByName(name))
 				.rejects
 				.toThrow(
-					/* eslint-disable-next-line max-len */
+					 
 					`TestExecutionStatus with name "${name}" could not be found.`
 				);
 		});

@@ -41,7 +41,7 @@ export default class TimeUtils {
 		const remainder = totalSeconds % 3600;
 		const min = Math.floor(remainder / 60);
 		const sec = remainder % 60;
-		/* eslint-disable-next-line max-len */
+		 
 		return `${hours}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 	}
 }

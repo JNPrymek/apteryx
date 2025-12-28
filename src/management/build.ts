@@ -61,7 +61,7 @@ export default class Build extends KiwiNamedItem {
 				
 				if (version === undefined) {
 					throw new Error(
-						/* eslint-disable-next-line max-len */
+						 
 						`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`
 					);
 				}

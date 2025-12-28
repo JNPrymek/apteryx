@@ -1,7 +1,6 @@
 /*
 	eslint-disable 
-	@typescript-eslint/no-explicit-any, 
-	@typescript-eslint/explicit-module-boundary-types 
+	@typescript-eslint/no-explicit-any 
 */
 export default function expectArrayWithObject(
 	container: Array<any>, 

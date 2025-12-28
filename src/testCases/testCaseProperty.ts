@@ -48,7 +48,7 @@ export default class TestCaseProperty extends KiwiBaseItem {
 	): Promise<TestCaseProperty> {
 		const results = await this.getByIds(id);
 		if (results.length == 0) {
-			/* eslint-disable-next-line max-len */
+			 
 			throw new Error(`Could not find any TestCase Property with ID ${id}`);
 		}
 		return results[0];

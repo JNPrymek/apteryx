@@ -54,7 +54,7 @@ export default class EnvironmentProperty extends KiwiBaseItem {
 	): Promise<EnvironmentProperty> {
 		const results = await this.getByIds(id);
 		if (results.length == 0) {
-			/* eslint-disable-next-line max-len */
+			 
 			throw new Error(`Could not find any Environment Property with ID ${id}`);
 		}
 		return results[0];

@@ -101,7 +101,7 @@ describe('Test Plan', () => {
 		});
 
 		it('Can get TestPlan Text', () => {
-			/* eslint-disable-next-line max-len */
+			 
 			expect(plan1.getText()).toEqual('An example test plan used for unit tests.\nThis is the description.');
 			expect(plan2.getText()).toEqual('Another Example Test Plan');
 		});
@@ -270,7 +270,7 @@ describe('Test Plan', () => {
 			const plan1 = new TestPlan(mockTestPlan());
 			const plan2 = new TestPlan(mockTestPlan({ id: 2 }));
 
-			/* eslint-disable-next-line max-len */
+			 
 			expect(plan1.getText()).toEqual('An example test plan used for unit tests.\nThis is the description.');
 			expect(plan2.isActive()).toEqual(true);
 			expect(plan2.getTypeId()).toEqual(1);
@@ -1227,7 +1227,7 @@ describe('Test Plan', () => {
 				expect(tc1Plans.length).toEqual(2);
 			});
 
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get all test plans containing a specific test case - by TestCase', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({

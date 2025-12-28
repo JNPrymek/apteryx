@@ -26,7 +26,7 @@ export default class KiwiConnector {
 	 * @param {number} [serverDetails.port] - Port number.  Default: 80 or 443.
 	 */
 	public static init(serverDetails: ServerDetails): void {
-		// eslint-disable-next-line max-len
+		 
 		this.debugConnector('Initializing KiwiConnector with params: %o', serverDetails);
 		const protocol = `http${(serverDetails.useSSL ?? true) ? 's' : ''}://`;
 		let host = serverDetails.hostName;
@@ -87,14 +87,14 @@ export default class KiwiConnector {
 				response.statusText
 			);
 
-			/* eslint-disable-next-line max-len */
+			 
 			throw new Error(`Network Error ${response.status} : ${response.statusText}`);
 		}
 
 		let parsedBody: Record<string, unknown>  | null = null;
 		try {
 			parsedBody = JSON.parse(response.body);
-		} catch (err) {
+		} catch {
 			this.debugConnector('RPC Error - invalid JSON %s', response.body);
 			throw new Error('RPC Error:  Response body is not valid JSON');
 		}

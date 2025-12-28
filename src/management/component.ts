@@ -90,7 +90,7 @@ export default class Component extends KiwiNamedItem {
 			`Component "${name}" could not be found.`
 		);
 		const prodNotSpecifiedErr = new Error(
-			/* eslint-disable-next-line max-len */
+			 
 			`Component '${name}' exists for multiple products.  The 'product' param must be specified.`);
 		const prodFailErr = new Error(
 			`Component "${name}" could not be found for product ${prodId}.`

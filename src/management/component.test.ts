@@ -39,7 +39,7 @@ describe('Component', () => {
 	const component3Vals = mockComponent({
 		id: 3,
 		product: 2,
-		/* eslint-disable-next-line max-len */
+		 
 		description: 'First component of the Product 2.  Has same name as a Product1 component'
 	});
 	
@@ -165,7 +165,7 @@ describe('Component', () => {
 			expect(component2.getDescription())
 				.toEqual('About page of Example.com');
 			expect(component3.getDescription())
-				/* eslint-disable-next-line max-len */
+				 
 				.toEqual('First component of the Product 2.  Has same name as a Product1 component');
 		});
 	
@@ -244,7 +244,7 @@ describe('Component', () => {
 		
 			expect(Component.getByName('First Component'))
 				.rejects
-				/* eslint-disable-next-line max-len */
+				 
 				.toThrow('Component "First Component" could not be found.');
 		});
 		
@@ -259,7 +259,7 @@ describe('Component', () => {
 			
 		});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Component by name - multiple matches without product filter throws Error', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -269,11 +269,11 @@ describe('Component', () => {
 				const name = 'Example Homepage';
 				expect(Component.getByName(name))
 					.rejects
-					/* eslint-disable-next-line max-len */
+					 
 					.toThrow(`Component '${name}' exists for multiple products.  The 'product' param must be specified`);
 			});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Component by name - single match with non-matching Product results in error', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -284,11 +284,11 @@ describe('Component', () => {
 			
 				expect(Component.getByName(name, 5))
 					.rejects
-					/* eslint-disable-next-line max-len */
+					 
 					.toThrow(`Component "${name}" could not be found for product 5.`);
 			});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Component by name - multiple matches with non-matching Product results in error', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -299,11 +299,11 @@ describe('Component', () => {
 			
 				expect(Component.getByName(name, 5))
 					.rejects
-					/* eslint-disable-next-line max-len */
+					 
 					.toThrow(`Component "${name}" could not be found for product 5.`);
 			});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Component by name - multiple matches filtered by product ID', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({

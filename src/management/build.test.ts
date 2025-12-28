@@ -123,7 +123,7 @@ describe('Version', () => {
 				.toThrow(`Build with name "${name}" could not be found.`);
 		});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Build by Name - Multiple name matches require version to be specified', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -133,12 +133,12 @@ describe('Version', () => {
 				const name = 'Android';
 				expect(Build.getByName(name))
 					.rejects
-					/* eslint-disable-next-line max-len */
+					 
 					.toThrow(`Build '${name}' exists for multiple versions.  The 'version' param must be specified.`);
 			
 			});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Build by Name - Multiple name matches are filtered by Version ID', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -153,7 +153,7 @@ describe('Version', () => {
 			
 			});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Build by Name - Multiple name matches are filtered by Version', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -168,7 +168,7 @@ describe('Version', () => {
 			
 			});
 		
-		/* eslint-disable-next-line max-len */
+		 
 		it('Can get Build by Name - Error thrown when multiple name matches, but no version ID match.', 
 			async () => {
 				mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
@@ -180,7 +180,7 @@ describe('Version', () => {
 			
 				expect(Build.getByName(name, versionId))
 					.rejects
-					/* eslint-disable-next-line max-len */
+					 
 					.toThrow(`Build with name "${name}" could not be found.`);
 			
 			});
