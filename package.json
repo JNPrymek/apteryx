@@ -11,7 +11,7 @@
 	"typings": "dist/index",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/JNPrymek/apteryx"
+		"url": "git+https://github.com/JNPrymek/apteryx.git"
 	},
 	"author": "Jacob N Prymek",
 	"license": "CC-BY-4.0",
