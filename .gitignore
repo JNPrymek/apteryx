@@ -1,6 +1,10 @@
-# Editor and System files
-.vscode
-.DS_Store
+# MacOS system files
+*.DS_Store
+
+# Editor settings (allow templates and recommended extensions)
+.vscode/*
+.cursor/*
+!.vscode/extensions.json
 
 # Dependencies
 node_modules
