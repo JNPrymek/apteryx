@@ -17,7 +17,7 @@ export type TestRunValues = {
 	manager__username: string;
 	default_tester: number | null;
 	default_tester__username: string | null;
-}
+};
 
 export type TestRunComputedFields = {
 	id: number;
@@ -28,23 +28,20 @@ export type TestRunComputedFields = {
 	build__version__value: string;
 	manager__username: string;
 	default_tester__username: string | null;
-}
+};
 
-export type TestRunWriteValues =
-	Omit<TestRunValues, keyof TestRunComputedFields>;
+export type TestRunWriteValues = Omit<TestRunValues, keyof TestRunComputedFields>;
 
-export type TestRunUpdateResponse =
-	TestRunWriteValues & {
-		id: number;
-	};
+export type TestRunUpdateResponse = TestRunWriteValues & {
+	id: number;
+};
 
-export type TestRunCreateValues =
-	Partial<TestRunWriteValues> & {
-		summary: string;
-		manager: number;
-		plan: number;
-		build: number;
-	};
+export type TestRunCreateValues = Partial<TestRunWriteValues> & {
+	summary: string;
+	manager: number;
+	plan: number;
+	build: number;
+};
 
 export type TestRunCaseEntry = {
 	id: number;
@@ -65,4 +62,4 @@ export type TestRunCaseEntry = {
 	reviewer: number | null;
 	execution_id: number;
 	status: string;
-}
+};

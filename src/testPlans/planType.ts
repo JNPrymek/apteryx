@@ -12,33 +12,33 @@ export default class PlanType extends KiwiNamedItem {
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
-	
+
 	// Kiwi Named
 	// --------------------------------
-	
+
 	public static async getByName(
-		name: string
+		name: string,
 	): Promise<PlanType> {
 		return await super.getByName(name) as PlanType;
 	}
-	
+
 	public static async serverFilter(
-		filterObj: Record<string, unknown>
+		filterObj: Record<string, unknown>,
 	): Promise<Array<PlanType>> {
 		return await super.serverFilter(filterObj) as Array<PlanType>;
 	}
-	
+
 	public static async getByIds(
-		id: number | Array<number>
+		id: number | Array<number>,
 	): Promise<Array<PlanType>> {
 		return await super.getByIds(id) as Array<PlanType>;
 	}
-	
+
 	public static async getById(
-		id: number
+		id: number,
 	): Promise<PlanType> {
 		return await super.getById(id) as PlanType;
 	}
-	
+
 	// ------------------------------------------------------------------------
 }

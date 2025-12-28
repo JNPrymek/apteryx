@@ -1,15 +1,13 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 
-import EnvironmentProperty from './environmentProperty';
 import { mockEnvironmentProperty } from '../../test/mockKiwiValues';
-import RequestHandler from '../core/requestHandler';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import RequestHandler from '../core/requestHandler';
+import EnvironmentProperty from './environmentProperty';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('EnvironmentProperty', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -19,7 +17,7 @@ describe('EnvironmentProperty', () => {
 
 	const propVals = [
 		mockEnvironmentProperty(),
-		mockEnvironmentProperty({ id: 2, name: 'fizz', value: 'buzz' })
+		mockEnvironmentProperty({ id: 2, name: 'fizz', value: 'buzz' }),
 	];
 
 	it('Can instantiate an EnvironmentProperty', () => {
@@ -56,8 +54,8 @@ describe('EnvironmentProperty', () => {
 		it('Can get an EnvironmentProperty By ID (1 match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
-					propVals[0]
-				]
+					propVals[0],
+				],
 			}));
 			expect(await EnvironmentProperty.getById(1))
 				.toEqual(new EnvironmentProperty(propVals[0]));
@@ -68,7 +66,7 @@ describe('EnvironmentProperty', () => {
 				result: [
 					propVals[0],
 					propVals[1],
-				]
+				],
 			}));
 			const result = await EnvironmentProperty.getByIds([1, 2]);
 			expect(result).toEqual(expect.arrayContaining([
@@ -79,23 +77,22 @@ describe('EnvironmentProperty', () => {
 
 		it('Can get an EnvironmentProperty by ID (no match)', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			expect(EnvironmentProperty.getById(1))
 				.rejects
 				.toThrow(
-					'Could not find any Environment Property with ID 1'
+					'Could not find any Environment Property with ID 1',
 				);
 		});
 
 		it('Can get Properties for an Environment', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: propVals
+				result: propVals,
 			}));
 
-			const results = 
-				await EnvironmentProperty.getPropertiesForEnvironment(1);
-			
+			const results = await EnvironmentProperty.getPropertiesForEnvironment(1);
+
 			expect(results).toEqual(expect.arrayContaining([
 				new EnvironmentProperty(propVals[0]),
 				new EnvironmentProperty(propVals[1]),

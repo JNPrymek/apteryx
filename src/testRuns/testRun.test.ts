@@ -1,9 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
-import TestRun from './testRun';
-import TestPlan from '../testPlans/testPlan';
-import Product from '../management/product';
-import User from '../management/user';
-import { 
+import { describe, expect, it } from '@jest/globals';
+import {
 	mockBuild,
 	mockProduct,
 	mockTag,
@@ -16,30 +12,26 @@ import {
 	mockTestRunCaseListItem,
 	mockTestRunUpdateResponse,
 	mockUser,
-	mockVersion
+	mockVersion,
 } from '../../test/mockKiwiValues';
-import { 
-	TestRunCreateValues,
-	TestRunWriteValues
-} from './testRun.type';
-import TimeUtils from '../utils/timeUtils';
-import TestCase from '../testCases/testCase';
-import TestExecution from './testExecution';
-import RequestHandler from '../core/requestHandler';
+import { assertPostRequestData } from '../../test/networkMocks/assertPostRequestData';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
-import {
-	assertPostRequestData
-} from '../../test/networkMocks/assertPostRequestData';
-import Tag from '../management/tag';
-import Version from '../management/version';
+import RequestHandler from '../core/requestHandler';
 import Build from '../management/build';
-
+import Product from '../management/product';
+import Tag from '../management/tag';
+import User from '../management/user';
+import Version from '../management/version';
+import TestCase from '../testCases/testCase';
+import TestPlan from '../testPlans/testPlan';
+import TimeUtils from '../utils/timeUtils';
+import TestExecution from './testExecution';
+import TestRun from './testRun';
+import { TestRunCreateValues, TestRunWriteValues } from './testRun.type';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Test Run', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -72,9 +64,9 @@ describe('Test Run', () => {
 		manager: 3,
 		manager__username: 'charlie',
 		default_tester: 3,
-		default_tester__username: 'charlie'
+		default_tester__username: 'charlie',
 	});
-	
+
 	const user1Vals = mockUser();
 	const user2Vals = mockUser({
 		id: 2,
@@ -83,7 +75,7 @@ describe('Test Run', () => {
 		first_name: 'Bob',
 		last_name: 'Bar',
 		is_staff: false,
-		is_superuser: false
+		is_superuser: false,
 	});
 
 	it('Can instantiate a TestRun', () => {
@@ -155,7 +147,7 @@ describe('Test Run', () => {
 			const expectDate = new Date('2023-01-04T08:53:30Z');
 			expect(tr3.getActualStopDate()).toEqual(expectDate);
 		});
-		
+
 		it('Can get TestRun Planned Start Date', () => {
 			const expectDate = new Date('2023-01-04T00:00:00Z');
 			expect(tr1.getPlannedStartDate()).toEqual(expectDate);
@@ -234,7 +226,7 @@ describe('Test Run', () => {
 
 		it('Can get TestPlan Manager', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [user1Vals]
+				result: [user1Vals],
 			}));
 
 			const alice = new User(user1Vals);
@@ -255,7 +247,7 @@ describe('Test Run', () => {
 
 		it('Can get TestPlan Default Tester', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [user2Vals]
+				result: [user2Vals],
 			}));
 
 			expect(await tr1.getDefaultTester())
@@ -267,7 +259,7 @@ describe('Test Run', () => {
 			const planVals = mockTestPlan();
 			const expectedTestPlan = new TestPlan(planVals);
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [planVals]
+				result: [planVals],
 			}));
 			expect(await tr1.getPlan()).toEqual(expectedTestPlan);
 		});
@@ -276,7 +268,7 @@ describe('Test Run', () => {
 			const productVals = mockProduct();
 			const expectedProduct = new Product(productVals);
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [productVals]
+				result: [productVals],
 			}));
 			expect(await tr1.getProduct()).toEqual(expectedProduct);
 		});
@@ -316,22 +308,22 @@ describe('Test Run', () => {
 		it('Can update TestRun values', async () => {
 			const tr1 = new TestRun(mockTestRun({
 				summary: 'Original summary',
-				notes: 'Original notes'
+				notes: 'Original notes',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
 				summary: 'New summary',
-				notes: 'New notes'
+				notes: 'New notes',
 			};
 			const updateVal = mockTestRun({
 				summary: 'New summary',
-				notes: 'New notes'
+				notes: 'New notes',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getTitle()).toEqual('Original summary');
@@ -357,20 +349,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Summary', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				summary: 'Original summary'
+				summary: 'Original summary',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				summary: 'New summary'
+				summary: 'New summary',
 			};
 			const updateVal = mockTestRun({
-				summary: 'New summary'
+				summary: 'New summary',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getSummary()).toEqual('Original summary');
@@ -394,20 +386,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Title (Summary alias)', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				summary: 'Original summary'
+				summary: 'Original summary',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				summary: 'New summary'
+				summary: 'New summary',
 			};
 			const updateVal = mockTestRun({
-				summary: 'New summary'
+				summary: 'New summary',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getTitle()).toEqual('Original summary');
@@ -431,20 +423,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Name (Summary alias)', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				summary: 'Original summary'
+				summary: 'Original summary',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				summary: 'New summary'
+				summary: 'New summary',
 			};
 			const updateVal = mockTestRun({
-				summary: 'New summary'
+				summary: 'New summary',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getName()).toEqual('Original summary');
@@ -468,20 +460,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Notes', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				notes: 'Original notes'
+				notes: 'Original notes',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				notes: 'New notes'
+				notes: 'New notes',
 			};
 			const updateVal = mockTestRun({
-				notes: 'New notes'
+				notes: 'New notes',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getNotes()).toEqual('Original notes');
@@ -505,20 +497,20 @@ describe('Test Run', () => {
 
 		it('Can delete TestRun Notes', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				notes: 'Original notes'
+				notes: 'Original notes',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				notes: ''
+				notes: '',
 			};
 			const updateVal = mockTestRun({
-				notes: ''
+				notes: '',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getNotes()).toEqual('Original notes');
@@ -542,20 +534,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Description (Notes alias)', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				notes: 'Original notes'
+				notes: 'Original notes',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				notes: 'New notes'
+				notes: 'New notes',
 			};
 			const updateVal = mockTestRun({
-				notes: 'New notes'
+				notes: 'New notes',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getDescription()).toEqual('Original notes');
@@ -579,20 +571,20 @@ describe('Test Run', () => {
 
 		it('Can delete TestRun Description (Notes alias)', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				notes: 'Original notes'
+				notes: 'Original notes',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				notes: ''
+				notes: '',
 			};
 			const updateVal = mockTestRun({
-				notes: ''
+				notes: '',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			expect(tr1.getDescription()).toEqual('Original notes');
@@ -616,20 +608,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Planned Start Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				planned_start: '2023-08-13T14:23:43.874'
+				planned_start: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				planned_start: '2023-08-26T12:00:00.000'
+				planned_start: '2023-08-26T12:00:00.000',
 			};
 			const updateVal = mockTestRun({
-				planned_start: '2023-08-26T12:00:00.000'
+				planned_start: '2023-08-26T12:00:00.000',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			const oldDate = TimeUtils
@@ -657,20 +649,20 @@ describe('Test Run', () => {
 
 		it('Can remove TestRun Planned Start Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				planned_start: '2023-08-13T14:23:43.874'
+				planned_start: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				planned_start: ''
+				planned_start: '',
 			};
 			const updateVal = mockTestRun({
-				planned_start: ''
+				planned_start: '',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			const oldDate = TimeUtils
@@ -696,20 +688,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Planned Stop Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				planned_stop: '2023-08-13T14:23:43.874'
+				planned_stop: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				planned_stop: '2023-08-26T12:00:00.000'
+				planned_stop: '2023-08-26T12:00:00.000',
 			};
 			const updateVal = mockTestRun({
-				planned_stop: '2023-08-26T12:00:00.000'
+				planned_stop: '2023-08-26T12:00:00.000',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			const oldDate = TimeUtils
@@ -737,20 +729,20 @@ describe('Test Run', () => {
 
 		it('Can remove TestRun Planned Stop Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				planned_stop: '2023-08-13T14:23:43.874'
+				planned_stop: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				planned_stop: ''
+				planned_stop: '',
 			};
 			const updateVal = mockTestRun({
-				planned_stop: ''
+				planned_stop: '',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			const oldDate = TimeUtils
@@ -776,20 +768,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Actual Start Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				start_date: '2023-08-13T14:23:43.874'
+				start_date: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				start_date: '2023-08-26T12:00:00.000'
+				start_date: '2023-08-26T12:00:00.000',
 			};
 			const updateVal = mockTestRun({
-				start_date: '2023-08-26T12:00:00.000'
+				start_date: '2023-08-26T12:00:00.000',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			const oldDate = TimeUtils
@@ -817,20 +809,20 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Actual Start Date (alias)', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				start_date: '2023-08-13T14:23:43.874'
+				start_date: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				start_date: '2023-08-26T12:00:00.000'
+				start_date: '2023-08-26T12:00:00.000',
 			};
 			const updateVal = mockTestRun({
-				start_date: '2023-08-26T12:00:00.000'
+				start_date: '2023-08-26T12:00:00.000',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			const oldDate = TimeUtils
@@ -858,20 +850,20 @@ describe('Test Run', () => {
 
 		it('Can remove TestRun Actual Start Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				start_date: '2023-08-13T14:23:43.874'
+				start_date: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				start_date: ''
+				start_date: '',
 			};
 			const updateVal = mockTestRun({
-				start_date: ''
+				start_date: '',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
 
 			const oldDate = TimeUtils
@@ -897,26 +889,26 @@ describe('Test Run', () => {
 
 		it('Can update TestRun Actual Stop Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				stop_date: '2023-08-13T14:23:43.874'
+				stop_date: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				stop_date: '2023-08-26T12:00:00.000'
+				stop_date: '2023-08-26T12:00:00.000',
 			};
 			const updateVal = mockTestRun({
-				stop_date: '2023-08-26T12:00:00.000'
+				stop_date: '2023-08-26T12:00:00.000',
 			});
-		
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-		
+
 			const oldDate = TimeUtils
 				.serverStringToDate('2023-08-13T14:23:43.874');
 			expect(tr1.getStopDate()).toEqual(oldDate);
-		
+
 			const newDate = TimeUtils
 				.serverStringToDate('2023-08-26T12:00:00.000');
 			await tr1.setStopDate(newDate);
@@ -932,32 +924,32 @@ describe('Test Run', () => {
 				params: [{ id: tr1.getId() }],
 				callIndex: 1,
 			});
-		
+
 			expect(tr1.getStopDate()).toEqual(newDate);
 		});
 
 		it('Can update TestRun Actual Stop Date (alias)', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				stop_date: '2023-08-13T14:23:43.874'
+				stop_date: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				stop_date: '2023-08-26T12:00:00.000'
+				stop_date: '2023-08-26T12:00:00.000',
 			};
 			const updateVal = mockTestRun({
-				stop_date: '2023-08-26T12:00:00.000'
+				stop_date: '2023-08-26T12:00:00.000',
 			});
-		
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-		
+
 			const oldDate = TimeUtils
 				.serverStringToDate('2023-08-13T14:23:43.874');
 			expect(tr1.getActualStopDate()).toEqual(oldDate);
-		
+
 			const newDate = TimeUtils
 				.serverStringToDate('2023-08-26T12:00:00.000');
 			await tr1.setActualStopDate(newDate);
@@ -973,32 +965,32 @@ describe('Test Run', () => {
 				params: [{ id: tr1.getId() }],
 				callIndex: 1,
 			});
-		
+
 			expect(tr1.getActualStopDate()).toEqual(newDate);
 		});
-		
+
 		it('Can remove TestRun Actual Stop Date', async () => {
 			const tr1 = new TestRun(mockTestRun({
-				stop_date: '2023-08-13T14:23:43.874'
+				stop_date: '2023-08-13T14:23:43.874',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				stop_date: ''
+				stop_date: '',
 			};
 			const updateVal = mockTestRun({
-				stop_date: ''
+				stop_date: '',
 			});
-		
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-		
+
 			const oldDate = TimeUtils
 				.serverStringToDate('2023-08-13T14:23:43.874');
 			expect(tr1.getStopDate()).toEqual(oldDate);
-		
+
 			await tr1.setStopDate();
 			assertPostRequestData({
 				mockPostRequest,
@@ -1012,33 +1004,33 @@ describe('Test Run', () => {
 				params: [{ id: tr1.getId() }],
 				callIndex: 1,
 			});
-		
+
 			expect(tr1.getStopDate()).toBeNull();
 		});
 
 		it('Can update TestRun Manager by ID', async () => {
 			const tr1 = new TestRun(mockTestRun({
 				manager: 1,
-				manager__username: 'alice'
+				manager__username: 'alice',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				manager: 2
+				manager: 2,
 			};
 			const updateVal = mockTestRun({
 				manager: 2,
-				manager__username: 'bob'
+				manager__username: 'bob',
 			});
-		
+
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-		
+
 			expect(tr1.getManagerId()).toEqual(1);
 			expect(tr1.getManagerUsername()).toEqual('alice');
-		
+
 			await tr1.setManager(2);
 			assertPostRequestData({
 				mockPostRequest,
@@ -1052,7 +1044,7 @@ describe('Test Run', () => {
 				params: [{ id: tr1.getId() }],
 				callIndex: 1,
 			});
-		
+
 			expect(tr1.getManagerId()).toEqual(2);
 			expect(tr1.getManagerUsername()).toEqual('bob');
 		});
@@ -1060,29 +1052,29 @@ describe('Test Run', () => {
 		it('Can update TestRun Manager by User', async () => {
 			const tr1 = new TestRun(mockTestRun({
 				manager: 1,
-				manager__username: 'alice'
+				manager__username: 'alice',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				manager: 2
+				manager: 2,
 			};
 			const updateVal = mockTestRun({
 				manager: 2,
-				manager__username: 'bob'
+				manager__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-		
+
 			expect(tr1.getManagerId()).toEqual(1);
 			expect(tr1.getManagerUsername()).toEqual('alice');
-		
+
 			const newManager = new User(mockUser({
 				id: 2,
-				username: 'bob'
+				username: 'bob',
 			}));
 			await tr1.setManager(newManager);
 			assertPostRequestData({
@@ -1097,7 +1089,7 @@ describe('Test Run', () => {
 				params: [{ id: tr1.getId() }],
 				callIndex: 1,
 			});
-		
+
 			expect(tr1.getManagerId()).toEqual(2);
 			expect(tr1.getManagerUsername()).toEqual('bob');
 		});
@@ -1105,26 +1097,26 @@ describe('Test Run', () => {
 		it('Can update TestRun Default Tester by ID', async () => {
 			const tr1 = new TestRun(mockTestRun({
 				default_tester: 1,
-				default_tester__username: 'alice'
+				default_tester__username: 'alice',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				default_tester: 2
+				default_tester: 2,
 			};
 			const updateVal = mockTestRun({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-		
+
 			expect(tr1.getDefaultTesterId()).toEqual(1);
 			expect(tr1.getDefaultTesterUsername()).toEqual('alice');
-		
+
 			await tr1.setDefaultTester(2);
 			assertPostRequestData({
 				mockPostRequest,
@@ -1138,7 +1130,7 @@ describe('Test Run', () => {
 				params: [{ id: tr1.getId() }],
 				callIndex: 1,
 			});
-		
+
 			expect(tr1.getDefaultTesterId()).toEqual(2);
 			expect(tr1.getDefaultTesterUsername()).toEqual('bob');
 		});
@@ -1146,29 +1138,29 @@ describe('Test Run', () => {
 		it('Can update TestRun Default Tester by User', async () => {
 			const tr1 = new TestRun(mockTestRun({
 				default_tester: 1,
-				default_tester__username: 'alice'
+				default_tester__username: 'alice',
 			}));
 			const changeVal: Partial<TestRunWriteValues> = {
-				default_tester: 2
+				default_tester: 2,
 			};
 			const updateVal = mockTestRun({
 				default_tester: 2,
-				default_tester__username: 'bob'
+				default_tester__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: mockTestRunUpdateResponse(changeVal)
+				result: mockTestRunUpdateResponse(changeVal),
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ updateVal ]
+				result: [updateVal],
 			}));
-		
+
 			expect(tr1.getDefaultTesterId()).toEqual(1);
 			expect(tr1.getDefaultTesterUsername()).toEqual('alice');
-		
+
 			const newTester = new User(mockUser({
 				id: 2,
-				username: 'bob'
+				username: 'bob',
 			}));
 			await tr1.setDefaultTester(newTester);
 			assertPostRequestData({
@@ -1183,7 +1175,7 @@ describe('Test Run', () => {
 				params: [{ id: tr1.getId() }],
 				callIndex: 1,
 			});
-		
+
 			expect(tr1.getDefaultTesterId()).toEqual(2);
 			expect(tr1.getDefaultTesterUsername()).toEqual('bob');
 		});
@@ -1195,14 +1187,14 @@ describe('Test Run', () => {
 				summary: 'Example Test Run',
 				plan: 4,
 				manager: 2,
-				build: 1
+				build: 1,
 			};
 			const createResponse = mockTestRunUpdateResponse({
 				id: 8,
 				summary: 'Example Test Run',
 				plan: 4,
 				manager: 2,
-				build: 1
+				build: 1,
 			});
 			const runVals = mockTestRun({
 				id: 8,
@@ -1210,14 +1202,14 @@ describe('Test Run', () => {
 				plan: 4,
 				plan__name: 'TestPlan 4',
 				manager: 2,
-				manager__username: 'bob'
+				manager__username: 'bob',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: createResponse
+				result: createResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ runVals ]
+				result: [runVals],
 			}));
 
 			const newRun = await TestRun.create(createVals);
@@ -1248,7 +1240,7 @@ describe('Test Run', () => {
 				manager: 2,
 				build: 1,
 				default_tester: 1,
-				notes: 'Custom description'
+				notes: 'Custom description',
 			};
 			const createResponse = mockTestRunUpdateResponse({
 				id: 8,
@@ -1257,7 +1249,7 @@ describe('Test Run', () => {
 				manager: 2,
 				build: 1,
 				default_tester: 1,
-				notes: 'Custom description'
+				notes: 'Custom description',
 			});
 			const runVals = mockTestRun({
 				id: 8,
@@ -1268,14 +1260,14 @@ describe('Test Run', () => {
 				manager__username: 'bob',
 				default_tester: 1,
 				default_tester__username: 'alice',
-				notes: 'Custom description'
+				notes: 'Custom description',
 			});
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: createResponse
+				result: createResponse,
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ runVals ]
+				result: [runVals],
 			}));
 
 			const newRun = await TestRun.create(createVals);
@@ -1316,18 +1308,18 @@ describe('Test Run', () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTestRunCaseListItem(
-						{ id: 1, execution_id: 8, summary: 'First Case' }
+						{ id: 1, execution_id: 8, summary: 'First Case' },
 					),
 					mockTestRunCaseListItem(
-						{ id: 2, execution_id: 9, summary: 'Second Case' }
+						{ id: 2, execution_id: 9, summary: 'Second Case' },
 					),
 					mockTestRunCaseListItem(
-						{ id: 30, execution_id: 10, summary: 'TC Thirty' }
+						{ id: 30, execution_id: 10, summary: 'TC Thirty' },
 					),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: testCaseValues
+				result: testCaseValues,
 			}));
 
 			const tests = await tr1.getTestCases();
@@ -1354,10 +1346,10 @@ describe('Test Run', () => {
 			const tr1 = new TestRun(mockTestRun({ id: 3 }));
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 
 			const tests = await tr1.getTestCases();
@@ -1382,31 +1374,31 @@ describe('Test Run', () => {
 			const tr1 = new TestRun(mockTestRun({ id: 3 }));
 			const executionValues = [
 				mockTestExecution(
-					{ id: 8, case: 1, case__summary: 'First Case' }
+					{ id: 8, case: 1, case__summary: 'First Case' },
 				),
 				mockTestExecution(
-					{ id: 9, case: 2, case__summary: 'Second Case' }
+					{ id: 9, case: 2, case__summary: 'Second Case' },
 				),
 				mockTestExecution(
-					{ id: 10, case: 30, case__summary: 'TC Thirty' }
+					{ id: 10, case: 30, case__summary: 'TC Thirty' },
 				),
 			];
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTestRunCaseListItem(
-						{ id: 1, execution_id: 8, summary: 'First Case' }
+						{ id: 1, execution_id: 8, summary: 'First Case' },
 					),
 					mockTestRunCaseListItem(
-						{ id: 2, execution_id: 9, summary: 'Second Case' }
+						{ id: 2, execution_id: 9, summary: 'Second Case' },
 					),
 					mockTestRunCaseListItem(
-						{ id: 30, execution_id: 10, summary: 'TC Thirty' }
+						{ id: 30, execution_id: 10, summary: 'TC Thirty' },
 					),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: executionValues
+				result: executionValues,
 			}));
 
 			const tests = await tr1.getTestExecutions();
@@ -1433,10 +1425,10 @@ describe('Test Run', () => {
 			const tr1 = new TestRun(mockTestRun({ id: 3 }));
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 
 			const tests = await tr1.getTestExecutions();
@@ -1464,8 +1456,8 @@ describe('Test Run', () => {
 				result: [mockTestExecutionCreateResponse({
 					case: 5,
 					run: 2,
-					id: 14
-				})]
+					id: 14,
+				})],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
@@ -1475,7 +1467,7 @@ describe('Test Run', () => {
 						case__summary: 'Test 5',
 						run: 2,
 					}),
-				]
+				],
 			}));
 
 			const executionList = await tr2.addTestCase(5);
@@ -1489,7 +1481,7 @@ describe('Test Run', () => {
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestExecution.filter',
-				params: [{ id__in: [ 14 ] }],
+				params: [{ id__in: [14] }],
 				callIndex: 1,
 			});
 
@@ -1504,15 +1496,15 @@ describe('Test Run', () => {
 			const tr2 = new TestRun(mockTestRun({ id: 2 }));
 			const tc5 = new TestCase(mockTestCase({
 				id: 5,
-				summary: 'Test 5'
+				summary: 'Test 5',
 			}));
 
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [mockTestExecutionCreateResponse({
 					case: 5,
 					run: 2,
-					id: 14
-				})]
+					id: 14,
+				})],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
@@ -1522,7 +1514,7 @@ describe('Test Run', () => {
 						case__summary: 'Test 5',
 						run: 2,
 					}),
-				]
+				],
 			}));
 
 			const executionList = await tr2.addTestCase(tc5);
@@ -1536,7 +1528,7 @@ describe('Test Run', () => {
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestExecution.filter',
-				params: [{ id__in: [ 14 ] }],
+				params: [{ id__in: [14] }],
 				callIndex: 1,
 			});
 
@@ -1556,36 +1548,36 @@ describe('Test Run', () => {
 						case: 5,
 						run: 2,
 						id: 14,
-						properties:[
+						properties: [
 							{
 								name: 'Foo',
-								value: 'Bar'
-							}
-						]
+								value: 'Bar',
+							},
+						],
 					}),
 					mockTestExecutionCreateResponse({
 						case: 5,
 						run: 2,
 						id: 15,
-						properties:[
+						properties: [
 							{
 								name: 'Foo',
-								value: 'Fizz'
-							}
-						]
+								value: 'Fizz',
+							},
+						],
 					}),
 					mockTestExecutionCreateResponse({
 						case: 5,
 						run: 2,
 						id: 16,
-						properties:[
+						properties: [
 							{
 								name: 'Foo',
-								value: 'Buzz'
-							}
-						]
+								value: 'Buzz',
+							},
+						],
 					}),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
@@ -1607,7 +1599,7 @@ describe('Test Run', () => {
 						case__summary: 'Test 5',
 						run: 2,
 					}),
-				]
+				],
 			}));
 
 			const executionList = await tr2.addTestCase(5);
@@ -1621,7 +1613,7 @@ describe('Test Run', () => {
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'TestExecution.filter',
-				params: [{ id__in: [ 14, 15, 16 ] }],
+				params: [{ id__in: [14, 15, 16] }],
 				callIndex: 1,
 			});
 
@@ -1668,28 +1660,28 @@ describe('Test Run', () => {
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 2, name: 'Tag2' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 2, name: 'Tag2' }),
 					mockTag({ id: 3, name: 'Tag3' }),
-				]
+				],
 			}));
 			await tr.addTag(tag2);
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 0,
 				method: 'TestRun.add_tag',
-				params: [1, 'ExampleTag2']
+				params: [1, 'ExampleTag2'],
 			});
 			await tr.addTag(tag3);
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 1,
 				method: 'TestRun.add_tag',
-				params: [1, 'ExampleTag3']
+				params: [1, 'ExampleTag3'],
 			});
 		});
 
@@ -1699,28 +1691,28 @@ describe('Test Run', () => {
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 2, name: 'Tag2' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 2, name: 'Tag2' }),
 					mockTag({ id: 3, name: 'Tag3' }),
-				]
+				],
 			}));
 			await tr.addTag('ExampleTag2');
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 0,
 				method: 'TestRun.add_tag',
-				params: [1, 'ExampleTag2']
+				params: [1, 'ExampleTag2'],
 			});
 			await tr.addTag('ExampleTag3');
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 1,
 				method: 'TestRun.add_tag',
-				params: [1, 'ExampleTag3']
+				params: [1, 'ExampleTag3'],
 			});
 		});
 
@@ -1729,25 +1721,25 @@ describe('Test Run', () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ id: 2, name: 'ExampleTag2' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 2, name: 'Tag2' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ id: 3, name: 'ExampleTag3' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 2, name: 'Tag2' }),
 					mockTag({ id: 3, name: 'Tag3' }),
-				]
+				],
 			}));
 
 			await tr.addTag(2);
@@ -1756,13 +1748,13 @@ describe('Test Run', () => {
 				mockPostRequest,
 				callIndex: 0,
 				method: 'Tag.filter',
-				params: [{ id__in: [ 2 ] }]
+				params: [{ id__in: [2] }],
 			});
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 1,
 				method: 'TestRun.add_tag',
-				params: [1, 'ExampleTag2']
+				params: [1, 'ExampleTag2'],
 			});
 
 			await tr.addTag(3);
@@ -1771,13 +1763,13 @@ describe('Test Run', () => {
 				mockPostRequest,
 				callIndex: 2,
 				method: 'Tag.filter',
-				params: [{ id__in: [ 3 ] }]
+				params: [{ id__in: [3] }],
 			});
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 3,
 				method: 'TestRun.add_tag',
-				params: [1, 'ExampleTag3']
+				params: [1, 'ExampleTag3'],
 			});
 		});
 
@@ -1789,26 +1781,26 @@ describe('Test Run', () => {
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 3, name: 'Tag3' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
-				]
+				],
 			}));
 			await tr.removeTag(tag2);
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 0,
 				method: 'TestRun.remove_tag',
-				params: [1, 'ExampleTag2']
+				params: [1, 'ExampleTag2'],
 			});
 			await tr.removeTag(tag3);
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 1,
 				method: 'TestRun.remove_tag',
-				params: [1, 'ExampleTag3']
+				params: [1, 'ExampleTag3'],
 			});
 		});
 
@@ -1818,26 +1810,26 @@ describe('Test Run', () => {
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 3, name: 'Tag3' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
-				]
+				],
 			}));
 			await tr.removeTag('ExampleTag2');
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 0,
 				method: 'TestRun.remove_tag',
-				params: [1, 'ExampleTag2']
+				params: [1, 'ExampleTag2'],
 			});
 			await tr.removeTag('ExampleTag3');
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 1,
 				method: 'TestRun.remove_tag',
-				params: [1, 'ExampleTag3']
+				params: [1, 'ExampleTag3'],
 			});
 		});
 
@@ -1846,23 +1838,23 @@ describe('Test Run', () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ id: 2, name: 'ExampleTag2' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
 					mockTag({ id: 3, name: 'Tag3' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
 				result: [
 					mockTagServerEntry({ id: 3, name: 'ExampleTag3' }),
-				]
+				],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
 				result: [
 					mockTag({ id: 1, name: 'Tag1' }),
-				]
+				],
 			}));
 
 			await tr.removeTag(2);
@@ -1871,13 +1863,13 @@ describe('Test Run', () => {
 				mockPostRequest,
 				callIndex: 0,
 				method: 'Tag.filter',
-				params: [{ id__in: [ 2 ] }]
+				params: [{ id__in: [2] }],
 			});
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 1,
 				method: 'TestRun.remove_tag',
-				params: [1, 'ExampleTag2']
+				params: [1, 'ExampleTag2'],
 			});
 
 			await tr.removeTag(3);
@@ -1886,13 +1878,13 @@ describe('Test Run', () => {
 				mockPostRequest,
 				callIndex: 2,
 				method: 'Tag.filter',
-				params: [{ id__in: [ 3 ] }]
+				params: [{ id__in: [3] }],
 			});
 			assertPostRequestData({
 				mockPostRequest,
 				callIndex: 3,
 				method: 'TestRun.remove_tag',
-				params: [1, 'ExampleTag3']
+				params: [1, 'ExampleTag3'],
 			});
 		});
 	});

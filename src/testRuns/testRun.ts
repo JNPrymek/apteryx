@@ -10,15 +10,9 @@ import TestPlan from '../testPlans/testPlan';
 import TimeUtils from '../utils/timeUtils';
 import TestExecution from './testExecution';
 import { TestExecutionCreateResponse } from './testExecution.type';
-import {
-	TestRunCaseEntry,
-	TestRunCreateValues,
-	TestRunUpdateResponse,
-	TestRunWriteValues
-} from './testRun.type';
+import { TestRunCaseEntry, TestRunCreateValues, TestRunUpdateResponse, TestRunWriteValues } from './testRun.type';
 
 export default class TestRun extends KiwiBaseItem {
-	
 	constructor(serializedValues: Record<string, unknown>) {
 		super(serializedValues);
 	}
@@ -221,21 +215,23 @@ export default class TestRun extends KiwiBaseItem {
 
 	public async getTestCases(): Promise<Array<TestCase>> {
 		const rawCaseList = (await KiwiConnector.sendRPCMethod(
-			'TestRun.get_cases', 
-			[ this.getId() ]
+			'TestRun.get_cases',
+			[this.getId()],
 		)) as Array<TestRunCaseEntry>;
 		const caseIdList: Array<number> = [];
-		rawCaseList.forEach( value => { caseIdList.push(value.id); });
+		rawCaseList.forEach(value => {
+			caseIdList.push(value.id);
+		});
 		return TestCase.getByIds(caseIdList);
 	}
 
 	public async getTestExecutions(): Promise<Array<TestExecution>> {
 		const rawCaseList = (await KiwiConnector.sendRPCMethod(
-			'TestRun.get_cases', 
-			[ this.getId() ]
+			'TestRun.get_cases',
+			[this.getId()],
 		)) as Array<TestRunCaseEntry>;
 		const executionIdList: Array<number> = [];
-		rawCaseList.forEach( value => {
+		rawCaseList.forEach(value => {
 			executionIdList.push(value.execution_id);
 		});
 		return TestExecution.getByIds(executionIdList);
@@ -244,39 +240,38 @@ export default class TestRun extends KiwiBaseItem {
 	public static async create(values: TestRunCreateValues): Promise<TestRun> {
 		const response = (await KiwiConnector.sendRPCMethod(
 			'TestRun.create',
-			[values]
+			[values],
 		)) as TestRunUpdateResponse;
 		return TestRun.getById(response.id);
 	}
 
 	public async serverUpdate(
-		updateVal: Partial<TestRunWriteValues>
+		updateVal: Partial<TestRunWriteValues>,
 	): Promise<void> {
 		await KiwiConnector.sendRPCMethod(
 			'TestRun.update',
 			[
 				this.getId(),
-				updateVal
-			]
+				updateVal,
+			],
 		);
 		await this.syncServerValues();
 	}
 
 	public async addTestCase(
-		testCase: number | TestCase
+		testCase: number | TestCase,
 	): Promise<Array<TestExecution>> {
-		const caseId: number = 
-			(typeof testCase === 'number') ? 
-				testCase : 
-				testCase.getId();
-		
+		const caseId: number = (typeof testCase === 'number')
+			? testCase
+			: testCase.getId();
+
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestRun.add_case',
-			[ this.getId(), caseId ]
+			[this.getId(), caseId],
 		);
 		const executionList = response as Array<TestExecutionCreateResponse>;
 		const executionIds: Array<number> = [];
-		executionList.forEach( item => {
+		executionList.forEach(item => {
 			executionIds.push(item.id);
 		});
 		return TestExecution.getByIds(executionIds);
@@ -286,7 +281,7 @@ export default class TestRun extends KiwiBaseItem {
 		const tagName = await Tag.resolveToTagName(tag);
 		await KiwiConnector.sendRPCMethod('TestRun.add_tag', [
 			this.getId(),
-			tagName
+			tagName,
 		]);
 	}
 
@@ -294,7 +289,7 @@ export default class TestRun extends KiwiBaseItem {
 		const tagName = await Tag.resolveToTagName(tag);
 		await KiwiConnector.sendRPCMethod('TestRun.remove_tag', [
 			this.getId(),
-			tagName
+			tagName,
 		]);
 	}
 
@@ -304,26 +299,25 @@ export default class TestRun extends KiwiBaseItem {
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
-	
+
 	// Kiwi Base
 	// --------------------------------
-	
+
 	public static async serverFilter(
-		filterObj: Record<string, unknown>
+		filterObj: Record<string, unknown>,
 	): Promise<Array<TestRun>> {
 		return await super.serverFilter(filterObj) as Array<TestRun>;
 	}
-	
+
 	public static async getByIds(
-		id: number | Array<number>
+		id: number | Array<number>,
 	): Promise<Array<TestRun>> {
 		return await super.getByIds(id) as Array<TestRun>;
 	}
-	
+
 	public static async getById(
-		id: number
+		id: number,
 	): Promise<TestRun> {
 		return await super.getById(id) as TestRun;
 	}
-	
 }

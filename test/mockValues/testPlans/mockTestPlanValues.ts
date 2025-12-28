@@ -1,25 +1,22 @@
-import { 
-	TestPlanUpdateResponse,
-	TestPlanValues
-} from '../../../src/testPlans/testPlan.type';
+import { TestPlanUpdateResponse, TestPlanValues } from '../../../src/testPlans/testPlan.type';
 import testPlanDefaults from './testPlan.json';
 
 export function mockTestPlan(
-	overrideValues?: Partial<TestPlanValues>
+	overrideValues?: Partial<TestPlanValues>,
 ): TestPlanValues {
 	return {
 		...testPlanDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
 import testPlanUpdateValDefaults from './testPlan_update.json';
 export function mockTestPlanUpdateResponse(
-	overrideValues?: Partial<TestPlanUpdateResponse>
+	overrideValues?: Partial<TestPlanUpdateResponse>,
 ): TestPlanUpdateResponse {
 	return {
 		...testPlanUpdateValDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
@@ -27,16 +24,16 @@ import { PlanTypeValues } from '../../../src/testPlans/planType.type';
 import planTypeDefaults from './planType.json';
 
 export function mockTestPlanType(
-	overrideValues?: Partial<PlanTypeValues>
+	overrideValues?: Partial<PlanTypeValues>,
 ): PlanTypeValues {
 	return {
 		...planTypeDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
 export function mockPlanType(
-	overrideValues?: Partial<PlanTypeValues>
+	overrideValues?: Partial<PlanTypeValues>,
 ): PlanTypeValues {
 	return mockTestPlanType(overrideValues);
 }

@@ -1,11 +1,8 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
 
-import Comment from './comment';
-import {
-	mockTestCaseComment,
-	mockTestExecutionComment
-} from '../../test/mockValues/comments/mockComment';
+import { mockTestCaseComment, mockTestExecutionComment } from '../../test/mockValues/comments/mockComment';
 import TimeUtils from '../utils/timeUtils';
+import Comment from './comment';
 
 describe('Comment', () => {
 	// Clear mock calls between tests - required to verify RPC calls
@@ -131,7 +128,7 @@ describe('Comment', () => {
 
 		it('Can get string representation of Comment object', () => {
 			expect(comment1.toString()).toEqual(
-				`Comment: ${JSON.stringify(comment1Vals)}`
+				`Comment: ${JSON.stringify(comment1Vals)}`,
 			);
 		});
 	});

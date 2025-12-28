@@ -6,7 +6,7 @@ export default class Category extends KiwiNamedItem {
 	constructor(serializedValues: Record<string, unknown>) {
 		super(serializedValues);
 	}
-	
+
 	public getProductId(): number {
 		return this.serialized.product as number;
 	}
@@ -14,13 +14,13 @@ export default class Category extends KiwiNamedItem {
 	public getDescription(): string {
 		return this.serialized.description as string;
 	}
-	
+
 	public async getProduct(): Promise<Product> {
 		return await Product.getById(this.getProductId());
 	}
 
 	public static async resolveCategoryId(
-		identifier: number | string | Category
+		identifier: number | string | Category,
 	): Promise<number> {
 		let result = 0;
 		if (typeof identifier === 'number') {
@@ -38,33 +38,33 @@ export default class Category extends KiwiNamedItem {
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
-	
+
 	// Kiwi Named
 	// --------------------------------
-	
+
 	public static async getByName(
-		name: string
+		name: string,
 	): Promise<Category> {
 		return await super.getByName(name) as Category;
 	}
-	
+
 	public static async serverFilter(
-		filterObj: Record<string, unknown>
+		filterObj: Record<string, unknown>,
 	): Promise<Array<Category>> {
 		return await super.serverFilter(filterObj) as Array<Category>;
 	}
-	
+
 	public static async getByIds(
-		id: number | Array<number>
+		id: number | Array<number>,
 	): Promise<Array<Category>> {
 		return await super.getByIds(id) as Array<Category>;
 	}
-	
+
 	public static async getById(
-		id: number
+		id: number,
 	): Promise<Category> {
 		return await super.getById(id) as Category;
 	}
-	
+
 	// ------------------------------------------------------------------------
 }

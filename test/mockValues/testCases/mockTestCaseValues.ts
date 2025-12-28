@@ -1,30 +1,27 @@
-import {
-	TestCaseUpdateResponseValues, 
-	TestCaseValues 
-} from '../../../src/testCases/testCase.type';
+import { TestCaseUpdateResponseValues, TestCaseValues } from '../../../src/testCases/testCase.type';
 import testCaseDefaults from './testCase.json';
 export function mockTestCase(
-	overrideValues?: Partial<TestCaseValues>
+	overrideValues?: Partial<TestCaseValues>,
 ): TestCaseValues {
 	return {
 		...testCaseDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
 import testCaseUpdateResponseValues from './testCase_update.json';
 export function mockTestCaseUpdateResponse(
-	overrideValues?: Partial<TestCaseUpdateResponseValues>
+	overrideValues?: Partial<TestCaseUpdateResponseValues>,
 ): TestCaseUpdateResponseValues {
 	return {
 		...testCaseUpdateResponseValues,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
 import { TestPlanAddCaseResponse } from '../../../src/testPlans/testPlan.type';
 export function mockTestPlanAddCaseResponse(
-	overrideValues?: Partial<TestPlanAddCaseResponse>
+	overrideValues?: Partial<TestPlanAddCaseResponse>,
 ): TestPlanAddCaseResponse {
 	const tcVals = mockTestCase();
 	return {
@@ -47,41 +44,37 @@ export function mockTestPlanAddCaseResponse(
 		reviewer: tcVals.reviewer,
 		create_date: tcVals.create_date,
 		sortkey: 10,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
-import { TestCaseStatusValues } 
-	from '../../../src/testCases/testCaseStatus.type';
+import { TestCaseStatusValues } from '../../../src/testCases/testCaseStatus.type';
 import testCaseStatusDefaults from './testCaseStatus.json';
 export function mockTestCaseStatus(
-	overrideValues?: Partial<TestCaseStatusValues>
+	overrideValues?: Partial<TestCaseStatusValues>,
 ): TestCaseStatusValues {
 	return {
 		...testCaseStatusDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
-import { CategoryValues } 
-	from '../../../src/testCases/category.type';
+import { CategoryValues } from '../../../src/testCases/category.type';
 import categoryDefaults from './category.json';
 
 export function mockCategory(
-	overrideValues?: Partial<CategoryValues>
+	overrideValues?: Partial<CategoryValues>,
 ): CategoryValues {
 	return {
 		...categoryDefaults,
-		...overrideValues
+		...overrideValues,
 	};
 }
 
-import {
-	TestCasePropertyValues
-} from '../../../src/testCases/testCaseProperty.type';
+import { TestCasePropertyValues } from '../../../src/testCases/testCaseProperty.type';
 import testCasePropertyDefaults from './testCaseProperty.json';
 export function mockTestCaseProperty(
-	overrideValues?: Partial<TestCasePropertyValues>
+	overrideValues?: Partial<TestCasePropertyValues>,
 ): TestCasePropertyValues {
 	return {
 		...testCasePropertyDefaults,

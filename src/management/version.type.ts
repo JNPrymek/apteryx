@@ -3,4 +3,4 @@ export type VersionValues = {
 	value: string;
 	product: number;
 	product__name: string;
-}
+};

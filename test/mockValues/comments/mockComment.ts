@@ -1,9 +1,8 @@
-
 import { CommentValues } from '../../../src/comments/comment.type';
 
 import CommentTestCaseDefault from './comment_testCase.json';
 export function mockTestCaseComment(
-	overrideValues?: Partial<CommentValues>
+	overrideValues?: Partial<CommentValues>,
 ): CommentValues {
 	return {
 		...CommentTestCaseDefault,
@@ -13,7 +12,7 @@ export function mockTestCaseComment(
 
 import CommentTestExeDefault from './comment_testExecution.json';
 export function mockTestExecutionComment(
-	overrideValues?: Partial<CommentValues>
+	overrideValues?: Partial<CommentValues>,
 ): CommentValues {
 	return {
 		...CommentTestExeDefault,

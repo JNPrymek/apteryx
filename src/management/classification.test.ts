@@ -1,28 +1,25 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from '@jest/globals';
+import { mockClassification } from '../../test/mockKiwiValues';
+import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
+import RequestHandler from '../core/requestHandler';
 import Classification from './classification';
 import { ClassificationValues } from './classification.type';
-import { mockClassification } from '../../test/mockKiwiValues';
-import RequestHandler from '../core/requestHandler';
-import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('Classification', () => {
-	
 	const class1Vals: ClassificationValues = mockClassification();
-	const class2Vals: ClassificationValues = mockClassification({ 
-		id: 2, 
-		name: 'Mobile App' 
+	const class2Vals: ClassificationValues = mockClassification({
+		id: 2,
+		name: 'Mobile App',
 	});
-	
+
 	it('Can instantiate a Classification', () => {
 		const class1 = new Classification(class1Vals);
 		const class2 = new Classification(class2Vals);
-		
+
 		expect(class1['serialized']).toEqual(class1Vals);
 		expect(class2['serialized']).toEqual(class2Vals);
 	});
@@ -45,24 +42,24 @@ describe('Classification', () => {
 	describe('Server Lookups', () => {
 		it('Can get Classification by ID', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [class1Vals]
-			}));mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [class2Vals]
+				result: [class1Vals],
 			}));
-			
+			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
+				result: [class2Vals],
+			}));
+
 			const class1 = await Classification.getById(1);
 			const class2 = await Classification.getById(2);
 			expect(class1['serialized']).toEqual(class1Vals);
 			expect(class2['serialized']).toEqual(class2Vals);
 		});
-		
+
 		it('Can get Classification by Name', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [class1Vals]
+				result: [class1Vals],
 			}));
 			const class1 = await Classification.getByName('Website');
 			expect(class1['serialized']).toEqual(class1Vals);
 		});
 	});
-	
 });

@@ -21,21 +21,21 @@ export default class Environment extends KiwiNamedItem {
 		const props = await this.getProperties();
 		// Use a Set to de-dupe properties with multiple values
 		const resultSet: Set<string> = new Set();
-		props.forEach( prop => {
+		props.forEach(prop => {
 			resultSet.add(prop.getName());
 		});
 		return Array.from<string>(resultSet);
 	}
 
 	public async getPropertyValues(
-		propertyName: string
+		propertyName: string,
 	): Promise<Array<string>> {
 		const props = await EnvironmentProperty.serverFilter({
 			environment: this.getId(),
 			name: propertyName,
 		});
 		const results: Array<string> = [];
-		props.forEach( prop => {
+		props.forEach(prop => {
 			results.push(prop.getValue());
 		});
 		return results;
@@ -43,73 +43,73 @@ export default class Environment extends KiwiNamedItem {
 
 	public async addProperty(
 		propertyName: string,
-		propertyValue: string
+		propertyValue: string,
 	): Promise<EnvironmentProperty> {
 		const result = await KiwiConnector.sendRPCMethod(
 			'Environment.add_property',
 			[
 				this.getId(),
 				propertyName,
-				propertyValue
-			]
+				propertyValue,
+			],
 		);
 		return new EnvironmentProperty(result as EnvironmentPropertyValues);
 	}
 
 	public async removeProperty(
 		propertyName: string,
-		propertyValue?: string
+		propertyValue?: string,
 	): Promise<void> {
 		const paramObj = {
 			environment: this.getId(),
 			name: propertyName,
-			value: propertyValue
+			value: propertyValue,
 		};
-		if(!propertyValue){
+		if (!propertyValue) {
 			delete paramObj.value;
 		}
 		await KiwiConnector.sendRPCMethod(
 			'Environment.remove_property',
-			[paramObj]
+			[paramObj],
 		);
 	}
 
 	public static async create(
-		envInfo: EnvironmentWriteValues
+		envInfo: EnvironmentWriteValues,
 	): Promise<Environment> {
 		const results = await KiwiConnector.sendRPCMethod(
 			'Environment.create',
-			[ envInfo ]
+			[envInfo],
 		);
 		return new Environment(results as EnvironmentValues);
 	}
 
 	// Inherited methods
 	// ------------------------------------------------------------------------
-	
+
 	// Kiwi Named
 	// --------------------------------
-	
+
 	public static async getByName(
-		name: string
+		name: string,
 	): Promise<Environment> {
 		return await super.getByName(name) as Environment;
 	}
-	
+
 	public static async serverFilter(
-		filterObj: Partial<EnvironmentValues>
+		filterObj: Partial<EnvironmentValues>,
 	): Promise<Array<Environment>> {
 		return await super.serverFilter(filterObj) as Array<Environment>;
 	}
-	
+
 	public static async getByIds(
-		id: number | Array<number>
+		id: number | Array<number>,
 	): Promise<Array<Environment>> {
 		return await super.getByIds(id) as Array<Environment>;
 	}
-	
+
 	public static async getById(
-		id: number
+		id: number,
 	): Promise<Environment> {
 		return await super.getById(id) as Environment;
 	}

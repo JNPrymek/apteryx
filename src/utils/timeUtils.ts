@@ -1,11 +1,9 @@
-
 export default class TimeUtils {
-	
-	public static serverStringToDate(rawString: string) : Date {
+	public static serverStringToDate(rawString: string): Date {
 		return new Date(`${rawString}Z`);
 	}
 
-	public static dateToServerString(rawDate: Date) : string {
+	public static dateToServerString(rawDate: Date): string {
 		const year = rawDate.getUTCFullYear();
 		const day = (rawDate.getUTCDate())
 			.toString()
@@ -34,14 +32,14 @@ export default class TimeUtils {
 	 * @returns Duration represented in `h:mm:ss` format string
 	 */
 	public static secondsToTimeString(
-		totalSeconds: number | undefined | null
+		totalSeconds: number | undefined | null,
 	): string {
 		if (!totalSeconds) return '0:00:00';
 		const hours = Math.floor(totalSeconds / 3600);
 		const remainder = totalSeconds % 3600;
 		const min = Math.floor(remainder / 60);
 		const sec = remainder % 60;
-		 
+
 		return `${hours}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 	}
 }

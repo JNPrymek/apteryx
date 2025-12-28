@@ -7,12 +7,12 @@ export default function mockRpcNetworkResponse(
 		result?: RpcResult;
 		error?: { code: number; message: string; };
 	},
-	setCookies?: Array<string>
+	setCookies?: Array<string>,
 ): NetworkResponse {
 	let setCookieHeaderString = '';
 
 	if (setCookies) {
-		setCookieHeaderString = setCookies.map( val => {
+		setCookieHeaderString = setCookies.map(val => {
 			return `${val}; domain=${kiwiTestServerInfo.hostName}; path=/`;
 		}).join(', ');
 	}
@@ -25,7 +25,7 @@ export default function mockRpcNetworkResponse(
 		: {
 			'content-type': 'application/json',
 		};
-	
+
 	const response: NetworkResponse = {
 		status: 200, // RPC errors still return 200 OK status
 		statusText: 'OK',
@@ -38,4 +38,4 @@ export default function mockRpcNetworkResponse(
 	};
 
 	return response;
-};
+}

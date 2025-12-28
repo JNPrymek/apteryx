@@ -1,25 +1,20 @@
-import { describe, it, expect } from '@jest/globals';
-import User from './user';
+import { describe, expect, it } from '@jest/globals';
 import { mockUser } from '../../test/mockKiwiValues';
-import RequestHandler from '../core/requestHandler';
+import { assertPostRequestData } from '../../test/networkMocks/assertPostRequestData';
 import mockRpcNetworkResponse from '../../test/networkMocks/mockPostResponse';
-import {
-	assertPostRequestData
-} from '../../test/networkMocks/assertPostRequestData';
+import RequestHandler from '../core/requestHandler';
+import User from './user';
 
 // Mock RequestHandler
 jest.mock('../core/requestHandler');
-const mockPostRequest =
-	RequestHandler.sendPostRequest as
-	jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
+const mockPostRequest = RequestHandler.sendPostRequest as jest.MockedFunction<typeof RequestHandler.sendPostRequest>;
 
 describe('User', () => {
-
 	// Clear mock calls between tests - required to verify RPC calls
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
-	
+
 	const user1Vals = mockUser();
 	const user2Vals = mockUser({
 		id: 2,
@@ -31,12 +26,12 @@ describe('User', () => {
 		is_staff: false,
 		is_superuser: false,
 	});
-	
+
 	it('Can instantiate a User object', () => {
 		expect(new User(user1Vals)).toBeInstanceOf(User);
 		expect(new User(user1Vals)).toHaveProperty(
 			'serialized',
-			user1Vals
+			user1Vals,
 		);
 		expect(new User(user2Vals))
 			.toHaveProperty('serialized', user2Vals);
@@ -90,7 +85,7 @@ describe('User', () => {
 	describe('Server Functions', () => {
 		it('Can get a User via single ID', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [user1Vals]
+				result: [user1Vals],
 			}));
 
 			expect(await User.getById(1)).toEqual(new User(user1Vals));
@@ -98,12 +93,12 @@ describe('User', () => {
 
 		it('Can get Users via a list of IDs', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [user1Vals, user2Vals]
+				result: [user1Vals, user2Vals],
 			}));
 
 			const expectResults = [
 				new User(user1Vals),
-				new User(user2Vals)
+				new User(user2Vals),
 			];
 
 			expect(await User.getByIds([1, 2]))
@@ -112,10 +107,10 @@ describe('User', () => {
 
 		it('Can get a User by their username', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user1Vals]
+				result: [user1Vals],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [user2Vals]
+				result: [user2Vals],
 			}));
 
 			expect(await User.getByUsername('alice'))
@@ -127,10 +122,10 @@ describe('User', () => {
 
 		it('Can get a User by their name', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [user1Vals]
+				result: [user1Vals],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [user2Vals]
+				result: [user2Vals],
 			}));
 
 			expect(await User.getByName('alice'))
@@ -142,12 +137,12 @@ describe('User', () => {
 
 		it('Throws error when getting User with invalid username', async () => {
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: []
+				result: [],
 			}));
 
 			expect(User.getByUsername('charlie'))
 				.rejects.toThrow(
-					'User with username "charlie" could not be found.'
+					'User with username "charlie" could not be found.',
 				);
 		});
 
@@ -166,10 +161,10 @@ describe('User', () => {
 
 		it('Can resolve ID from username', async () => {
 			mockPostRequest.mockResolvedValueOnce(mockRpcNetworkResponse({
-				result: [ user1Vals ]
+				result: [user1Vals],
 			}));
 			mockPostRequest.mockResolvedValue(mockRpcNetworkResponse({
-				result: [ user2Vals ]
+				result: [user2Vals],
 			}));
 
 			expect(await User.resolveUserId('alice')).toEqual(1);
@@ -177,12 +172,12 @@ describe('User', () => {
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'User.filter',
-				params: [ { username: 'alice' }],
+				params: [{ username: 'alice' }],
 			});
 			assertPostRequestData({
 				mockPostRequest,
 				method: 'User.filter',
-				params: [ { username: 'bob' }],
+				params: [{ username: 'bob' }],
 				callIndex: 1,
 			});
 		});

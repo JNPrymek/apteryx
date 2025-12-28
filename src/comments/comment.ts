@@ -2,9 +2,8 @@ import TimeUtils from '../utils/timeUtils';
 import { CommentValues } from './comment.type';
 
 export default class Comment {
-
 	protected serialized: CommentValues;
-	
+
 	constructor(serializedValues: CommentValues) {
 		this.serialized = serializedValues;
 	}
@@ -42,7 +41,7 @@ export default class Comment {
 		if (this.serialized.content_type === 17) return 'TestCase';
 		if (this.serialized.content_type_id === 36) return 'TestExecution';
 		throw new Error(
-			`Unknown commentable content type for comment ${this.getId()}`
+			`Unknown commentable content type for comment ${this.getId()}`,
 		);
 	}
 

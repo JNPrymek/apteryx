@@ -1,27 +1,25 @@
-
-import fetch from 'node-fetch';
 import debug from 'debug';
-import { CookieJar, Cookie } from 'tough-cookie';
+import fetch from 'node-fetch';
+import { Cookie, CookieJar } from 'tough-cookie';
 import { NetworkResponse } from './networkTypes';
 
 /**
  * Utility Class to handle HTTP requests and manage Cookies
  */
 export default class RequestHandler {
-
 	// Debug logger
 	private static debugNetworkRequest = debug('apteryx:network');
 	private static debugCookieProcess = debug('apteryx:network:cookie');
 	// Create Cookie Jar
 	static cookieJar = new CookieJar();
-	
+
 	/**
 	 * Deletes ALL cookies stored
 	 */
 	static async clearCookieJar(): Promise<void> {
 		await this.cookieJar.removeAllCookies();
 	}
-	
+
 	/**
 	 * Sends a HTTP POST request, using cookies from the jar.
 	 * @param url URL the POST request is sent to
@@ -30,20 +28,20 @@ export default class RequestHandler {
 	 * @returns An HTTP Response Object
 	 */
 	static async sendPostRequest(
-		url: string, 
-		body: Record<string, unknown>, 
+		url: string,
+		body: Record<string, unknown>,
 		headers: Record<string, string> = {
 			'Content-Type': 'application/json',
-			'User-Agent': 'Node-Fetch'
-		}
+			'User-Agent': 'Node-Fetch',
+		},
 	): Promise<NetworkResponse> {
 		// Add cookies to request headers
 		const sendHeaders = await this.appendCookiesToHeader(url, headers);
-		
+
 		this.debugNetworkRequest(
 			'Sending POST request to %s with body: %o',
 			url,
-			this.getSafeBodyForLogging(body)
+			this.getSafeBodyForLogging(body),
 		);
 		// Send POST request
 		const response = await fetch(url, {
@@ -51,7 +49,7 @@ export default class RequestHandler {
 			body: JSON.stringify(body),
 			headers: sendHeaders,
 		});
-		
+
 		// Save new/edited cookies to jar
 		await this.saveCookiesFromHeader(url, response.headers.raw());
 
@@ -65,11 +63,11 @@ export default class RequestHandler {
 			headers: Object.fromEntries(response.headers),
 			body: responseBody,
 		};
-		
+
 		// Return results
 		return result;
 	}
-	
+
 	/**
 	 * Append cookies from cookie jar to a HTTP request's Header object
 	 * @param url URL to send the HTTP request is going to
@@ -77,31 +75,31 @@ export default class RequestHandler {
 	 * @returns A copy of the Headers object, with 'Cookie' header
 	 */
 	static async appendCookiesToHeader(
-		url: string, 
-		headers: Record<string, string>
+		url: string,
+		headers: Record<string, string>,
 	): Promise<Record<string, string>> {
 		const cookieHeader = await this.cookieJar.getCookieString(url);
 		if (cookieHeader) {
-			return { ...headers, Cookie:  cookieHeader };
+			return { ...headers, Cookie: cookieHeader };
 		}
 		return headers;
 	}
-	
+
 	/**
 	 * Save cookies from HTTP response to cookie jar
 	 * @param url URL that the Request went to
 	 * @param headers Headers object of the request's response
 	 */
 	static async saveCookiesFromHeader(
-		url: string, 
+		url: string,
 		headers: Record<string, unknown>,
 	): Promise<void> {
 		const setCookieHeader = headers['set-cookie'];
 		this.debugCookieProcess(
 			'Processing Set-Cookie header(s): %O',
-			setCookieHeader
+			setCookieHeader,
 		);
-		
+
 		// Set single cookie to jar
 		if (typeof setCookieHeader === 'string') {
 			const cookie = Cookie.parse(setCookieHeader);
@@ -113,21 +111,21 @@ export default class RequestHandler {
 				const cookie = Cookie.parse(cookieString);
 				if (cookie) {
 					await this.cookieJar.setCookie(cookie, url);
-				};
+				}
 			}
 		} else {
 			this.debugCookieProcess(
 				'Set-Cookie header in unrecognized format: %O',
-				setCookieHeader
+				setCookieHeader,
 			);
 		}
 	}
 
 	private static getSafeBodyForLogging(
-		body: Record<string, unknown>
+		body: Record<string, unknown>,
 	): string {
 		if (body.method === 'Auth.login') {
-			const safeBody = { ... body };
+			const safeBody = { ...body };
 			safeBody.params = ['USERNAME_REDACTED', 'PASSWORD_REDACTED'];
 			return JSON.stringify(safeBody);
 		} else {

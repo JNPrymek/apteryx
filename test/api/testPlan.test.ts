@@ -1,27 +1,26 @@
-import { describe, it, before } from 'mocha';
 import { expect } from 'chai';
+import { before, describe, it } from 'mocha';
 import KiwiConnector from '../../src/core/kiwiConnector';
 import { kiwiTestServerInfo } from '../testServerDetails';
 
 const dateRegex = /\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(.\d{3})?/;
 
 describe('Kiwi RPC API - TestPlan', () => {
-
 	before(async () => {
 		KiwiConnector.init(kiwiTestServerInfo);
 		await KiwiConnector.login(
 			kiwiTestServerInfo.username,
-			kiwiTestServerInfo.password
+			kiwiTestServerInfo.password,
 		);
 	});
 
 	it('TestPlan.filter returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestPlan.filter',
-			[{ id: 1 }]
+			[{ id: 1 }],
 		);
 		expect(response).to.be.an('array');
-		const arr = (response as Array<Record<string, unknown>>);
+		const arr = response as Array<Record<string, unknown>>;
 		expect(arr.length).to.be.equal(1);
 		const item = arr[0];
 		expect(item).to.be.an('object').that.has.all.keys(
@@ -40,7 +39,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 			'type',
 			'type__name',
 			'parent',
-			'children__count'
+			'children__count',
 		);
 
 		expect(item.id).to.be.a('number').that.equals(1);
@@ -49,8 +48,8 @@ describe('Kiwi RPC API - TestPlan', () => {
 		expect(item.create_date).to.be.a('string').that.matches(dateRegex);
 		expect(item.is_active).to.be.a('boolean');
 		expect(
-			(item.extra_link === null) ||
-			(typeof item.extra_link === 'string')
+			(item.extra_link === null)
+				|| (typeof item.extra_link === 'string'),
 		).to.be.true;
 		expect(item.product_version).to.be.a('number');
 		expect(item.product_version__value).to.be.a('string');
@@ -61,8 +60,8 @@ describe('Kiwi RPC API - TestPlan', () => {
 		expect(item.type).to.be.a('number');
 		expect(item.type__name).to.be.a('string');
 		expect(
-			(item.parent === null) ||
-			(typeof item.parent === 'number')
+			(item.parent === null)
+				|| (typeof item.parent === 'number'),
 		).to.be.true;
 		expect(item.children__count).to.be.a('number');
 	});
@@ -74,11 +73,11 @@ describe('Kiwi RPC API - TestPlan', () => {
 				product: 1,
 				product_version: 1,
 				type: 1,
-				name: 'API integration test - example TestPlan'
-			}]
+				name: 'API integration test - example TestPlan',
+			}],
 		);
 		expect(response).to.be.an('object');
-		const item = (response as Record<string, undefined>);
+		const item = response as Record<string, undefined>;
 		expect(item).to.be.an('object').that.has.all.keys(
 			'id',
 			'name',
@@ -90,7 +89,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 			'product',
 			'author',
 			'type',
-			'parent'
+			'parent',
 		);
 
 		expect(item.id).to.be.a('number').that.is.greaterThanOrEqual(1);
@@ -99,32 +98,32 @@ describe('Kiwi RPC API - TestPlan', () => {
 		expect(item.create_date).to.be.a('string').that.matches(dateRegex);
 		expect(item.is_active).to.be.a('boolean');
 		expect(
-			(item.extra_link === null) ||
-			(typeof item.extra_link === 'string')
+			(item.extra_link === null)
+				|| (typeof item.extra_link === 'string'),
 		).to.be.true;
 		expect(item.product_version).to.be.a('number');
 		expect(item.product).to.be.a('number');
 		expect(item.author).to.be.a('number');
 		expect(item.type).to.be.a('number');
 		expect(
-			(item.parent === null) ||
-			(typeof item.parent === 'number')
+			(item.parent === null)
+				|| (typeof item.parent === 'number'),
 		).to.be.true;
 	});
 
 	it('TestPlan.update returns expected type', async () => {
 		const orig = await KiwiConnector.sendRPCMethod(
 			'TestPlan.filter',
-			[{ id: 1 }]
+			[{ id: 1 }],
 		);
-		const tp1 = (orig as Record<string, unknown>);
+		const tp1 = orig as Record<string, unknown>;
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestPlan.update',
-			[1, { name: tp1.name }]
+			[1, { name: tp1.name }],
 		);
 		expect(response).to.be.an('object');
-		const item = (response as Record<string, unknown>);
-		
+		const item = response as Record<string, unknown>;
+
 		expect(item).to.be.an('object').that.has.all.keys(
 			'id',
 			'name',
@@ -136,7 +135,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 			'product',
 			'author',
 			'type',
-			'parent'
+			'parent',
 		);
 
 		expect(item.id).to.be.a('number').that.equals(1);
@@ -145,16 +144,16 @@ describe('Kiwi RPC API - TestPlan', () => {
 		expect(item.create_date).to.be.a('string').that.matches(dateRegex);
 		expect(item.is_active).to.be.a('boolean');
 		expect(
-			(item.extra_link === null) ||
-			(typeof item.extra_link === 'string')
+			(item.extra_link === null)
+				|| (typeof item.extra_link === 'string'),
 		).to.be.true;
 		expect(item.product_version).to.be.a('number');
 		expect(item.product).to.be.a('number');
 		expect(item.author).to.be.a('number');
 		expect(item.type).to.be.a('number');
 		expect(
-			(item.parent === null) ||
-			(typeof item.parent === 'number')
+			(item.parent === null)
+				|| (typeof item.parent === 'number'),
 		).to.be.true;
 	});
 
@@ -162,11 +161,11 @@ describe('Kiwi RPC API - TestPlan', () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestPlan.add_case',
 			// plan 1, case 2
-			[1, 2]
+			[1, 2],
 		);
 		expect(response).to.be.an('object');
-		const item = (response as Record<string, unknown>);
-		
+		const item = response as Record<string, unknown>;
+
 		expect(item).to.be.an('object').that.has.all.keys(
 			'id',
 			'create_date',
@@ -186,7 +185,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 			'reviewer',
 			'setup_duration',
 			'testing_duration',
-			'sortkey'
+			'sortkey',
 		);
 
 		expect(item.id).to.be.a('number').that.equals(2);
@@ -195,13 +194,13 @@ describe('Kiwi RPC API - TestPlan', () => {
 		expect(item.script).to.be.a('string');
 		expect(item.arguments).to.be.a('string');
 		expect(
-			(item.extra_link === null) ||
-			(typeof item.extra_link === 'string')
+			(item.extra_link === null)
+				|| (typeof item.extra_link === 'string'),
 		).to.be.true;
 		expect(item.summary).to.be.a('string');
 		expect(
-			(item.requirement === null) ||
-			(typeof item.requirement === 'string')
+			(item.requirement === null)
+				|| (typeof item.requirement === 'string'),
 		).to.be.true;
 		expect(item.notes).to.be.a('string');
 		expect(item.text).to.be.a('string');
@@ -210,16 +209,16 @@ describe('Kiwi RPC API - TestPlan', () => {
 		expect(item.priority).to.be.a('number');
 		expect(item.author).to.be.a('number');
 		expect(
-			(item.default_tester === null) ||
-			(typeof item.default_tester === 'number')
+			(item.default_tester === null)
+				|| (typeof item.default_tester === 'number'),
 		).to.be.true;
 		expect(
-			(item.setup_duration === null) ||
-			(typeof item.setup_duration === 'number')
+			(item.setup_duration === null)
+				|| (typeof item.setup_duration === 'number'),
 		).to.be.true;
 		expect(
-			(item.testing_duration === null) ||
-			(typeof item.testing_duration === 'number')
+			(item.testing_duration === null)
+				|| (typeof item.testing_duration === 'number'),
 		).to.be.true;
 		expect(item.sortkey).to.be.a('number').that.is.greaterThanOrEqual(0);
 	});
@@ -229,7 +228,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 		const planId = 2;
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestPlan.remove_case',
-			[planId, caseId]
+			[planId, caseId],
 		);
 		expect(response).to.be.null;
 	});
@@ -239,7 +238,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 		const planId = 2;
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestPlan.update_case_order',
-			[planId, caseId, 50]
+			[planId, caseId, 50],
 		);
 		expect(response).to.be.null;
 	});
@@ -247,7 +246,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 	it('TestPlan.add_tag returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestPlan.add_tag',
-			[1, 'Tag1']
+			[1, 'Tag1'],
 		);
 		expect(response).to.be.null;
 	});
@@ -255,7 +254,7 @@ describe('Kiwi RPC API - TestPlan', () => {
 	it('TestPlan.remove_tag returns expected type', async () => {
 		const response = await KiwiConnector.sendRPCMethod(
 			'TestPlan.remove_tag',
-			[1, 'Tag1']
+			[1, 'Tag1'],
 		);
 		expect(response).to.be.null;
 	});
